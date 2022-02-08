@@ -1,0 +1,171 @@
+{
+    "info": {
+        "title": "http://shipping.sock-shop - refael up9-demo-link all",
+        "version": "0.0.125"
+    },
+    "servers": [
+        {
+            "url": "http://shipping.sock-shop",
+            "description": "refael up9-demo-link all"
+        }
+    ],
+    "openapi": "3.1.0",
+    "paths": {
+        "/shipping": {
+            "parameters": [],
+            "post": {
+                "operationId": "91e31f26-8835-4135-8715-044b643ed59f",
+                "parameters": [
+                    {
+                        "examples": {
+                            "accept": {
+                                "summary": "accept",
+                                "value": "aplication/json"
+                            }
+                        },
+                        "in": "header",
+                        "name": "accept",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "examples": {
+                            "xx-b3-parentspanid": {
+                                "summary": "x-b3-parentspanid",
+                                "value": "5986ccf0f3a47140"
+                            },
+                            "x-b3-parentspanid": {
+                                "summary": "x-b3-parentspanid",
+                                "value": "2caa4ced9d7fd9d9"
+                            }
+                        },
+                        "in": "header",
+                        "name": "x-b3-parentspanid",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "examples": {
+                            "x-b3-sampled": {
+                                "summary": "x-b3-sampled",
+                                "value": "1"
+                            }
+                        },
+                        "in": "header",
+                        "name": "x-b3-sampled",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "examples": {
+                            "x-b3-spanid": {
+                                "summary": "x-b3-spanid",
+                                "value": "54f10184631b094e"
+                            },
+                            "x-b3-spanid2": {
+                                "summary": "x-b3-spanid",
+                                "value": "9c409f17b716f69f"
+                            }
+                        },
+                        "in": "header",
+                        "name": "x-b3-spanid",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "examples": {
+                            "x-b3-traceid": {
+                                "summary": "x-b3-traceid",
+                                "value": "4a1bdbc562d9e78f"
+                            },
+                            "x-b3-traceid2": {
+                                "summary": "x-b3-traceid",
+                                "value": "1a7016ef43c58069"
+                            }
+                        },
+                        "in": "header",
+                        "name": "x-b3-traceid",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "examples": {
+                            "x-span-name": {
+                                "summary": "x-span-name",
+                                "value": "http:/shipping"
+                            }
+                        },
+                        "in": "header",
+                        "name": "x-span-name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name"
+                                ],
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "id": "07141703-ebdc-4457-aa20-fd76f7f38621",
+                                    "name": "57a98d98e4b00679b4a830b2"
+                                },
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "name"
+                                    ],
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "description": "Created"
+                    }
+                },
+                "summary": "Seen 463 requests"
+            }
+        }
+    },
+    "tags": []
+}

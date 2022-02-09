@@ -21,5 +21,5 @@ OAS 3.1 Validation and Diff Tool
     ````
 - Diff
     ````
-    ./build/oasdiff diff --file test/shipping_valid.json --file2 test/shipping_invalid.json
+    ./build/oasdiff diff --file test/simple.json --file2 test/simple2.json
     ````

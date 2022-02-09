@@ -14,6 +14,7 @@ import (
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	"github.com/tidwall/gjson"
 	"github.com/up9inc/oas-diff/console"
+	"github.com/up9inc/oas-diff/model"
 	"github.com/urfave/cli/v2"
 )
 
@@ -51,7 +52,7 @@ func getJsonPathData(jsonData []byte, path string) (result []byte, err error) {
 	return result, nil
 }
 
-func validate(filePath string) (*[]byte, error) {
+func validate(filePath string) ([]byte, error) {
 	compiler := jsonschema.NewCompiler()
 	compiler.Draft = jsonschema.Draft2020
 	//sch, err := compiler.Compile(OAS_SCHEMA_URL)
@@ -62,15 +63,15 @@ func validate(filePath string) (*[]byte, error) {
 
 	jsonData, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return &jsonData, err
+		return nil, err
 	}
 
 	var v interface{}
 	if err := json.Unmarshal(jsonData, &v); err != nil {
-		return &jsonData, err
+		return nil, err
 	}
 
-	return &jsonData, sch.Validate(v)
+	return jsonData, sch.Validate(v)
 }
 
 func validateCommand(c *cli.Context) error {
@@ -117,8 +118,38 @@ func diffCommand(c *cli.Context) error {
 		return fmt.Errorf("%s is not a valid 3.1 OAS file", filePath2)
 	}
 
-	fmt.Println(len(*fileData))
-	fmt.Println(len(*fileData2))
+	fmt.Println(len(fileData))
+	fmt.Println(len(fileData2))
+
+	// file 1
+	infoData, err := getJsonPathData(fileData, OAS_INFO_KEY)
+	if err != nil {
+		return err
+	}
+
+	var infoModel model.Info
+	err = json.Unmarshal(infoData, &infoModel)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("info1: %s\n", string(infoData))
+	fmt.Println(infoModel)
+
+	// file 2
+	infoData2, err := getJsonPathData(fileData2, OAS_INFO_KEY)
+	if err != nil {
+		return err
+	}
+
+	var infoModel2 model.Info
+	err = json.Unmarshal(infoData2, &infoModel2)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("info2: %s\n", string(infoData2))
+	fmt.Println(infoModel2)
 
 	return nil
 }

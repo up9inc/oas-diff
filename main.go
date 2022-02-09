@@ -6,11 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"sort"
+	"strings"
 
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	"github.com/tidwall/gjson"
-	"github.com/up9inc/oas-diff/model"
+	"github.com/up9inc/oas-diff/console"
+	"github.com/urfave/cli/v2"
 )
 
 const (
@@ -19,6 +23,15 @@ const (
 	OAS_SERVERS_KEY  = "servers"
 	OAS_PATHS_KEY    = "paths"
 	OAS_WEBHOOKS_KEY = "webhooks"
+)
+
+var (
+	PathFlag = &cli.StringFlag{
+		Name:     "path",
+		Aliases:  []string{"p"},
+		Usage:    "Path of the OAS 3.1 file",
+		Required: true,
+	}
 )
 
 func isSliceOfUniqueItems(xs []interface{}) bool {
@@ -44,73 +57,71 @@ func getJsonPathData(jsonData []byte, path string) (result []byte, err error) {
 	return result, nil
 }
 
-func main() {
+func validateCommand(c *cli.Context) error {
+	path := c.String(PathFlag.Name)
+
 	compiler := jsonschema.NewCompiler()
 	compiler.Draft = jsonschema.Draft2020
-	//sch, err := compiler.Compile("schema/OAS.json")
-	sch, err := compiler.Compile(OAS_SCHEMA_URL)
+	//sch, err := compiler.Compile(OAS_SCHEMA_URL)
+	sch, err := compiler.Compile("schema/OAS.json")
 	if err != nil {
-		log.Fatalf("%#v", err)
+		return err
 	}
 
-	jsonData, err := ioutil.ReadFile("test/shipping_valid.json")
+	jsonData, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	var v interface{}
 	if err := json.Unmarshal(jsonData, &v); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if err = sch.Validate(v); err != nil {
+		sb := strings.Builder{}
+		sb.WriteString("ERROR List: \n")
+
 		var validationError *jsonschema.ValidationError
 		if errors.As(err, &validationError) {
 			output := validationError.BasicOutput()
-			/* 			b, _ := json.MarshalIndent(output, "", "  ")
-			   			fmt.Println(string(b)) */
-
 			for _, e := range output.Errors {
-				//if len(e.InstanceLocation) > 0 && !strings.HasSuffix(e.Error, fmt.Sprintf("'/$defs%s'", e.InstanceLocation)) {
 				if len(e.InstanceLocation) > 0 {
-					fmt.Printf("ERROR: '%s' %s\n", e.InstanceLocation, e.Error)
+					sb.WriteString(fmt.Sprintf("'%s' %s\n", e.InstanceLocation, e.Error))
 				}
 			}
 		} else {
-			log.Fatalf("%#v", err)
+			sb.WriteString(fmt.Sprintf("%#v", err))
 		}
+
+		return errors.New(sb.String())
 	}
 
-	infoSch := sch.Properties[OAS_INFO_KEY]
-	serversSch := sch.Properties[OAS_SERVERS_KEY]
-	pathsSch := sch.Properties[OAS_PATHS_KEY]
-	webhooksSch := sch.Properties[OAS_WEBHOOKS_KEY]
+	fmt.Println(console.Green("Valid OAS 3.1 file!"))
 
-	fmt.Println(infoSch.String())
-	fmt.Println(serversSch.String())
-	fmt.Println(pathsSch.String())
-	fmt.Println(webhooksSch.String())
+	return nil
+}
 
-	if !gjson.ValidBytes(jsonData) {
-		panic("invalid json")
+func main() {
+	app := &cli.App{
+		Name:  "oas-diff",
+		Usage: "Validate/Diff OAS 3.1 files",
+		Commands: []*cli.Command{
+			{
+				Name:    "validate",
+				Aliases: []string{"v"},
+				Usage:   "Validate file to OAS 3.1 schema",
+				Action:  validateCommand,
+				Flags:   []cli.Flag{PathFlag},
+			},
+		},
 	}
 
-	infoData, err := getJsonPathData(jsonData, OAS_INFO_KEY)
+	sort.Sort(cli.FlagsByName(app.Flags))
+	sort.Sort(cli.CommandsByName(app.Commands))
+
+	err := app.Run(os.Args)
 	if err != nil {
-		panic(err)
+		log.Fatal(console.Red(fmt.Sprintf("%v", err)))
 	}
-
-	fmt.Println(string(infoData))
-
-	var infoModel model.Info
-	err = json.Unmarshal(infoData, &infoModel)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(infoModel)
-
-	// TODO: Implement CLI, receive two OAS 3.1 files as input
-	// TODO: Validate both files
-	// TODO: Compare files structures/objects/properties - https://github.com/r3labs/diff
 }

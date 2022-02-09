@@ -26,23 +26,17 @@ const (
 )
 
 var (
-	PathFlag = &cli.StringFlag{
-		Name:     "path",
-		Aliases:  []string{"p"},
+	FileFlag = &cli.StringFlag{
+		Name:     "file",
 		Usage:    "Path of the OAS 3.1 file",
 		Required: true,
 	}
-)
-
-func isSliceOfUniqueItems(xs []interface{}) bool {
-	s := len(xs)
-	m := make(map[string]struct{}, s)
-	for _, x := range xs {
-		key, _ := json.Marshal(&x)
-		m[string(key)] = struct{}{}
+	FileFlag2 = &cli.StringFlag{
+		Name:     "file2",
+		Usage:    "Path of the second OAS 3.1 file",
+		Required: true,
 	}
-	return s == len(m)
-}
+)
 
 func getJsonPathData(jsonData []byte, path string) (result []byte, err error) {
 	node := gjson.GetBytes(jsonData, path)
@@ -57,9 +51,7 @@ func getJsonPathData(jsonData []byte, path string) (result []byte, err error) {
 	return result, nil
 }
 
-func validateCommand(c *cli.Context) error {
-	path := c.String(PathFlag.Name)
-
+func validate(filePath string) error {
 	compiler := jsonschema.NewCompiler()
 	compiler.Draft = jsonschema.Draft2020
 	//sch, err := compiler.Compile(OAS_SCHEMA_URL)
@@ -68,7 +60,7 @@ func validateCommand(c *cli.Context) error {
 		return err
 	}
 
-	jsonData, err := ioutil.ReadFile(path)
+	jsonData, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -78,27 +70,40 @@ func validateCommand(c *cli.Context) error {
 		return err
 	}
 
-	if err = sch.Validate(v); err != nil {
+	return sch.Validate(v)
+}
+
+func validateCommand(c *cli.Context) error {
+	filePath := c.String(FileFlag.Name)
+
+	err := validate(filePath)
+	if err != nil {
 		sb := strings.Builder{}
-		sb.WriteString("ERROR List: \n")
 
 		var validationError *jsonschema.ValidationError
 		if errors.As(err, &validationError) {
 			output := validationError.BasicOutput()
 			for _, e := range output.Errors {
 				if len(e.InstanceLocation) > 0 {
-					sb.WriteString(fmt.Sprintf("'%s' %s\n", e.InstanceLocation, e.Error))
+					sb.WriteString(console.Red(fmt.Sprintf("'%s' %s\n", e.InstanceLocation, e.Error)))
 				}
 			}
+
 		} else {
-			sb.WriteString(fmt.Sprintf("%#v", err))
+			sb.WriteString(console.Red(fmt.Sprintf("%#v", err)))
 		}
 
-		return errors.New(sb.String())
+		fmt.Println(sb.String())
+
+		return nil
 	}
 
 	fmt.Println(console.Green("Valid OAS 3.1 file!"))
 
+	return nil
+}
+
+func diffCommand(c *cli.Context) error {
 	return nil
 }
 
@@ -112,7 +117,17 @@ func main() {
 				Aliases: []string{"v"},
 				Usage:   "Validate file to OAS 3.1 schema",
 				Action:  validateCommand,
-				Flags:   []cli.Flag{PathFlag},
+				Flags:   []cli.Flag{FileFlag},
+			},
+			{
+				Name:    "diff",
+				Aliases: []string{"d"},
+				Usage:   "Diff between two OAS 3.1 files",
+				Action:  diffCommand,
+				Flags: []cli.Flag{
+					FileFlag,
+					FileFlag2,
+				},
 			},
 		},
 	}

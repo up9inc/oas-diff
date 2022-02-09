@@ -17,5 +17,9 @@ OAS 3.1 Validation and Diff Tool
 ## Examples
 - Validate
     ````
-    ./build/oasdiff validate --path test/shipping_invalid.json
+    ./build/oasdiff validate --file test/shipping_invalid.json
+    ````
+- Diff
+    ````
+    ./build/oasdiff diff --file test/shipping_valid.json --file2 test/shipping_invalid.json
     ````

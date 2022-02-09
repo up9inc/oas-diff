@@ -109,4 +109,8 @@ func main() {
 	}
 
 	fmt.Println(infoModel)
+
+	// TODO: Implement CLI, receive two OAS 3.1 files as input
+	// TODO: Validate both files
+	// TODO: Compare files structures/objects/properties - https://github.com/r3labs/diff
 }

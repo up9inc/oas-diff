@@ -7,10 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/gustavomassa/oas-diff/model"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	"github.com/tidwall/gjson"
+	"github.com/up9inc/oas-diff/model"
 )
 
 const (

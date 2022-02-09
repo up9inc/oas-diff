@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/r3labs/diff/v2"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	"github.com/tidwall/gjson"
@@ -86,15 +87,15 @@ func validateCommand(c *cli.Context) error {
 			output := validationError.BasicOutput()
 			for _, e := range output.Errors {
 				if len(e.InstanceLocation) > 0 {
-					sb.WriteString(console.Red(fmt.Sprintf("'%s' %s\n", e.InstanceLocation, e.Error)))
+					sb.WriteString(fmt.Sprintf("'%s' %s\n", e.InstanceLocation, e.Error))
 				}
 			}
 
 		} else {
-			sb.WriteString(console.Red(fmt.Sprintf("%#v", err)))
+			sb.WriteString(fmt.Sprintf("%#v", err))
 		}
 
-		fmt.Println(sb.String())
+		fmt.Println(console.Red(sb.String()))
 
 		return nil
 	}
@@ -150,6 +151,18 @@ func diffCommand(c *cli.Context) error {
 
 	fmt.Printf("info2: %s\n", string(infoData2))
 	fmt.Println(infoModel2)
+
+	changelog, err := diff.Diff(infoModel, infoModel2)
+	if err != nil {
+		return err
+	}
+
+	sb := strings.Builder{}
+	for _, c := range changelog {
+		sb.WriteString(fmt.Sprintf("\nproperty: %s\npath: %s\ntype: %s\nfrom: %s\nto: %s\n", OAS_INFO_KEY, c.Path, c.Type, c.From, c.To))
+	}
+
+	fmt.Println(console.Green(sb.String()))
 
 	return nil
 }

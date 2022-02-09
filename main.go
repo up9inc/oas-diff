@@ -51,32 +51,32 @@ func getJsonPathData(jsonData []byte, path string) (result []byte, err error) {
 	return result, nil
 }
 
-func validate(filePath string) error {
+func validate(filePath string) (*[]byte, error) {
 	compiler := jsonschema.NewCompiler()
 	compiler.Draft = jsonschema.Draft2020
 	//sch, err := compiler.Compile(OAS_SCHEMA_URL)
 	sch, err := compiler.Compile("schema/OAS.json")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	jsonData, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return err
+		return &jsonData, err
 	}
 
 	var v interface{}
 	if err := json.Unmarshal(jsonData, &v); err != nil {
-		return err
+		return &jsonData, err
 	}
 
-	return sch.Validate(v)
+	return &jsonData, sch.Validate(v)
 }
 
 func validateCommand(c *cli.Context) error {
 	filePath := c.String(FileFlag.Name)
 
-	err := validate(filePath)
+	_, err := validate(filePath)
 	if err != nil {
 		sb := strings.Builder{}
 
@@ -104,6 +104,22 @@ func validateCommand(c *cli.Context) error {
 }
 
 func diffCommand(c *cli.Context) error {
+	filePath := c.String(FileFlag.Name)
+
+	fileData, err := validate(filePath)
+	if err != nil {
+		return fmt.Errorf("%s is not a valid 3.1 OAS file", filePath)
+	}
+
+	filePath2 := c.String(FileFlag2.Name)
+	fileData2, err := validate(filePath2)
+	if err != nil {
+		return fmt.Errorf("%s is not a valid 3.1 OAS file", filePath2)
+	}
+
+	fmt.Println(len(*fileData))
+	fmt.Println(len(*fileData2))
+
 	return nil
 }
 

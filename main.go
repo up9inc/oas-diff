@@ -40,17 +40,17 @@ var (
 	}
 )
 
-func getJsonPathData(jsonData []byte, path string) (result []byte, err error) {
+func getJsonPathData(jsonData []byte, path string) (result []byte) {
 	node := gjson.GetBytes(jsonData, path)
 	if !node.Exists() {
-		return result, fmt.Errorf("failed to find json path: %s", path)
+		return nil
 	}
 	if node.Index > 0 {
 		result = jsonData[node.Index : node.Index+len(node.Raw)]
 	} else {
 		result = []byte(node.Raw)
 	}
-	return result, nil
+	return result
 }
 
 func validate(filePath string) ([]byte, error) {
@@ -105,8 +105,15 @@ func validateCommand(c *cli.Context) error {
 	return nil
 }
 
+func buildChangelog(key string, changelog diff.Changelog, sb *strings.Builder) {
+	for _, c := range changelog {
+		sb.WriteString(fmt.Sprintf("\nproperty: %s\npath: %s\ntype: %s\nfrom: %v\nto: %v\n", key, c.Path, c.Type, c.From, c.To))
+	}
+}
+
 func diffCommand(c *cli.Context) error {
 	filePath := c.String(FileFlag.Name)
+	sb := strings.Builder{}
 
 	fileData, err := validate(filePath)
 	if err != nil {
@@ -122,11 +129,8 @@ func diffCommand(c *cli.Context) error {
 	fmt.Println(len(fileData))
 	fmt.Println(len(fileData2))
 
-	// file 1
-	infoData, err := getJsonPathData(fileData, OAS_INFO_KEY)
-	if err != nil {
-		return err
-	}
+	// info file 1
+	infoData := getJsonPathData(fileData, OAS_INFO_KEY)
 
 	var infoModel model.Info
 	err = json.Unmarshal(infoData, &infoModel)
@@ -137,11 +141,8 @@ func diffCommand(c *cli.Context) error {
 	fmt.Printf("info1: %s\n", string(infoData))
 	fmt.Println(infoModel)
 
-	// file 2
-	infoData2, err := getJsonPathData(fileData2, OAS_INFO_KEY)
-	if err != nil {
-		return err
-	}
+	// info file 2
+	infoData2 := getJsonPathData(fileData2, OAS_INFO_KEY)
 
 	var infoModel2 model.Info
 	err = json.Unmarshal(infoData2, &infoModel2)
@@ -152,15 +153,47 @@ func diffCommand(c *cli.Context) error {
 	fmt.Printf("info2: %s\n", string(infoData2))
 	fmt.Println(infoModel2)
 
-	changelog, err := diff.Diff(infoModel, infoModel2)
+	// info diff
+	infoChangelog, err := diff.Diff(infoModel, infoModel2)
 	if err != nil {
 		return err
 	}
 
-	sb := strings.Builder{}
-	for _, c := range changelog {
-		sb.WriteString(fmt.Sprintf("\nproperty: %s\npath: %s\ntype: %s\nfrom: %s\nto: %s\n", OAS_INFO_KEY, c.Path, c.Type, c.From, c.To))
+	buildChangelog(OAS_INFO_KEY, infoChangelog, &sb)
+
+	// servers file 1
+	serversData := getJsonPathData(fileData, OAS_SERVERS_KEY)
+
+	var serversModel model.Servers
+	err = json.Unmarshal(serversData, &serversModel)
+	if err != nil {
+		return err
 	}
+
+	fmt.Printf("servers1: %s\n", string(serversData))
+	fmt.Println(serversModel)
+
+	// servers file 2
+	serversData2 := getJsonPathData(fileData2, OAS_SERVERS_KEY)
+
+	var serversModel2 model.Servers
+	if serversData2 != nil {
+		err = json.Unmarshal(serversData2, &serversModel2)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("servers2: %s\n", string(serversData2))
+	fmt.Println(serversModel2)
+
+	// servers diff
+	serversChangelog, err := diff.Diff(serversModel, serversModel2)
+	if err != nil {
+		return err
+	}
+
+	buildChangelog(OAS_SERVERS_KEY, serversChangelog, &sb)
 
 	fmt.Println(console.Green(sb.String()))
 

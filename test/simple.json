@@ -4,10 +4,15 @@
     "title": "Simple example",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "http://shipping.sock-shop",
+      "description": "refael up9-demo-link all"
+    }
+  ],
   "paths": {
     "/users": {
-      "get": {
-      }
+      "get": {}
     }
   }
 }

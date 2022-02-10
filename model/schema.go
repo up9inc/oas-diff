@@ -27,7 +27,7 @@ type ServerVariable struct {
 }
 
 type Server struct {
-	URL         string                     `json:"url" diff:"url"`
+	URL         string                     `json:"url" diff:"url,identifier"`
 	Description string                     `json:"description,omitempty" diff:"description"`
 	Variables   map[string]*ServerVariable `json:"variables,omitempty" diff:"variables"`
 }

@@ -8,8 +8,10 @@ import (
 )
 
 type JsonFile interface {
-	ValidateFilePath() error
-	ReadFile() (*[]byte, error)
+	ValidatePath() error
+	Read() (*[]byte, error)
+	GetPath() string
+	GetData() *[]byte
 }
 
 type jsonFile struct {
@@ -35,7 +37,15 @@ func (f *jsonFile) exists(path string) bool {
 	return false
 }
 
-func (f *jsonFile) ValidateFilePath() error {
+func (f *jsonFile) GetPath() string {
+	return f.path
+}
+
+func (f *jsonFile) GetData() *[]byte {
+	return f.data
+}
+
+func (f *jsonFile) ValidatePath() error {
 	if !strings.HasSuffix(f.path, ".json") {
 		return errors.New("invalid path, file must be a .json file")
 	}
@@ -45,8 +55,8 @@ func (f *jsonFile) ValidateFilePath() error {
 	return nil
 }
 
-func (f *jsonFile) ReadFile() (*[]byte, error) {
-	err := f.ValidateFilePath()
+func (f *jsonFile) Read() (*[]byte, error) {
+	err := f.ValidatePath()
 	if err != nil {
 		return nil, err
 	}

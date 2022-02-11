@@ -15,7 +15,9 @@ import (
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	"github.com/tidwall/gjson"
 	"github.com/up9inc/oas-diff/console"
+	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
+	"github.com/up9inc/oas-diff/validator"
 	"github.com/urfave/cli/v2"
 )
 
@@ -115,16 +117,40 @@ func diffCommand(c *cli.Context) error {
 	filePath := c.String(FileFlag.Name)
 	sb := strings.Builder{}
 
-	fileData, err := validate(filePath)
+	//version := getJsonPathData(, OAS_INFO_KEY)
+
+	jsonFile := file.NewJsonFile(filePath)
+	_, err := jsonFile.Read()
 	if err != nil {
-		return fmt.Errorf("%s is not a valid 3.1 OAS file", filePath)
+		return err
 	}
 
-	filePath2 := c.String(FileFlag2.Name)
-	fileData2, err := validate(filePath2)
+	validator := validator.NewValidator()
+	err = validator.InitOAS31Schema()
 	if err != nil {
-		return fmt.Errorf("%s is not a valid 3.1 OAS file", filePath2)
+		return err
 	}
+
+	err = validator.Validate(jsonFile)
+	if err != nil {
+		return fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile.GetPath())
+	}
+
+	fileData := *jsonFile.GetData()
+
+	filePath2 := c.String(FileFlag2.Name)
+	jsonFile2 := file.NewJsonFile(filePath2)
+	_, err = jsonFile2.Read()
+	if err != nil {
+		return err
+	}
+
+	err = validator.Validate(jsonFile2)
+	if err != nil {
+		return fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile2.GetPath())
+	}
+
+	fileData2 := *jsonFile2.GetData()
 
 	fmt.Println(len(fileData))
 	fmt.Println(len(fileData2))

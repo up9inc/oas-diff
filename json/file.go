@@ -2,6 +2,7 @@ package json
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -50,7 +51,7 @@ func (f *jsonFile) ValidatePath() error {
 		return errors.New("invalid path, file must be a .json file")
 	}
 	if !f.exists(f.path) {
-		return errors.New("invalid path, file does not exist")
+		return fmt.Errorf("invalid path, file does not exist: %s", f.path)
 	}
 	return nil
 }

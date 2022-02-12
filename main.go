@@ -8,7 +8,6 @@ import (
 
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	cmd "github.com/up9inc/oas-diff/cli"
-	"github.com/up9inc/oas-diff/console"
 	"github.com/urfave/cli/v2"
 )
 
@@ -27,6 +26,6 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(console.Red(fmt.Sprintf("%v", err)))
+		log.Fatal(cmd.Red(fmt.Sprintf("%v", err)))
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/r3labs/diff/v2"
-	"github.com/up9inc/oas-diff/console"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
 	"github.com/up9inc/oas-diff/validator"
@@ -134,7 +133,7 @@ func diffCmd(c *cli.Context) error {
 
 	buildOutput(model.OAS_SERVERS_KEY, serversChangelog, &sb)
 
-	fmt.Println(console.Green(sb.String()))
+	fmt.Println(Green(sb.String()))
 
 	return nil
 }

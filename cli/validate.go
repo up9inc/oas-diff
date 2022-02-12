@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/santhosh-tekuri/jsonschema/v5"
-	"github.com/up9inc/oas-diff/console"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/validator"
 	"github.com/urfave/cli/v2"
@@ -54,12 +53,12 @@ func validateCmd(c *cli.Context) error {
 			sb.WriteString(fmt.Sprintf("%#v", err))
 		}
 
-		fmt.Println(console.Red(sb.String()))
+		fmt.Println(Red(sb.String()))
 
 		return nil
 	}
 
-	fmt.Println(console.Green("Valid OAS 3.1 file!"))
+	fmt.Println(Green("Valid OAS 3.1 file!"))
 
 	return nil
 }

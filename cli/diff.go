@@ -70,24 +70,32 @@ func diffCmd(c *cli.Context) error {
 	infoData := jsonFile.GetNodeData(model.OAS_INFO_KEY)
 
 	var infoModel model.Info
-	err = json.Unmarshal(*infoData, &infoModel)
-	if err != nil {
-		return err
+
+	if infoData != nil {
+		fmt.Printf("info1: %s\n", string(*infoData))
+
+		err = json.Unmarshal(*infoData, &infoModel)
+		if err != nil {
+			return err
+		}
 	}
 
-	fmt.Printf("info1: %s\n", string(*infoData))
 	fmt.Println(infoModel)
 
 	// info file 2
 	infoData2 := jsonFile2.GetNodeData(model.OAS_INFO_KEY)
 
 	var infoModel2 model.Info
-	err = json.Unmarshal(*infoData2, &infoModel2)
-	if err != nil {
-		return err
+
+	if infoData2 != nil {
+		fmt.Printf("info2: %s\n", string(*infoData2))
+
+		err = json.Unmarshal(*infoData2, &infoModel2)
+		if err != nil {
+			return err
+		}
 	}
 
-	fmt.Printf("info2: %s\n", string(*infoData2))
 	fmt.Println(infoModel2)
 
 	// info diff
@@ -103,26 +111,32 @@ func diffCmd(c *cli.Context) error {
 	serversData := jsonFile.GetNodeData(model.OAS_SERVERS_KEY)
 
 	var serversModel model.Servers
-	err = json.Unmarshal(*serversData, &serversModel)
-	if err != nil {
-		return err
+
+	if serversData != nil {
+		fmt.Printf("servers1: %s\n", string(*serversData))
+
+		err = json.Unmarshal(*serversData, &serversModel)
+		if err != nil {
+			return err
+		}
 	}
 
-	fmt.Printf("servers1: %s\n", string(*serversData))
 	fmt.Println(serversModel)
 
 	// servers file 2
 	serversData2 := jsonFile2.GetNodeData(model.OAS_SERVERS_KEY)
 
 	var serversModel2 model.Servers
+
 	if serversData2 != nil {
+		fmt.Printf("servers2: %s\n", string(*serversData2))
+
 		err = json.Unmarshal(*serversData2, &serversModel2)
 		if err != nil {
 			return err
 		}
 	}
 
-	fmt.Printf("servers2: %s\n", string(*serversData2))
 	fmt.Println(serversModel2)
 
 	// servers diff

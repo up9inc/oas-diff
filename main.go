@@ -13,7 +13,6 @@ import (
 	"github.com/r3labs/diff/v2"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
-	"github.com/tidwall/gjson"
 	"github.com/up9inc/oas-diff/console"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
@@ -41,19 +40,6 @@ var (
 		Required: true,
 	}
 )
-
-func getJsonPathData(jsonData []byte, path string) (result []byte) {
-	node := gjson.GetBytes(jsonData, path)
-	if !node.Exists() {
-		return nil
-	}
-	if node.Index > 0 {
-		result = jsonData[node.Index : node.Index+len(node.Raw)]
-	} else {
-		result = []byte(node.Raw)
-	}
-	return result
-}
 
 func validate(filePath string) ([]byte, error) {
 	compiler := jsonschema.NewCompiler()
@@ -136,8 +122,6 @@ func diffCommand(c *cli.Context) error {
 		return fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile.GetPath())
 	}
 
-	fileData := *jsonFile.GetData()
-
 	filePath2 := c.String(FileFlag2.Name)
 	jsonFile2 := file.NewJsonFile(filePath2)
 	_, err = jsonFile2.Read()
@@ -150,33 +134,28 @@ func diffCommand(c *cli.Context) error {
 		return fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile2.GetPath())
 	}
 
-	fileData2 := *jsonFile2.GetData()
-
-	fmt.Println(len(fileData))
-	fmt.Println(len(fileData2))
-
 	// info file 1
-	infoData := getJsonPathData(fileData, OAS_INFO_KEY)
+	infoData := jsonFile.GetNodeData(OAS_INFO_KEY)
 
 	var infoModel model.Info
-	err = json.Unmarshal(infoData, &infoModel)
+	err = json.Unmarshal(*infoData, &infoModel)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("info1: %s\n", string(infoData))
+	fmt.Printf("info1: %s\n", string(*infoData))
 	fmt.Println(infoModel)
 
 	// info file 2
-	infoData2 := getJsonPathData(fileData2, OAS_INFO_KEY)
+	infoData2 := jsonFile2.GetNodeData(OAS_INFO_KEY)
 
 	var infoModel2 model.Info
-	err = json.Unmarshal(infoData2, &infoModel2)
+	err = json.Unmarshal(*infoData2, &infoModel2)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("info2: %s\n", string(infoData2))
+	fmt.Printf("info2: %s\n", string(*infoData2))
 	fmt.Println(infoModel2)
 
 	// info diff
@@ -188,29 +167,30 @@ func diffCommand(c *cli.Context) error {
 	buildChangelog(OAS_INFO_KEY, infoChangelog, &sb)
 
 	// servers file 1
-	serversData := getJsonPathData(fileData, OAS_SERVERS_KEY)
+
+	serversData := jsonFile.GetNodeData(OAS_SERVERS_KEY)
 
 	var serversModel model.Servers
-	err = json.Unmarshal(serversData, &serversModel)
+	err = json.Unmarshal(*serversData, &serversModel)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("servers1: %s\n", string(serversData))
+	fmt.Printf("servers1: %s\n", string(*serversData))
 	fmt.Println(serversModel)
 
 	// servers file 2
-	serversData2 := getJsonPathData(fileData2, OAS_SERVERS_KEY)
+	serversData2 := jsonFile2.GetNodeData(OAS_SERVERS_KEY)
 
 	var serversModel2 model.Servers
 	if serversData2 != nil {
-		err = json.Unmarshal(serversData2, &serversModel2)
+		err = json.Unmarshal(*serversData2, &serversModel2)
 		if err != nil {
 			return err
 		}
 	}
 
-	fmt.Printf("servers2: %s\n", string(serversData2))
+	fmt.Printf("servers2: %s\n", string(*serversData2))
 	fmt.Println(serversModel2)
 
 	// servers diff

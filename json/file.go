@@ -8,25 +8,6 @@ import (
 	"strings"
 )
 
-type JsonFile interface {
-	ValidatePath() error
-	Read() (*[]byte, error)
-	GetPath() string
-	GetData() *[]byte
-}
-
-type jsonFile struct {
-	path string
-	data *[]byte
-}
-
-func NewJsonFile(path string) JsonFile {
-	return &jsonFile{
-		path: path,
-		data: nil,
-	}
-}
-
 func (f *jsonFile) exists(path string) bool {
 	_, err := os.Stat(path)
 	if err == nil {

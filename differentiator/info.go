@@ -4,6 +4,7 @@ import (
 	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
+	"github.com/up9inc/oas-diff/validator"
 )
 
 type infoDiff struct {
@@ -12,35 +13,35 @@ type infoDiff struct {
 	data2 *model.Info
 }
 
-func (d *differentiator) infoDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) error {
+func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) (*infoDiff, error) {
 	var err error
-	d.info = &infoDiff{
+	i = &infoDiff{
 		internalDiff: NewInternalDiff(model.OAS_INFO_KEY),
 	}
 
 	// schema
-	err = d.info.schema.Build(d.validator)
+	err = i.schema.Build(validator)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// info1
-	d.info.data, err = model.ParseInfo(jsonFile)
+	i.data, err = model.ParseInfo(jsonFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// info2
-	d.info.data2, err = model.ParseInfo(jsonFile2)
+	i.data2, err = model.ParseInfo(jsonFile2)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// info changelog
-	d.info.changelog.Changelog, err = lib.Diff(d.info.data, d.info.data2)
+	i.changelog.Changelog, err = lib.Diff(i.data, i.data2)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return i, nil
 }

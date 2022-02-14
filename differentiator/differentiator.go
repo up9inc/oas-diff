@@ -3,24 +3,19 @@ package differentiator
 import (
 	"fmt"
 
-	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
-	"github.com/up9inc/oas-diff/model"
 	"github.com/up9inc/oas-diff/validator"
 )
 
 type Differentiator interface {
-	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*changelog, error)
+	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) ([]*changelog, error)
 }
 
 type differentiator struct {
 	validator validator.Validator
 
-	info *infoDiff
-
-	servers          *model.Servers
-	servers2         *model.Servers
-	serversChangelog lib.Changelog
+	info    *infoDiff
+	servers *serversDiff
 }
 
 func NewDiff() Differentiator {
@@ -31,7 +26,7 @@ func NewDiff() Differentiator {
 	return v
 }
 
-func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*changelog, error) {
+func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) ([]*changelog, error) {
 	err := d.validator.InitOAS31Schema()
 	if err != nil {
 		return nil, err
@@ -47,29 +42,22 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile2.GetPath())
 	}
 
+	// changelog
+	changelog := make([]*changelog, 0)
+
 	// info
-	err = d.infoDiff(jsonFile, jsonFile2)
+	d.info, err = d.info.Diff(jsonFile, jsonFile2, d.validator)
 	if err != nil {
 		return nil, err
 	}
+	changelog = append(changelog, d.info.changelog)
 
 	// servers
-	d.servers, err = model.ParseServers(jsonFile)
+	d.servers, err = d.servers.Diff(jsonFile, jsonFile2, d.validator)
 	if err != nil {
 		return nil, err
 	}
+	changelog = append(changelog, d.servers.changelog)
 
-	// servers2
-	d.servers2, err = model.ParseServers(jsonFile2)
-	if err != nil {
-		return nil, err
-	}
-
-	// servers changelog
-	d.serversChangelog, err = lib.Diff(d.servers, d.servers2)
-	if err != nil {
-		return nil, err
-	}
-
-	return d.info.changelog, nil
+	return changelog, nil
 }

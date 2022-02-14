@@ -7,10 +7,13 @@ import (
 	file "github.com/up9inc/oas-diff/json"
 )
 
-const OAS_SCHEMA_URL = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v3.1/schema.json"
+const (
+	OAS_SCHEMA_URL  = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v3.1/schema.json"
+	OAS_SCHEMA_FILE = "validator/oas31.json"
+)
 
 func (v *validator) InitOAS31Schema() error {
-	v.jsonSchema = file.NewJsonFile("schema/OAS.json")
+	v.jsonSchema = file.NewJsonFile(OAS_SCHEMA_FILE)
 	err := v.jsonSchema.ValidatePath()
 	if err != nil {
 		return err

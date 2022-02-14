@@ -67,33 +67,17 @@ func diffCmd(c *cli.Context) error {
 	}
 
 	// info file 1
-	infoData := jsonFile.GetNodeData(model.OAS_INFO_KEY)
-
-	var infoModel model.Info
-
-	if infoData != nil {
-		fmt.Printf("info1: %s\n", string(*infoData))
-
-		err = json.Unmarshal(*infoData, &infoModel)
-		if err != nil {
-			return err
-		}
+	infoModel, err := model.ParseInfo(jsonFile)
+	if err != nil {
+		return err
 	}
 
 	fmt.Println(infoModel)
 
 	// info file 2
-	infoData2 := jsonFile2.GetNodeData(model.OAS_INFO_KEY)
-
-	var infoModel2 model.Info
-
-	if infoData2 != nil {
-		fmt.Printf("info2: %s\n", string(*infoData2))
-
-		err = json.Unmarshal(*infoData2, &infoModel2)
-		if err != nil {
-			return err
-		}
+	infoModel2, err := model.ParseInfo(jsonFile2)
+	if err != nil {
+		return err
 	}
 
 	fmt.Println(infoModel2)

@@ -1,6 +1,10 @@
 package cli
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+
 	differentiator "github.com/up9inc/oas-diff/differentiator"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/urfave/cli/v2"
@@ -36,6 +40,23 @@ func diffCmd(c *cli.Context) error {
 	}
 
 	diff := differentiator.NewDiff()
+	changelog, err := diff.Diff(jsonFile, jsonFile2)
+	if err != nil {
+		return err
+	}
 
-	return diff.Diff(jsonFile, jsonFile2)
+	output, err := json.MarshalIndent(changelog, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+
+	outputPath := "changelog.json"
+	err = ioutil.WriteFile(outputPath, output, 0644)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(Green(fmt.Sprintf("report saved: %s", outputPath)))
+
+	return nil
 }

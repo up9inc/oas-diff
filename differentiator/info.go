@@ -34,6 +34,7 @@ func (d *differentiator) infoDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFil
 		return err
 	}
 
+	// info1
 	d.info.data, err = model.ParseInfo(jsonFile)
 	if err != nil {
 		return err

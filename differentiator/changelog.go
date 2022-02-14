@@ -5,12 +5,12 @@ import (
 )
 
 type changelog struct {
-	key string
-	lib.Changelog
+	Key           string `json:"property"`
+	lib.Changelog `json:"changelog"`
 }
 
 func NewChangelog(key string) *changelog {
 	return &changelog{
-		key: key,
+		Key: key,
 	}
 }

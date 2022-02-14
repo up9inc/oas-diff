@@ -33,3 +33,14 @@ func ParseServers(file file.JsonFile) (*Servers, error) {
 
 	return &serversModel, nil
 }
+
+// It should only return 1 result, the url identifier is unique
+func (s Servers) FilterByURL(url string) (int, *Server) {
+	for k, v := range s {
+		if v.URL == url {
+			return k, v
+		}
+	}
+
+	return -1, nil
+}

@@ -38,7 +38,7 @@ func (s *serversDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, vali
 	}
 
 	// servers changelog
-	s.changelog.Changelog, err = lib.Diff(s.data, s.data2)
+	s.changelog.Changelog, err = lib.Diff(s.data, s.data2, lib.DisableStructValues())
 	if err != nil {
 		return nil, err
 	}

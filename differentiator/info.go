@@ -38,7 +38,7 @@ func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validat
 	}
 
 	// info changelog
-	i.changelog.Changelog, err = lib.Diff(i.data, i.data2)
+	i.changelog.Changelog, err = lib.Diff(i.data, i.data2, lib.DisableStructValues())
 	if err != nil {
 		return nil, err
 	}

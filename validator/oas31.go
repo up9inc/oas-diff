@@ -40,7 +40,11 @@ func (v *validator) GetSchemaProperty(key string) (*jsonschema.Schema, error) {
 		return nil, fmt.Errorf("failed to find schema property for key: %s", key)
 	}
 
-	return p.Ref, nil
+	if p.Ref != nil {
+		return p.Ref, nil
+	}
+
+	return p, nil
 }
 
 func (v *validator) GetSchemaPropertyRequiredFields(key string) ([]string, error) {

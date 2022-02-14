@@ -11,6 +11,9 @@ import (
 type Validator interface {
 	InitOAS31Schema() error
 	Validate(jsonFile file.JsonFile) error
+	GetSchemaProperty(key string) (*jsonschema.Schema, error)
+	GetSchemaPropertyRequiredFields(key string) ([]string, error)
+	GetSchemaPropertyFields(key string) ([]string, error)
 }
 
 type validator struct {

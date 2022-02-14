@@ -7,26 +7,16 @@ import (
 )
 
 type infoDiff struct {
-	key       string
-	schema    *schema
-	data      *model.Info
-	data2     *model.Info
-	changelog *changelog
-}
-
-func NewInfoDiff() *infoDiff {
-	const key = model.OAS_INFO_KEY
-
-	return &infoDiff{
-		key:       key,
-		schema:    NewSchema(key),
-		changelog: NewChangelog(key),
-	}
+	*internalDiff
+	data  *model.Info
+	data2 *model.Info
 }
 
 func (d *differentiator) infoDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) error {
 	var err error
-	d.info = NewInfoDiff()
+	d.info = &infoDiff{
+		internalDiff: NewInternalDiff(model.OAS_INFO_KEY),
+	}
 
 	// schema
 	err = d.info.schema.Build(d.validator)

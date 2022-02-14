@@ -17,9 +17,7 @@ type Differentiator interface {
 type differentiator struct {
 	validator validator.Validator
 
-	info          *model.Info
-	info2         *model.Info
-	infoChangelog lib.Changelog
+	info *infoDiff
 
 	servers          *model.Servers
 	servers2         *model.Servers
@@ -57,25 +55,15 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) e
 	}
 
 	// info
-	d.info, err = model.ParseInfo(jsonFile)
+	err = d.infoDiff(jsonFile, jsonFile2)
 	if err != nil {
-		return err
+		return nil
 	}
 
-	// info2
-	d.info2, err = model.ParseInfo(jsonFile2)
-	if err != nil {
-		return err
-	}
-
-	// info changelog
-	d.infoChangelog, err = lib.Diff(d.info, d.info2)
-	if err != nil {
-		return err
-	}
+	fmt.Printf("info schema: %v\n", d.info.schema)
 
 	sb := strings.Builder{}
-	buildOutput(model.OAS_INFO_KEY, d.infoChangelog, &sb)
+	buildOutput(model.OAS_INFO_KEY, d.info.changelog.Changelog, &sb)
 
 	// servers
 	d.servers, err = model.ParseServers(jsonFile)

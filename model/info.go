@@ -29,9 +29,9 @@ type License struct {
 
 func ParseInfo(file file.JsonFile) (*Info, error) {
 	var infoModel Info
-	infoData := file.GetNodeData(OAS_INFO_KEY)
-	if infoData != nil {
-		err := json.Unmarshal(*infoData, &infoModel)
+	node := file.GetNodeData(OAS_INFO_KEY)
+	if node != nil {
+		err := json.Unmarshal(*node, &infoModel)
 		if err != nil {
 			return nil, fmt.Errorf("failed to Unmarshal Info struct: %v", err)
 		}

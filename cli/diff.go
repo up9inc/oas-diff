@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -91,34 +90,17 @@ func diffCmd(c *cli.Context) error {
 	buildOutput(model.OAS_INFO_KEY, infoChangelog, &sb)
 
 	// servers file 1
-
-	serversData := jsonFile.GetNodeData(model.OAS_SERVERS_KEY)
-
-	var serversModel model.Servers
-
-	if serversData != nil {
-		fmt.Printf("servers1: %s\n", string(*serversData))
-
-		err = json.Unmarshal(*serversData, &serversModel)
-		if err != nil {
-			return err
-		}
+	serversModel, err := model.ParseServers(jsonFile)
+	if err != nil {
+		return err
 	}
 
 	fmt.Println(serversModel)
 
 	// servers file 2
-	serversData2 := jsonFile2.GetNodeData(model.OAS_SERVERS_KEY)
-
-	var serversModel2 model.Servers
-
-	if serversData2 != nil {
-		fmt.Printf("servers2: %s\n", string(*serversData2))
-
-		err = json.Unmarshal(*serversData2, &serversModel2)
-		if err != nil {
-			return err
-		}
+	serversModel2, err := model.ParseServers(jsonFile2)
+	if err != nil {
+		return err
 	}
 
 	fmt.Println(serversModel2)

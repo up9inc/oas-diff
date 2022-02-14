@@ -1,5 +1,12 @@
 package model
 
+import (
+	"encoding/json"
+	"fmt"
+
+	file "github.com/up9inc/oas-diff/json"
+)
+
 type Servers []*Server
 
 type Server struct {
@@ -12,4 +19,17 @@ type ServerVariable struct {
 	Enum        []string `json:"enum,omitempty" diff:"enum"`
 	Default     string   `json:"default,omitempty" diff:"default"`
 	Description string   `json:"description,omitempty" diff:"description"`
+}
+
+func ParseServers(file file.JsonFile) (*Servers, error) {
+	var serversModel Servers
+	node := file.GetNodeData(OAS_SERVERS_KEY)
+	if node != nil {
+		err := json.Unmarshal(*node, &serversModel)
+		if err != nil {
+			return nil, fmt.Errorf("failed to Unmarshal Servers struct: %v", err)
+		}
+	}
+
+	return &serversModel, nil
 }

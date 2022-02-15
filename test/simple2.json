@@ -6,13 +6,17 @@
   },
   "servers": [
     {
-      "url": "http://shipping.sock-shop",
+      "url": "http://refael.shipping.sock-shop",
+      "description": "refael up9-demo-link all"
+    },  
+    {
+      "url": "http://gustavo.shipping.sock-shop",
       "description": "gustavo up9-demo-link all"
     },
     {
-      "url": "url",
-      "description": "desc"
-    }    
+      "url": "https://test2.com",
+      "description": "some description 2"
+    }
   ],
   "paths": {
     "/users": {

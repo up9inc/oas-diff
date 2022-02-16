@@ -49,14 +49,14 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 	changeMap := NewChangeMap()
 
 	// info
-	d.info.internalDiff, err = d.info.Diff(jsonFile, jsonFile2, d.validator)
+	err = d.info.Diff(jsonFile, jsonFile2, d.validator)
 	if err != nil {
 		return nil, err
 	}
 	changeMap[model.OAS_INFO_KEY] = d.info.changelog
 
 	// servers
-	d.servers.internalDiff, err = d.servers.Diff(jsonFile, jsonFile2, d.validator)
+	err = d.servers.Diff(jsonFile, jsonFile2, d.validator)
 	if err != nil {
 		return nil, err
 	}

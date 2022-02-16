@@ -23,40 +23,35 @@ func NewInfoDiff() *infoDiff {
 	}
 }
 
-func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) (*internalDiff, error) {
+func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) error {
 	var err error
 
 	// schema
 	err = i.schema.Build(validator)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// info1
 	i.filePath = jsonFile.GetPath()
 	err = i.data.Parse(jsonFile)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// info2
 	i.filePath2 = jsonFile2.GetPath()
 	err = i.data2.Parse(jsonFile2)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// info changelog
 	changes, err := i.diff(i.data, i.data2)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// changelogs
-	err = i.handleChanges(changes)
-	if err != nil {
-		return nil, err
-	}
-
-	return i.internalDiff, nil
+	return i.handleChanges(changes)
 }

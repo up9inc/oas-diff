@@ -23,40 +23,35 @@ func NewServersDiff() *serversDiff {
 	}
 }
 
-func (s *serversDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) (*internalDiff, error) {
+func (s *serversDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) error {
 	var err error
 
 	// schema
 	err = s.schema.Build(validator)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// servers1
 	s.filePath = jsonFile.GetPath()
 	err = s.data.Parse(jsonFile)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// servers2
 	s.filePath2 = jsonFile2.GetPath()
 	err = s.data2.Parse(jsonFile2)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// servers changelog
 	changes, err := s.diff(s.data, s.data2)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// changelogs
-	err = s.handleArrayChanges(s.data, s.data2, changes)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.internalDiff, nil
+	return s.handleArrayChanges(s.data, s.data2, changes)
 }

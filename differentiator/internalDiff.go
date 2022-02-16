@@ -13,7 +13,7 @@ import (
 //var _ InternalDiff = (*internalDiff)(nil)
 
 type InternalDiff interface {
-	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) (*internalDiff, error)
+	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) error
 }
 
 type internalDiff struct {
@@ -53,6 +53,8 @@ func (i *internalDiff) handleChanges(changes lib.Changelog) error {
 
 	return nil
 }
+
+//TODO: handleObjectChanges - object changes file path info
 
 func (i *internalDiff) handleArrayChanges(data, data2 model.Array, changes lib.Changelog) error {
 	for _, c := range changes {

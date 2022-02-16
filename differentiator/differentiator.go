@@ -22,6 +22,8 @@ type differentiator struct {
 func NewDiff() Differentiator {
 	v := &differentiator{
 		validator: validator.NewValidator(),
+		info:      NewInfoDiff(),
+		servers:   NewServersDiff(),
 	}
 
 	return v
@@ -47,14 +49,14 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 	changeMap := NewChangeMap()
 
 	// info
-	d.info, err = d.info.Diff(jsonFile, jsonFile2, d.validator)
+	d.info.internalDiff, err = d.info.Diff(jsonFile, jsonFile2, d.validator)
 	if err != nil {
 		return nil, err
 	}
 	changeMap[model.OAS_INFO_KEY] = d.info.changelog
 
 	// servers
-	d.servers, err = d.servers.Diff(jsonFile, jsonFile2, d.validator)
+	d.servers.internalDiff, err = d.servers.Diff(jsonFile, jsonFile2, d.validator)
 	if err != nil {
 		return nil, err
 	}

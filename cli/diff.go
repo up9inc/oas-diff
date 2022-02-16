@@ -7,6 +7,7 @@ import (
 
 	differentiator "github.com/up9inc/oas-diff/differentiator"
 	file "github.com/up9inc/oas-diff/json"
+	"github.com/up9inc/oas-diff/validator"
 	"github.com/urfave/cli/v2"
 )
 
@@ -39,7 +40,9 @@ func diffCmd(c *cli.Context) error {
 		return err
 	}
 
-	diff := differentiator.NewDiff()
+	val := validator.NewValidator()
+	diff := differentiator.NewDiff(val)
+
 	changelog, err := diff.Diff(jsonFile, jsonFile2)
 	if err != nil {
 		return err

@@ -19,9 +19,9 @@ type differentiator struct {
 	servers *serversDiff
 }
 
-func NewDiff() Differentiator {
+func NewDiff(val validator.Validator) Differentiator {
 	v := &differentiator{
-		validator: validator.NewValidator(),
+		validator: val,
 		info:      NewInfoDiff(),
 		servers:   NewServersDiff(),
 	}
@@ -30,12 +30,7 @@ func NewDiff() Differentiator {
 }
 
 func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (changeMap, error) {
-	err := d.validator.InitOAS31Schema()
-	if err != nil {
-		return nil, err
-	}
-
-	err = d.validator.Validate(jsonFile)
+	err := d.validator.Validate(jsonFile)
 	if err != nil {
 		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile.GetPath())
 	}

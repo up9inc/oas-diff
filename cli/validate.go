@@ -30,13 +30,13 @@ func validateCmd(c *cli.Context) error {
 		return err
 	}
 
-	validator := validator.NewValidator()
-	err = validator.InitOAS31Schema()
+	val := validator.NewValidator()
+	err = val.InitOAS31Schema(validator.OAS_SCHEMA_FILE)
 	if err != nil {
 		return err
 	}
 
-	err = validator.Validate(jsonFile)
+	err = val.Validate(jsonFile)
 	if err != nil {
 		sb := strings.Builder{}
 

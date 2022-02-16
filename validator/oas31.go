@@ -12,8 +12,12 @@ const (
 	OAS_SCHEMA_FILE = "validator/oas31.json"
 )
 
-func (v *validator) InitOAS31Schema() error {
-	v.jsonSchema = file.NewJsonFile(OAS_SCHEMA_FILE)
+func (v *validator) InitOAS31Schema(path string) error {
+	if len(path) == 0 {
+		path = OAS_SCHEMA_FILE
+	}
+
+	v.jsonSchema = file.NewJsonFile(path)
 	err := v.jsonSchema.ValidatePath()
 	if err != nil {
 		return err
@@ -29,7 +33,7 @@ func (v *validator) InitOAS31Schema() error {
 
 func (v *validator) GetSchemaProperty(key string) (*jsonschema.Schema, error) {
 	if v.schema == nil {
-		err := v.InitOAS31Schema()
+		err := v.InitOAS31Schema(OAS_SCHEMA_FILE)
 		if err != nil {
 			return nil, err
 		}

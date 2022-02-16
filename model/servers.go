@@ -2,10 +2,14 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	file "github.com/up9inc/oas-diff/json"
 )
+
+// make sure this model implements the Array interface
+var _ Array = (*Servers)(nil)
 
 type Servers []*Server
 
@@ -34,13 +38,17 @@ func ParseServers(file file.JsonFile) (*Servers, error) {
 	return &serversModel, nil
 }
 
-// It should only return 1 result, the url identifier is unique
-func (s Servers) FilterByURL(url string) (int, *Server) {
+func (s Servers) SearchByIdentifier(identifier interface{}) (int, interface{}, error) {
+	url, ok := identifier.(string)
+	if !ok {
+		return -1, nil, errors.New("invalid identifier for servers model, must be a string")
+	}
+
 	for k, v := range s {
 		if v.URL == url {
-			return k, v
+			return k, v, nil
 		}
 	}
 
-	return -1, nil
+	return -1, nil, nil
 }

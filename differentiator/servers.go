@@ -59,13 +59,19 @@ func (s *serversDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, vali
 			// we have to figure out if it was created on the file1 or file2
 
 			// file1
-			index, _ := s.data.FilterByURL(lastPath)
+			index, _, err := s.data.SearchByIdentifier(lastPath)
+			if err != nil {
+				return nil, err
+			}
 			if index != -1 {
 				path = fmt.Sprintf("%s#%s.%d", jsonFile.GetPath(), s.key, index)
 
 			} else {
 				// file2
-				index, _ := s.data2.FilterByURL(lastPath)
+				index, _, err := s.data2.SearchByIdentifier(lastPath)
+				if err != nil {
+					return nil, err
+				}
 				if index != -1 {
 					path = fmt.Sprintf("%s#%s.%d", jsonFile2.GetPath(), s.key, index)
 				}
@@ -77,13 +83,19 @@ func (s *serversDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, vali
 			// we have to figure out if it was created on the file1 or file2
 
 			// file1
-			index, _ := s.data.FilterByURL(penultPath)
+			index, _, err := s.data.SearchByIdentifier(penultPath)
+			if err != nil {
+				return nil, err
+			}
 			if index != -1 {
 				path = fmt.Sprintf("%s#%s.%d.%s", jsonFile.GetPath(), s.key, index, lastPath)
 
 			} else {
 				// file2
-				index, _ := s.data2.FilterByURL(penultPath)
+				index, _, err := s.data2.SearchByIdentifier(penultPath)
+				if err != nil {
+					return nil, err
+				}
 				if index != -1 {
 					path = fmt.Sprintf("%s#%s.%d.%s", jsonFile2.GetPath(), s.key, index, lastPath)
 				}

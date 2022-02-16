@@ -8,7 +8,10 @@ import (
 	file "github.com/up9inc/oas-diff/json"
 )
 
-// make sure this model implements the Array interface
+// make sure we implement the Model interface
+var _ Model = (*Servers)(nil)
+
+// make sure we implement the Array interface
 var _ Array = (*Servers)(nil)
 
 type Servers []*Server
@@ -25,17 +28,16 @@ type ServerVariable struct {
 	Description string   `json:"description,omitempty" diff:"description"`
 }
 
-func ParseServers(file file.JsonFile) (*Servers, error) {
-	var serversModel Servers
+func (s *Servers) Parse(file file.JsonFile) error {
 	node := file.GetNodeData(OAS_SERVERS_KEY)
 	if node != nil {
-		err := json.Unmarshal(*node, &serversModel)
+		err := json.Unmarshal(*node, s)
 		if err != nil {
-			return nil, fmt.Errorf("failed to Unmarshal Servers struct: %v", err)
+			return fmt.Errorf("failed to Unmarshal Servers struct: %v", err)
 		}
 	}
 
-	return &serversModel, nil
+	return nil
 }
 
 func (s Servers) SearchByIdentifier(identifier interface{}) (int, interface{}, error) {

@@ -7,6 +7,9 @@ import (
 	file "github.com/up9inc/oas-diff/json"
 )
 
+// make sure we implement the Model interface
+var _ Model = (*Info)(nil)
+
 type Info struct {
 	Title          string   `json:"title" diff:"title"`
 	Description    string   `json:"description,omitempty" diff:"description"`
@@ -27,15 +30,13 @@ type License struct {
 	URL  string `json:"url,omitempty" diff:"url"`
 }
 
-func ParseInfo(file file.JsonFile) (*Info, error) {
-	var infoModel Info
+func (i *Info) Parse(file file.JsonFile) error {
 	node := file.GetNodeData(OAS_INFO_KEY)
 	if node != nil {
-		err := json.Unmarshal(*node, &infoModel)
+		err := json.Unmarshal(*node, i)
 		if err != nil {
-			return nil, fmt.Errorf("failed to Unmarshal Info struct: %v", err)
+			return fmt.Errorf("failed to Unmarshal Info struct: %v", err)
 		}
 	}
-
-	return &infoModel, nil
+	return nil
 }

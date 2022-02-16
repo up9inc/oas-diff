@@ -18,8 +18,8 @@ type infoDiff struct {
 func NewInfoDiff() *infoDiff {
 	return &infoDiff{
 		internalDiff: NewInternalDiff(model.OAS_INFO_KEY),
-		data:         nil,
-		data2:        nil,
+		data:         &model.Info{},
+		data2:        &model.Info{},
 	}
 }
 
@@ -34,14 +34,14 @@ func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validat
 
 	// info1
 	i.filePath = jsonFile.GetPath()
-	i.data, err = model.ParseInfo(jsonFile)
+	err = i.data.Parse(jsonFile)
 	if err != nil {
 		return nil, err
 	}
 
 	// info2
 	i.filePath2 = jsonFile2.GetPath()
-	i.data2, err = model.ParseInfo(jsonFile2)
+	err = i.data2.Parse(jsonFile2)
 	if err != nil {
 		return nil, err
 	}

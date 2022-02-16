@@ -18,8 +18,8 @@ type serversDiff struct {
 func NewServersDiff() *serversDiff {
 	return &serversDiff{
 		internalDiff: NewInternalDiff(model.OAS_SERVERS_KEY),
-		data:         nil,
-		data2:        nil,
+		data:         &model.Servers{},
+		data2:        &model.Servers{},
 	}
 }
 
@@ -34,14 +34,14 @@ func (s *serversDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, vali
 
 	// servers1
 	s.filePath = jsonFile.GetPath()
-	s.data, err = model.ParseServers(jsonFile)
+	err = s.data.Parse(jsonFile)
 	if err != nil {
 		return nil, err
 	}
 
 	// servers2
 	s.filePath2 = jsonFile2.GetPath()
-	s.data2, err = model.ParseServers(jsonFile2)
+	err = s.data2.Parse(jsonFile2)
 	if err != nil {
 		return nil, err
 	}

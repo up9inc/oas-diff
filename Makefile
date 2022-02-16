@@ -17,3 +17,7 @@ clean:
 test:
 	@echo "running tests .." 
 	@go test ./... -timeout 30s -v -race
+
+acceptance-test:
+	@echo "running acceptance tests .."
+	@cd acceptanceTests && $(MAKE) test

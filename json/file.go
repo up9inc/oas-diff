@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -31,6 +32,13 @@ func (f *jsonFile) ValidatePath() error {
 	if !strings.HasSuffix(f.path, ".json") {
 		return errors.New("invalid path, file must be a .json file")
 	}
+
+	var err error
+	f.path, err = filepath.Abs(f.path)
+	if err != nil {
+		return err
+	}
+
 	if !f.exists(f.path) {
 		return fmt.Errorf("invalid path, file does not exist: %s", f.path)
 	}

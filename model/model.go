@@ -1,8 +1,23 @@
 package model
 
-import file "github.com/up9inc/oas-diff/json"
+import (
+	"github.com/santhosh-tekuri/jsonschema/v5"
+	file "github.com/up9inc/oas-diff/json"
+)
 
 type Model interface {
 	// Each model struct must have its own parse logic
 	Parse(file file.JsonFile) error
 }
+
+type SchemaRef struct {
+	Ref   string
+	Value *jsonschema.Schema
+}
+
+type ExternalDocs struct {
+	Description string `json:"description,omitempty"`
+	URL         string `json:"url,omitempty"`
+}
+
+type SecurityRequirements []map[string][]string

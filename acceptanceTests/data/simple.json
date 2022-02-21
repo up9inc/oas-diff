@@ -17,7 +17,18 @@
   ],
   "paths": {
     "/users": {
-      "get": {}
+      "get": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }          
+        ]
+      }
     }
   }
 }

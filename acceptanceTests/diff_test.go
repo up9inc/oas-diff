@@ -67,21 +67,22 @@ func (d *DiffSuite) TestDiff() {
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
 	assert.NotNil(output, "changeMap is nil")
-	assert.Len(output, 2, "changeMap len should be 2")
+	assert.Len(output, 3, "changeMap len should be 3")
 	assert.NotNil(output[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
 	assert.NotNil(output[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
+	assert.NotNil(output[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
 
 	// info
 	info := output[model.OAS_INFO_KEY]
 	assert.Len(info, 2, "info should have 2 changes")
 	// info[0]
 	assert.Equal("update", info[0].Type)
-	assert.Equal("info.title", info[0].Path)
+	assert.Equal("title", info[0].Path)
 	assert.Equal("Simple example", info[0].From)
 	assert.Equal("Simple example 2", info[0].To)
 	// info[1]
 	assert.Equal("update", info[1].Type)
-	assert.Equal("info.version", info[1].Path)
+	assert.Equal("version", info[1].Path)
 	assert.Equal("1.0.0", info[1].From)
 	assert.Equal("1.1.0", info[1].To)
 
@@ -112,4 +113,21 @@ func (d *DiffSuite) TestDiff() {
 		URL:         "https://test2.com",
 		Description: "some description 2",
 	}, servers[2].To)
+
+	// paths
+	paths := output[model.OAS_PATHS_KEY]
+	assert.Len(paths, 1, "paths should have 1 change")
+	// paths[0]
+	paramName := "accept"
+	assert.Equal("delete", paths[0].Type)
+	assert.Equal(fmt.Sprintf("/users.get.parameters.%s", paramName), paths[0].Path)
+	assert.Equal(model.Parameter{
+		Name: paramName,
+		In:   "header",
+		Schema: &model.SchemaRef{
+			Ref:   "",
+			Value: nil,
+		},
+	}, paths[0].From)
+	assert.Equal(nil, paths[0].To)
 }

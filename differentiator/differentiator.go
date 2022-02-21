@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	file "github.com/up9inc/oas-diff/json"
-	"github.com/up9inc/oas-diff/model"
 	"github.com/up9inc/oas-diff/validator"
 )
 
@@ -17,6 +16,7 @@ type differentiator struct {
 
 	info    *infoDiff
 	servers *serversDiff
+	paths   *pathsDiff
 }
 
 func NewDiff(val validator.Validator) Differentiator {
@@ -24,6 +24,7 @@ func NewDiff(val validator.Validator) Differentiator {
 		validator: val,
 		info:      NewInfoDiff(),
 		servers:   NewServersDiff(),
+		paths:     NewPathsDiff(),
 	}
 
 	return v
@@ -48,14 +49,21 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 	if err != nil {
 		return nil, err
 	}
-	changeMap[model.OAS_INFO_KEY] = d.info.changelog
+	changeMap[d.info.key] = d.info.changelog
 
 	// servers
 	err = d.servers.Diff(jsonFile, jsonFile2, d.validator)
 	if err != nil {
 		return nil, err
 	}
-	changeMap[model.OAS_SERVERS_KEY] = d.servers.changelog
+	changeMap[d.servers.key] = d.servers.changelog
+
+	// paths
+	err = d.paths.Diff(jsonFile, jsonFile2, d.validator)
+	if err != nil {
+		return nil, err
+	}
+	changeMap[d.paths.key] = d.paths.changelog
 
 	return changeMap, nil
 }

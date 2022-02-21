@@ -12,7 +12,6 @@ var _ Model = (*Paths)(nil)
 
 type Paths map[string]*PathItem
 
-// TODO: Add identifiers to arrays
 type PathItem struct {
 	Ref         string     `json:"$ref,omitempty" diff:"$ref"`
 	Summary     string     `json:"summary,omitempty" diff:"summary"`
@@ -46,9 +45,9 @@ type Operation struct {
 type Parameters []*Parameter
 
 type Parameter struct {
+	Name             string        `json:"name,omitempty" diff:"name,identifier"`
 	Ref              string        `json:"$ref,omitempty" diff:"$ref"`
 	In               string        `json:"in,omitempty" diff:"in"`
-	Name             string        `json:"name,omitempty" diff:"name"`
 	Description      string        `json:"description,omitempty" diff:"description"`
 	CollectionFormat string        `json:"collectionFormat,omitempty" diff:"collectionFormat"`
 	Type             string        `json:"type,omitempty" diff:"type"`

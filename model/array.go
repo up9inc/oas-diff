@@ -1,5 +1,5 @@
 package model
 
 type Array interface {
-	SearchByIdentifier(identifier interface{}) (int, interface{}, error)
+	SearchByIdentifier(identifier interface{}) (int, error)
 }

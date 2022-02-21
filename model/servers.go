@@ -40,17 +40,17 @@ func (s *Servers) Parse(file file.JsonFile) error {
 	return nil
 }
 
-func (s Servers) SearchByIdentifier(identifier interface{}) (int, interface{}, error) {
+func (s Servers) SearchByIdentifier(identifier interface{}) (int, error) {
 	url, ok := identifier.(string)
 	if !ok {
-		return -1, nil, errors.New("invalid identifier for servers model, must be a string")
+		return -1, errors.New("invalid identifier for servers model, must be a string")
 	}
 
 	for k, v := range s {
 		if v.URL == url {
-			return k, v, nil
+			return k, nil
 		}
 	}
 
-	return -1, nil, nil
+	return -1, nil
 }

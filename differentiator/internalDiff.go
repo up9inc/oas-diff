@@ -2,15 +2,13 @@ package differentiator
 
 import (
 	"fmt"
+	"strings"
 
 	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
 	"github.com/up9inc/oas-diff/validator"
 )
-
-// make sure internalDiff struct implements the InternalDiff interface
-//var _ InternalDiff = (*internalDiff)(nil)
 
 type InternalDiff interface {
 	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) error
@@ -40,7 +38,8 @@ func (i *internalDiff) diff(a, b interface{}) (lib.Changelog, error) {
 
 func (i *internalDiff) handleChanges(changes lib.Changelog) error {
 	for _, c := range changes {
-		path := fmt.Sprintf("%s.%s", i.key, c.Path[len(c.Path)-1])
+		// TODO: Improve path information for arrays
+		path := strings.Join(c.Path, ".")
 		i.changelog = append(i.changelog,
 			&changelog{
 				Type: c.Type,

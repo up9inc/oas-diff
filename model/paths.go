@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	file "github.com/up9inc/oas-diff/json"
@@ -41,6 +42,9 @@ type Operation struct {
 	Produces     []string              `json:"produces,omitempty" diff:"produces"`
 	Security     *SecurityRequirements `json:"security,omitempty" diff:"security"`
 }
+
+// make sure we implement the Array interface
+var _ Array = (*Parameters)(nil)
 
 type Parameters []*Parameter
 
@@ -94,4 +98,19 @@ func (p *Paths) Parse(file file.JsonFile) error {
 	}
 
 	return nil
+}
+
+func (p Parameters) SearchByIdentifier(identifier interface{}) (int, error) {
+	name, ok := identifier.(string)
+	if !ok {
+		return -1, errors.New("invalid identifier for parameters model, must be a string")
+	}
+
+	for k, v := range p {
+		if v.Name == name {
+			return k, nil
+		}
+	}
+
+	return -1, nil
 }

@@ -46,6 +46,48 @@ func (p *pathsDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, valida
 		return err
 	}
 
+	// TODO: Diff segments of the paths instead the entire map
+	for k := range p.data {
+		// Parameters
+		err = p.handleArray(p.data[k].Parameters, p.data2[k].Parameters)
+		if err != nil {
+			return err
+		}
+		p.data[k].Parameters = nil
+		p.data2[k].Parameters = nil
+
+		// Servers
+		err = p.handleArray(p.data[k].Servers, p.data2[k].Servers)
+		if err != nil {
+			return err
+		}
+		p.data[k].Servers = nil
+		p.data2[k].Servers = nil
+
+		// Operations
+
+		// Connect
+		if p.data[k].Connect != nil && p.data2[k].Connect != nil {
+			// Connect Parameters
+			err = p.handleArray(p.data[k].Connect.Parameters, p.data2[k].Connect.Parameters)
+			if err != nil {
+				return err
+			}
+			p.data[k].Connect.Parameters = nil
+			p.data2[k].Connect.Parameters = nil
+		}
+
+		/* 		Connect
+		   		Delete
+		   		Get
+		   		Head
+		   		Options
+		   		Patch
+		   		Post
+		   		Put
+		   		Trace        */
+	}
+
 	// paths changelog
 	changes, err := p.diff(p.data, p.data2)
 	if err != nil {
@@ -54,4 +96,30 @@ func (p *pathsDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, valida
 
 	// changelogs
 	return p.handleChanges(changes)
+}
+
+func (p *pathsDiff) handleOperation(ops, ops2 *model.Operation) error {
+	opsChanges, err := p.diff(ops, ops2)
+	if err != nil {
+		return err
+	}
+	err = p.handleChanges(opsChanges)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *pathsDiff) handleArray(params, params2 model.Array) error {
+	paramsChanges, err := p.diff(params, params2)
+	if err != nil {
+		return err
+	}
+	err = p.handleArrayChanges(params, params2, paramsChanges)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

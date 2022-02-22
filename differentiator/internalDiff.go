@@ -36,22 +36,23 @@ func (i *internalDiff) diff(a, b interface{}) (lib.Changelog, error) {
 	return lib.Diff(a, b, lib.DisableStructValues(), lib.SliceOrdering(false))
 }
 
-// TODO: Include source file information on the path
-// TODO: Improve path information for arrays
-func (i *internalDiff) handleChanges(changes lib.Changelog) error {
-	for _, c := range changes {
-		path := strings.Join(c.Path, ".")
-		i.changelog = append(i.changelog,
-			&changelog{
-				Type: c.Type,
-				Path: path,
-				From: c.From,
-				To:   c.To,
-			},
-		)
-	}
+// TODO: Include source file information in path
+func (i *internalDiff) handleChange(change lib.Change) {
+	path := strings.Join(change.Path, ".")
+	i.changelog = append(i.changelog,
+		&changelog{
+			Type: change.Type,
+			Path: path,
+			From: change.From,
+			To:   change.To,
+		},
+	)
+}
 
-	return nil
+func (i *internalDiff) handleChanges(changes lib.Changelog) {
+	for _, c := range changes {
+		i.handleChange(c)
+	}
 }
 
 func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Change) (err error) {
@@ -144,6 +145,7 @@ func (i *internalDiff) handleArrayChanges(data, data2 model.Array, changes lib.C
 	return nil
 }
 
+// TODO: Fix update showing array identifier in path
 func (i *internalDiff) buildArrayPath(path []string, filePath string, index int) string {
 	var result string
 	// ignore the last path, the last path is the array identifier value

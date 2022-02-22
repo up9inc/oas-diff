@@ -53,5 +53,7 @@ func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validat
 	}
 
 	// changelogs
-	return i.handleChanges(changes)
+	i.internalDiff.handleChanges(changes)
+
+	return nil
 }

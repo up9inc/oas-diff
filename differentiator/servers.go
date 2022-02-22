@@ -53,5 +53,7 @@ func (s *serversDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, vali
 	}
 
 	// changelogs
-	return s.handleArrayChanges(s.data, s.data2, changes)
+	s.internalDiff.handleArrayChanges(s.data, s.data2, changes)
+
+	return nil
 }

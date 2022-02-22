@@ -91,7 +91,7 @@ func (d *DiffSuite) TestDiff() {
 	assert.Len(servers, 3, "servers should have 3 changes")
 	// servers[0]
 	assert.Equal("delete", servers[0].Type)
-	assert.Equal(fmt.Sprintf("%s/%s#servers.0", d.absPath, FILE1), servers[0].Path)
+	assert.Equal(fmt.Sprintf("%s/%s#%s.0", d.absPath, FILE1, model.OAS_SERVERS_KEY), servers[0].Path)
 	assert.Equal(model.Server{
 		URL:         "https://test.com",
 		Description: "some description",
@@ -99,7 +99,7 @@ func (d *DiffSuite) TestDiff() {
 	assert.Equal(nil, servers[0].To)
 	// servers[1]
 	assert.Equal("create", servers[1].Type)
-	assert.Equal(fmt.Sprintf("%s/%s#servers.1", d.absPath, FILE2), servers[1].Path)
+	assert.Equal(fmt.Sprintf("%s/%s#%s.1", d.absPath, FILE2, model.OAS_SERVERS_KEY), servers[1].Path)
 	assert.Equal(nil, servers[1].From)
 	assert.Equal(model.Server{
 		URL:         "http://gustavo.shipping.sock-shop",
@@ -107,7 +107,7 @@ func (d *DiffSuite) TestDiff() {
 	}, servers[1].To)
 	// servers[2]
 	assert.Equal("create", servers[2].Type)
-	assert.Equal(fmt.Sprintf("%s/%s#servers.2", d.absPath, FILE2), servers[2].Path)
+	assert.Equal(fmt.Sprintf("%s/%s#%s.2", d.absPath, FILE2, model.OAS_SERVERS_KEY), servers[2].Path)
 	assert.Equal(nil, servers[2].From)
 	assert.Equal(model.Server{
 		URL:         "https://test2.com",
@@ -120,7 +120,7 @@ func (d *DiffSuite) TestDiff() {
 	// paths[0]
 	paramName := "accept"
 	assert.Equal("delete", paths[0].Type)
-	assert.Equal(fmt.Sprintf("/users.get.parameters.%s", paramName), paths[0].Path)
+	assert.Equal(fmt.Sprintf("%s/%s#%s./users.get.parameters.0", d.absPath, FILE1, model.OAS_PATHS_KEY), paths[0].Path)
 	assert.Equal(model.Parameter{
 		Name: paramName,
 		In:   "header",

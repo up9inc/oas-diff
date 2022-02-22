@@ -3,21 +3,41 @@
   "info": {
     "title": "Simple example",
     "version": "1.0.0"
-  },  
+  },
   "servers": [
-
     {
       "url": "https://test.com",
       "description": "some description"
     },
     {
       "url": "http://refael.shipping.sock-shop",
-      "description": "refael up9-demo-link all"
-    }      
+      "description": "refael up9-demo-link alla"
+    }
   ],
   "paths": {
     "/users": {
-      "get": {}
+      "parameters": [
+        {
+          "in": "header",
+          "name": "accept",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        }          
+      ],
+      "get": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
     }
   }
 }

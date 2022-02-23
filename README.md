@@ -23,3 +23,9 @@ OAS 3.1 Validation and Diff Tool
     ````
     ./build/oasdiff diff --file test/simple.json --file2 test/simple2.json
     ````
+## Changelog Rules
+- Arrays
+    ````
+    CREATE/DELETE -> Always the entire element
+    UPDATE -> Only the property, exception if the property is the identifier
+    ````

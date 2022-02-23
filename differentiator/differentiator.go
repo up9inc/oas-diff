@@ -11,20 +11,31 @@ type Differentiator interface {
 	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (changeMap, error)
 }
 
+type DifferentiatorOptions struct {
+	IncludeFilePath bool
+}
+
 type differentiator struct {
 	validator validator.Validator
+	opts      *DifferentiatorOptions
 
 	info    *infoDiff
 	servers *serversDiff
 	paths   *pathsDiff
 }
 
-func NewDiff(val validator.Validator) Differentiator {
+func NewDiff(val validator.Validator, opts *DifferentiatorOptions) Differentiator {
 	v := &differentiator{
 		validator: val,
+		opts:      opts,
 		info:      NewInfoDiff(),
 		servers:   NewServersDiff(),
 		paths:     NewPathsDiff(),
+	}
+	if v.opts == nil {
+		v.opts = &DifferentiatorOptions{
+			IncludeFilePath: false,
+		}
 	}
 
 	return v

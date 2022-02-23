@@ -23,8 +23,11 @@ func NewInfoDiff() *infoDiff {
 	}
 }
 
-func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator) error {
+func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts *DifferentiatorOptions) error {
 	var err error
+
+	// opts
+	i.opts = opts
 
 	// schema
 	err = i.schema.Build(validator)

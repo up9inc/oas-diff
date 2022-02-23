@@ -4,9 +4,9 @@ type Array interface {
 	SearchByIdentifier(identifier interface{}) (int, error)
 }
 
-func IsArrayProperty(p string) bool {
+func IsArrayProperty(property string) bool {
 	for _, a := range [...]string{"servers", "parameters"} {
-		if a == p {
+		if a == property {
 			return true
 		}
 	}

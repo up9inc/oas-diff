@@ -56,21 +56,21 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 	changeMap := NewChangeMap()
 
 	// info
-	err = d.info.Diff(jsonFile, jsonFile2, d.validator)
+	err = d.info.Diff(jsonFile, jsonFile2, d.validator, d.opts)
 	if err != nil {
 		return nil, err
 	}
 	changeMap[d.info.key] = d.info.changelog
 
 	// servers
-	err = d.servers.Diff(jsonFile, jsonFile2, d.validator)
+	err = d.servers.Diff(jsonFile, jsonFile2, d.validator, d.opts)
 	if err != nil {
 		return nil, err
 	}
 	changeMap[d.servers.key] = d.servers.changelog
 
 	// paths
-	err = d.paths.Diff(jsonFile, jsonFile2, d.validator)
+	err = d.paths.Diff(jsonFile, jsonFile2, d.validator, d.opts)
 	if err != nil {
 		return nil, err
 	}

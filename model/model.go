@@ -10,6 +10,7 @@ type Model interface {
 	Parse(file file.JsonFile) error
 }
 
+// TODO: SchemaRef not working as expected
 type SchemaRef struct {
 	Ref   string
 	Value *jsonschema.Schema

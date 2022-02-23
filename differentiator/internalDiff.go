@@ -91,7 +91,7 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 			return err
 		}
 		if index != -1 {
-			path = i.buildArrayPath(change.Path, filePath, index)
+			path = i.buildArrayPath(change.Type, change.Path, filePath, index)
 			//path = fmt.Sprintf("%s#%s.%d", filePath, i.key, index)
 
 		}
@@ -109,7 +109,7 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 			return err
 		}
 		if index != -1 {
-			path = i.buildArrayPath(change.Path, i.filePath, index)
+			path = i.buildArrayPath(change.Type, change.Path, i.filePath, index)
 			//path = fmt.Sprintf("%s#%s.%d.%s", i.filePath, i.key, index, lastPath)
 
 		} else {
@@ -119,7 +119,7 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 				return err
 			}
 			if index != -1 {
-				path = i.buildArrayPath(change.Path, i.filePath2, index)
+				path = i.buildArrayPath(change.Type, change.Path, i.filePath2, index)
 				//path = fmt.Sprintf("%s#%s.%d.%s", i.filePath2, i.key, index, lastPath)
 			}
 		}
@@ -148,8 +148,9 @@ func (i *internalDiff) handleArrayChanges(data, data2 model.Array, changes lib.C
 	return nil
 }
 
-func (i *internalDiff) buildArrayPath(path []string, filePath string, index int) string {
+func (i *internalDiff) buildArrayPath(operation string, path []string, filePath string, index int) string {
 	var auxPath string
+	var result string
 
 	// len == 2 -> array property and the identifier value
 	if len(path) > 2 {
@@ -166,13 +167,23 @@ func (i *internalDiff) buildArrayPath(path []string, filePath string, index int)
 	// path len == 1 and the path is the identifier value
 	if len(auxPath) == 0 {
 		if i.opts.IncludeFilePath {
-			return fmt.Sprintf("%s#%s.%d", filePath, i.key, index)
+			result = fmt.Sprintf("%s#%s.%d", filePath, i.key, index)
+		} else {
+			result = fmt.Sprintf("%s.%d", i.key, index)
 		}
-		return fmt.Sprintf("%s.%d", i.key, index)
+	} else {
+		// auxPath
+		if i.opts.IncludeFilePath {
+			result = fmt.Sprintf("%s#%s.%s.%d", filePath, i.key, auxPath, index)
+		} else {
+			result = fmt.Sprintf("%s.%s.%d", i.key, auxPath, index)
+		}
 	}
 
-	if i.opts.IncludeFilePath {
-		return fmt.Sprintf("%s#%s.%s.%d", filePath, i.key, auxPath, index)
+	// for update we need to include the updated property name on the end
+	if operation == "update" {
+		result = fmt.Sprintf("%s.%s", result, path[len(path)-1])
 	}
-	return fmt.Sprintf("%s.%s.%d", i.key, auxPath, index)
+
+	return result
 }

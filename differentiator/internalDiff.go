@@ -34,7 +34,7 @@ func NewInternalDiff(key string) *internalDiff {
 }
 
 func (i *internalDiff) diff(a, b interface{}) (lib.Changelog, error) {
-	return lib.Diff(a, b, lib.StructMapKeySupport(), lib.DisableStructValues(), lib.SliceOrdering(false))
+	return lib.Diff(a, b, lib.CustomValueDiffers(NewStringDiffer(i.opts)), lib.StructMapKeySupport(), lib.DisableStructValues(), lib.SliceOrdering(false))
 }
 
 // TODO: Include source file information in path

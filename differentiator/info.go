@@ -23,7 +23,7 @@ func NewInfoDiff() *infoDiff {
 	}
 }
 
-func (i *infoDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts *DifferentiatorOptions) error {
+func (i *infoDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts *DifferentiatorOptions) error {
 	var err error
 
 	// opts

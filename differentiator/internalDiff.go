@@ -11,7 +11,7 @@ import (
 )
 
 type InternalDiff interface {
-	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts *DifferentiatorOptions) error
+	InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts *DifferentiatorOptions) error
 }
 
 type internalDiff struct {

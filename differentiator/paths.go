@@ -24,7 +24,7 @@ func NewPathsDiff() *pathsDiff {
 	}
 }
 
-func (p *pathsDiff) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts *DifferentiatorOptions) error {
+func (p *pathsDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts *DifferentiatorOptions) error {
 	var err error
 
 	// opts

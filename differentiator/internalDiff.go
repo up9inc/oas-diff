@@ -38,6 +38,8 @@ func (i *internalDiff) diff(a, b interface{}) (lib.Changelog, error) {
 
 // TODO: Include source file information in path
 func (i *internalDiff) handleChange(change lib.Change) {
+	// TODO: Exclusion logic here
+
 	path := strings.Join(change.Path, ".")
 	i.changelog = append(i.changelog,
 		&changelog{
@@ -145,16 +147,19 @@ func (i *internalDiff) handleArrayChanges(data, data2 model.Array, changes lib.C
 	return nil
 }
 
-// TODO: Fix update showing array identifier in path
 func (i *internalDiff) buildArrayPath(path []string, filePath string, index int) string {
 	var result string
-	// ignore the last path, the last path is the array identifier value
-	for i := 0; i < len(path)-1; i++ {
-		if i == 0 {
-			result = path[i]
-			continue
+
+	// len == 2 -> array property and the identifier value
+	if len(path) > 2 {
+		// ignore the last path, the last path is the array identifier value
+		for i := 0; i < len(path)-1; i++ {
+			if i == 0 {
+				result = path[i]
+				continue
+			}
+			result = fmt.Sprintf("%s.%s", result, path[i])
 		}
-		result = fmt.Sprintf("%s.%s", result, path[i])
 	}
 
 	// path len == 1 and the path is the identifier value

@@ -149,23 +149,30 @@ func (i *internalDiff) handleArrayChanges(data, data2 model.Array, changes lib.C
 }
 
 func (i *internalDiff) buildArrayPath(path []string, filePath string, index int) string {
-	var result string
+	var auxPath string
 
 	// len == 2 -> array property and the identifier value
 	if len(path) > 2 {
 		// ignore the last path, the last path is the array identifier value
 		for i := 0; i < len(path)-1; i++ {
 			if i == 0 {
-				result = path[i]
+				auxPath = path[i]
 				continue
 			}
-			result = fmt.Sprintf("%s.%s", result, path[i])
+			auxPath = fmt.Sprintf("%s.%s", auxPath, path[i])
 		}
 	}
 
 	// path len == 1 and the path is the identifier value
-	if len(result) == 0 {
-		return fmt.Sprintf("%s#%s.%d", filePath, i.key, index)
+	if len(auxPath) == 0 {
+		if i.opts.IncludeFilePath {
+			return fmt.Sprintf("%s#%s.%d", filePath, i.key, index)
+		}
+		return fmt.Sprintf("%s.%d", i.key, index)
 	}
-	return fmt.Sprintf("%s#%s.%s.%d", filePath, i.key, result, index)
+
+	if i.opts.IncludeFilePath {
+		return fmt.Sprintf("%s#%s.%s.%d", filePath, i.key, auxPath, index)
+	}
+	return fmt.Sprintf("%s.%s.%d", i.key, auxPath, index)
 }

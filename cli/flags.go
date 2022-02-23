@@ -15,7 +15,13 @@ var (
 	}
 	IncludeFilePath = &cli.BoolFlag{
 		Name:     "include-file-path",
-		Usage:    "Whether or not to include the full file path on the changelog",
+		Usage:    "Whether or not to include the full file path from the diff changelog",
+		Required: false,
+		Value:    false,
+	}
+	ExcludeDescriptions = &cli.BoolFlag{
+		Name:     "exclude-descriptions",
+		Usage:    "Whether or not to exclude descriptions from the diff changelog",
 		Required: false,
 		Value:    false,
 	}

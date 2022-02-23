@@ -43,7 +43,8 @@ func diffCmd(c *cli.Context) error {
 
 	val := validator.NewValidator()
 	opts := &differentiator.DifferentiatorOptions{
-		IncludeFilePath: c.Bool(IncludeFilePath.Name),
+		IncludeFilePath:     c.Bool(IncludeFilePath.Name),
+		ExcludeDescriptions: c.Bool(ExcludeDescriptions.Name),
 	}
 	diff := differentiator.NewDiff(val, opts)
 

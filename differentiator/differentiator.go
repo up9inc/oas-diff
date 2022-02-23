@@ -12,7 +12,8 @@ type Differentiator interface {
 }
 
 type DifferentiatorOptions struct {
-	IncludeFilePath bool
+	IncludeFilePath     bool
+	ExcludeDescriptions bool
 }
 
 type differentiator struct {
@@ -32,9 +33,12 @@ func NewDiff(val validator.Validator, opts *DifferentiatorOptions) Differentiato
 		servers:   NewServersDiff(),
 		paths:     NewPathsDiff(),
 	}
+
+	// default options values
 	if v.opts == nil {
 		v.opts = &DifferentiatorOptions{
-			IncludeFilePath: false,
+			IncludeFilePath:     false,
+			ExcludeDescriptions: false,
 		}
 	}
 

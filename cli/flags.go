@@ -13,13 +13,19 @@ var (
 		Usage:    "Path of the second OAS 3.1 file",
 		Required: true,
 	}
-	IncludeFilePath = &cli.BoolFlag{
+	LooseFlag = &cli.BoolFlag{
+		Name:     "loose",
+		Usage:    "loosely diff",
+		Required: false,
+		Value:    false,
+	}
+	IncludeFilePathFlag = &cli.BoolFlag{
 		Name:     "include-file-path",
 		Usage:    "Whether or not to include the full file path from the diff changelog",
 		Required: false,
 		Value:    false,
 	}
-	ExcludeDescriptions = &cli.BoolFlag{
+	ExcludeDescriptionsFlag = &cli.BoolFlag{
 		Name:     "exclude-descriptions",
 		Usage:    "Whether or not to exclude descriptions from the diff changelog",
 		Required: false,

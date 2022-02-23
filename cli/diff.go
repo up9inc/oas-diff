@@ -20,7 +20,9 @@ func RegisterDiffCmd() *cli.Command {
 		Flags: []cli.Flag{
 			FileFlag,
 			FileFlag2,
-			IncludeFilePath,
+			LooseFlag,
+			IncludeFilePathFlag,
+			ExcludeDescriptionsFlag,
 		},
 	}
 }
@@ -43,8 +45,9 @@ func diffCmd(c *cli.Context) error {
 
 	val := validator.NewValidator()
 	opts := &differentiator.DifferentiatorOptions{
-		IncludeFilePath:     c.Bool(IncludeFilePath.Name),
-		ExcludeDescriptions: c.Bool(ExcludeDescriptions.Name),
+		Loose:               c.Bool(LooseFlag.Name),
+		IncludeFilePath:     c.Bool(IncludeFilePathFlag.Name),
+		ExcludeDescriptions: c.Bool(ExcludeDescriptionsFlag.Name),
 	}
 	diff := differentiator.NewDiff(val, opts)
 

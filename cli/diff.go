@@ -20,6 +20,7 @@ func RegisterDiffCmd() *cli.Command {
 		Flags: []cli.Flag{
 			FileFlag,
 			FileFlag2,
+			IncludeFilePath,
 		},
 	}
 }
@@ -41,7 +42,10 @@ func diffCmd(c *cli.Context) error {
 	}
 
 	val := validator.NewValidator()
-	diff := differentiator.NewDiff(val)
+	opts := &differentiator.DifferentiatorOptions{
+		IncludeFilePath: c.Bool(IncludeFilePath.Name),
+	}
+	diff := differentiator.NewDiff(val, opts)
 
 	changelog, err := diff.Diff(jsonFile, jsonFile2)
 	if err != nil {

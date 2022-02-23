@@ -19,29 +19,20 @@ type DifferentiatorOptions struct {
 
 type differentiator struct {
 	validator validator.Validator
-	opts      *DifferentiatorOptions
+	opts      DifferentiatorOptions
 
 	info    *infoDiff
 	servers *serversDiff
 	paths   *pathsDiff
 }
 
-func NewDiff(val validator.Validator, opts *DifferentiatorOptions) Differentiator {
+func NewDiff(val validator.Validator, opts DifferentiatorOptions) Differentiator {
 	v := &differentiator{
 		validator: val,
 		opts:      opts,
 		info:      NewInfoDiff(),
 		servers:   NewServersDiff(),
 		paths:     NewPathsDiff(),
-	}
-
-	// default options values
-	if v.opts == nil {
-		v.opts = &DifferentiatorOptions{
-			Loose:               false,
-			IncludeFilePath:     false,
-			ExcludeDescriptions: false,
-		}
 	}
 
 	return v

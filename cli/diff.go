@@ -44,12 +44,11 @@ func diffCmd(c *cli.Context) error {
 	}
 
 	val := validator.NewValidator()
-	opts := &differentiator.DifferentiatorOptions{
+	diff := differentiator.NewDiff(val, differentiator.DifferentiatorOptions{
 		Loose:               c.Bool(LooseFlag.Name),
 		IncludeFilePath:     c.Bool(IncludeFilePathFlag.Name),
 		ExcludeDescriptions: c.Bool(ExcludeDescriptionsFlag.Name),
-	}
-	diff := differentiator.NewDiff(val, opts)
+	})
 
 	changelog, err := diff.Diff(jsonFile, jsonFile2)
 	if err != nil {

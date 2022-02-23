@@ -56,7 +56,7 @@ func TestDiffSuite(t *testing.T) {
 	suite.Run(t, new(DiffSuite))
 }
 
-func SimpleDiff(d *DiffSuite, opts *differentiator.DifferentiatorOptions) {
+func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	if d.diff == nil {
 		d.T().Error("diff is nil, you must initialize diff for each test")
 		return
@@ -183,7 +183,7 @@ func SimpleDiff(d *DiffSuite, opts *differentiator.DifferentiatorOptions) {
 }
 
 func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {
-	opts := &differentiator.DifferentiatorOptions{
+	opts := differentiator.DifferentiatorOptions{
 		IncludeFilePath: true,
 	}
 	d.diff = differentiator.NewDiff(d.vall, opts)
@@ -191,7 +191,7 @@ func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {
 }
 
 func (d *DiffSuite) TestSimpleDiffWithoutFilePath() {
-	opts := &differentiator.DifferentiatorOptions{
+	opts := differentiator.DifferentiatorOptions{
 		IncludeFilePath: false,
 	}
 	d.diff = differentiator.NewDiff(d.vall, opts)

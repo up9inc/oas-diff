@@ -80,6 +80,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	// aux vars
 	index := -1
+	identifier := ""
 	property := ""
 
 	// info
@@ -89,14 +90,16 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	// info[0]
 	index = 0
 	assert.Equal("update", info[index].Type)
-	assert.Equal("title", info[index].Path)
+	assert.Len(info[index].Path, 1)
+	assert.Equal([]string{"title"}, info[index].Path)
 	assert.Equal("Simple example", info[index].From)
 	assert.Equal("Simple example 2", info[index].To)
 
 	// info[1]
 	index = 1
 	assert.Equal("update", info[index].Type)
-	assert.Equal("version", info[index].Path)
+	assert.Len(info[index].Path, 1)
+	assert.Equal([]string{"version"}, info[index].Path)
 	assert.Equal("1.0.0", info[index].From)
 	assert.Equal("1.1.0", info[index].To)
 
@@ -106,55 +109,67 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	// servers[0] -> position 0
 	index = 0
+	identifier = "https://test.com"
 	assert.Equal("delete", servers[index].Type)
 	if opts.IncludeFilePath {
-		assert.Equal(fmt.Sprintf("%s/%s#%s.%d", d.absPath, FILE1, model.OAS_SERVERS_KEY, index), servers[index].Path)
+		assert.Len(servers[index].Path, 3)
+		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
 	} else {
-		assert.Equal(fmt.Sprintf("%s.%d", model.OAS_SERVERS_KEY, index), servers[index].Path)
+		assert.Len(servers[index].Path, 1)
+		assert.Equal([]string{identifier}, servers[index].Path)
 	}
 	assert.Equal(model.Server{
-		URL:         "https://test.com",
+		URL:         identifier,
 		Description: "some description",
 	}, servers[index].From)
 	assert.Equal(nil, servers[index].To)
 
 	// servers[1] -> position 1
 	index = 1
+	identifier = "http://refael.shipping.sock-shop"
 	property = "description"
 	assert.Equal("update", servers[index].Type)
 	if opts.IncludeFilePath {
-		assert.Equal(fmt.Sprintf("%s/%s#%s.%d.%s", d.absPath, FILE1, model.OAS_SERVERS_KEY, index, property), servers[index].Path)
+		assert.Len(servers[index].Path, 4)
+		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_SERVERS_KEY, identifier, property}, servers[index].Path)
 	} else {
-		assert.Equal(fmt.Sprintf("%s.%d.%s", model.OAS_SERVERS_KEY, index, property), servers[index].Path)
+		assert.Len(servers[index].Path, 2)
+		assert.Equal([]string{identifier, property}, servers[index].Path)
 	}
 	assert.Equal("refael salt bae", servers[index].From)
 	assert.Equal("refael up9-demo-link all", servers[index].To)
 
 	// servers[2] -> position 1
 	index = 2
+	identifier = "http://gustavo.shipping.sock-shop"
 	assert.Equal("create", servers[index].Type)
 	if opts.IncludeFilePath {
-		assert.Equal(fmt.Sprintf("%s/%s#%s.%d", d.absPath, FILE2, model.OAS_SERVERS_KEY, index-1), servers[index].Path)
+		assert.Len(servers[index].Path, 3)
+		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE2), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
 	} else {
-		assert.Equal(fmt.Sprintf("%s.%d", model.OAS_SERVERS_KEY, index-1), servers[index].Path)
+		assert.Len(servers[index].Path, 1)
+		assert.Equal([]string{identifier}, servers[index].Path)
 	}
 	assert.Equal(nil, servers[index].From)
 	assert.Equal(model.Server{
-		URL:         "http://gustavo.shipping.sock-shop",
+		URL:         identifier,
 		Description: "gustavo up9-demo-link all",
 	}, servers[index].To)
 
 	// servers[3] -> position 2
 	index = 3
+	identifier = "https://test2.com"
 	assert.Equal("create", servers[index].Type)
 	if opts.IncludeFilePath {
-		assert.Equal(fmt.Sprintf("%s/%s#%s.%d", d.absPath, FILE2, model.OAS_SERVERS_KEY, index-1), servers[index].Path)
+		assert.Len(servers[index].Path, 3)
+		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE2), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
 	} else {
-		assert.Equal(fmt.Sprintf("%s.%d", model.OAS_SERVERS_KEY, index-1), servers[index].Path)
+		assert.Len(servers[index].Path, 1)
+		assert.Equal([]string{identifier}, servers[index].Path)
 	}
 	assert.Equal(nil, servers[index].From)
 	assert.Equal(model.Server{
-		URL:         "https://test2.com",
+		URL:         identifier,
 		Description: "some description 2",
 	}, servers[index].To)
 
@@ -164,15 +179,18 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	// paths[0]
 	index = 0
-	paramName := "accept"
+	identifier = "accept"
+	basePath := []string{"/users", "get", "parameters"}
 	assert.Equal("delete", paths[index].Type)
 	if opts.IncludeFilePath {
-		assert.Equal(fmt.Sprintf("%s/%s#%s./users.get.parameters.%d", d.absPath, FILE1, model.OAS_PATHS_KEY, index), paths[index].Path)
+		assert.Len(paths[index].Path, 6)
+		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], identifier}, paths[index].Path)
 	} else {
-		assert.Equal(fmt.Sprintf("%s./users.get.parameters.%d", model.OAS_PATHS_KEY, index), paths[index].Path)
+		assert.Len(paths[index].Path, 4)
+		assert.Equal([]string{basePath[0], basePath[1], basePath[2], identifier}, paths[index].Path)
 	}
 	assert.Equal(model.Parameter{
-		Name: paramName,
+		Name: identifier,
 		In:   "header",
 		Schema: &model.SchemaRef{
 			Ref:   "",

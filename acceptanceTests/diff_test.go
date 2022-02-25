@@ -175,7 +175,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	// paths
 	paths := output[model.OAS_PATHS_KEY]
-	assert.Len(paths, 1, "paths should have 1 change")
+	assert.Len(paths, 3, "paths should have 3 changes")
 
 	// paths[0]
 	index = 0
@@ -197,6 +197,44 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		},
 	}, paths[index].From)
 	assert.Equal(nil, paths[index].To)
+
+	// paths[1]
+	index = 1
+	identifier = "id"
+	basePath = []string{"/users", "get", "parameters", identifier, "schema", "pattern"}
+	assert.Equal("update", paths[index].Type)
+	assert.Len(paths[index].Path, 6)
+	assert.Equal(basePath, paths[index].Path)
+
+	// TODO: Fix array detection and info on this path
+	/* 	if opts.IncludeFilePath {
+	   		assert.Len(paths[index].Path, 8)
+	   		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
+	   	} else {
+	   		assert.Len(paths[index].Path, 6)
+	   		assert.Equal(basePath, paths[index].Path)
+	   	} */
+	assert.Equal(".+(_|-|\\.).+", paths[index].From)
+	assert.Equal(".+(_|-ABC-|\\.).+", paths[index].To)
+
+	// paths[2]
+	index = 2
+	identifier = "id"
+	basePath = []string{"/users", "get", "parameters", identifier, "example"}
+	assert.Equal("update", paths[index].Type)
+	assert.Len(paths[index].Path, 5)
+	assert.Equal(basePath, paths[index].Path)
+
+	// TODO: Fix array detection and info on this path
+	/* 	if opts.IncludeFilePath {
+		   assert.Len(paths[index].Path, 7)
+		   assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4]}, paths[index].Path)
+	   } else {
+		   assert.Len(paths[index].Path, 5)
+		   assert.Equal(basePath, paths[index].Path)
+	   } */
+	assert.Equal("some-uuid-maybe", paths[index].From)
+	assert.Equal("custom uuid", paths[index].To)
 }
 
 func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {

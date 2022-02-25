@@ -8,7 +8,7 @@
     {
       "url": "http://refael.shipping.sock-shop",
       "description": "refael up9-demo-link all"
-    },  
+    },
     {
       "url": "http://gustavo.shipping.sock-shop",
       "description": "gustavo up9-demo-link all"
@@ -20,7 +20,21 @@
   ],
   "paths": {
     "/users": {
-      "get": {}
+      "get": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "pattern": ".+(_|-ABC-|\\.).+"
+            },
+            "example": "custom uuid"
+          }
+        ]
+      }
     }
   }
 }

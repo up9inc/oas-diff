@@ -3,9 +3,8 @@
   "info": {
     "title": "Simple example",
     "version": "1.0.0"
-  },  
+  },
   "servers": [
-
     {
       "url": "https://test.com",
       "description": "some description"
@@ -13,7 +12,7 @@
     {
       "url": "http://refael.shipping.sock-shop",
       "description": "refael salt bae"
-    }      
+    }
   ],
   "paths": {
     "/users": {
@@ -26,7 +25,18 @@
             "schema": {
               "type": "string"
             }
-          }          
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "pattern": ".+(_|-|\\.).+"
+            },
+            "example": "some-uuid-maybe"
+          }
         ]
       }
     }

@@ -62,8 +62,8 @@ type Parameter struct {
 	UniqueItems      bool          `json:"uniqueItems,omitempty" diff:"uniqueItems"`
 	ExclusiveMin     bool          `json:"exclusiveMinimum,omitempty" diff:"exclusiveMinimum"`
 	ExclusiveMax     bool          `json:"exclusiveMaximum,omitempty" diff:"exclusiveMaximum"`
-	Schema           *SchemaRef    `json:"schema,omitempty" diff:"schema"`
-	Items            *SchemaRef    `json:"items,omitempty" diff:"items"`
+	Schema           *Schema       `json:"schema,omitempty" diff:"schema"`
+	Items            *Schema       `json:"items,omitempty" diff:"items"`
 	Enum             []interface{} `json:"enum,omitempty" diff:"enum"`
 	MultipleOf       *float64      `json:"multipleOf,omitempty" diff:"multipleOf"`
 	Minimum          *float64      `json:"minimum,omitempty" diff:"minimum"`
@@ -78,7 +78,7 @@ type Parameter struct {
 type Response struct {
 	Ref         string             `json:"$ref,omitempty" diff:"$ref"`
 	Description string             `json:"description,omitempty" diff:"description"`
-	Schema      *SchemaRef         `json:"schema,omitempty" diff:"schema"`
+	Schema      *Schema            `json:"schema,omitempty" diff:"schema"`
 	Headers     map[string]*Header `json:"headers,omitempty" diff:"headers"`
 	// TODO: 3.1 examples is an object
 	Examples map[string]interface{} `json:"examples,omitempty" diff:"examples"`

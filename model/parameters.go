@@ -1,6 +1,8 @@
 package model
 
-import "errors"
+import (
+	"fmt"
+)
 
 // make sure we implement the Array interface
 var _ Array = (*Parameters)(nil)
@@ -37,6 +39,10 @@ type Parameter struct {
 	Examples         []interface{} `json:"examples,omitempty" diff:"examples"`
 }
 
+func (p Parameters) GetName() string {
+	return "parameters"
+}
+
 func (p Parameters) GetIdentifierName() string {
 	return "name"
 }
@@ -44,7 +50,7 @@ func (p Parameters) GetIdentifierName() string {
 func (p Parameters) SearchByIdentifier(identifier interface{}) (int, error) {
 	name, ok := identifier.(string)
 	if !ok {
-		return -1, errors.New("invalid identifier for parameters model, must be a string")
+		return -1, fmt.Errorf("invalid identifier for %s model, must be a string", p.GetName())
 	}
 
 	for k, v := range p {

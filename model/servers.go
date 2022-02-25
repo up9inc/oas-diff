@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	file "github.com/up9inc/oas-diff/json"
@@ -40,6 +39,10 @@ func (s *Servers) Parse(file file.JsonFile) error {
 	return nil
 }
 
+func (s Servers) GetName() string {
+	return "servers"
+}
+
 func (s Servers) GetIdentifierName() string {
 	return "url"
 }
@@ -47,7 +50,7 @@ func (s Servers) GetIdentifierName() string {
 func (s Servers) SearchByIdentifier(identifier interface{}) (int, error) {
 	url, ok := identifier.(string)
 	if !ok {
-		return -1, errors.New("invalid identifier for servers model, must be a string")
+		return -1, fmt.Errorf("invalid identifier for %s model, must be a string", s.GetName())
 	}
 
 	for k, v := range s {

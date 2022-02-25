@@ -33,7 +33,8 @@ type Parameter struct {
 	MinLength        uint64        `json:"minLength,omitempty" diff:"minLength"`
 	MinItems         uint64        `json:"minItems,omitempty" diff:"minItems"`
 	Default          interface{}   `json:"default,omitempty" diff:"default"`
-	Examples
+	Example          interface{}   `json:"example,omitempty" diff:"example"`
+	Examples         []interface{} `json:"examples,omitempty" diff:"examples"`
 }
 
 func (p Parameters) GetIdentifierName() string {

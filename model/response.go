@@ -9,5 +9,6 @@ type Response struct {
 	Description string             `json:"description,omitempty" diff:"description"`
 	Schema      *Schema            `json:"schema,omitempty" diff:"schema"`
 	Headers     map[string]*Header `json:"headers,omitempty" diff:"headers"`
-	Examples
+	Example     interface{}        `json:"example,omitempty" diff:"example"`
+	Examples    []interface{}      `json:"examples,omitempty" diff:"examples"`
 }

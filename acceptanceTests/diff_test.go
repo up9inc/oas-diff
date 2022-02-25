@@ -192,9 +192,8 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal(model.Parameter{
 		Name: identifier,
 		In:   "header",
-		Schema: &model.SchemaRef{
-			Ref:   "",
-			Value: nil,
+		Schema: &model.Schema{
+			Type: "string",
 		},
 	}, paths[index].From)
 	assert.Equal(nil, paths[index].To)

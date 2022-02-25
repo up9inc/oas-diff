@@ -22,6 +22,8 @@ type internalDiff struct {
 	changelog []*changelog
 }
 
+type identifier map[string]string
+
 func NewInternalDiff(key string) *internalDiff {
 	return &internalDiff{
 		key:       key,
@@ -56,6 +58,13 @@ func (i *internalDiff) handleChanges(changes lib.Changelog) {
 }
 
 func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Change) (err error) {
+	lastPath := change.Path[len(change.Path)-1]
+	penultPath := lastPath
+	if len(change.Path) > 1 {
+		penultPath = change.Path[len(change.Path)-2]
+	}
+	var identifierValue string
+
 	if change.Type == "create" || change.Type == "delete" {
 		// create will display the path as the new element url value
 		// the last path value is the identifier value of the array
@@ -63,6 +72,7 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 		// creation is always from file2
 		// deletion is always from file1
 
+		identifierValue = lastPath
 		filePath := i.filePath
 
 		if change.Type == "create" {
@@ -75,20 +85,23 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 	// TODO: Find the source file/index of the updated element property - GJSON query?
 	// ISSUE: The identifier will always be present on both files, we need more info than just the identifier to find the source of the update
 	if change.Type == "update" {
-		// the last path value is the identifier value of the array
+		// the last path value is the property name that was updated
+		// the penult path value is the identifier value of the array
 		// we have to figure out if it was updated from file1 or file2
 
-		// TODO: for now let's just assume file1 as the source of the update
+		// TODO: for now let's just assume file1 as the source of the update - when --include-file-path
+		identifierValue = penultPath
 		filePath := i.filePath
 		change.Path = i.buildArrayPath(change.Path, filePath)
 	}
 
 	i.changelog = append(i.changelog,
 		&changelog{
-			Type: change.Type,
-			Path: change.Path,
-			From: change.From,
-			To:   change.To,
+			Type:       change.Type,
+			Path:       change.Path,
+			Identifier: identifier{data.GetIdentifierName(): identifierValue},
+			From:       change.From,
+			To:         change.To,
 		},
 	)
 

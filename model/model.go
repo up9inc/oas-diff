@@ -9,8 +9,9 @@ type Model interface {
 	Parse(file file.JsonFile) error
 }
 
+// TODO: Remove omitempty from required properties related to OAS 3.1
 // TODO: Support Extensions
-// TODO: Numbers should be uint64 or just int/uint32?
+// TODO: Numbers should be uint64 or int/uint32?
 type Schema struct {
 	// Schema
 	OneOf      []*Schema          `json:"oneOf,omitempty" diff:"oneOf"`

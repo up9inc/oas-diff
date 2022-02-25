@@ -38,11 +38,15 @@ type Schema struct {
 	// Int
 	MinItems uint64 `json:"minItems,omitempty" diff:"minItems"`
 
-	// TODO: Should we support example or just examples?
 	// Examples/docs
-	Example      interface{}   `json:"example,omitempty" diff:"example"`
-	Examples     []interface{} `json:"examples,omitempty" diff:"examples"`
+	Examples
 	ExternalDocs *ExternalDocs `json:"externalDocs,omitempty" diff:"externalDocs"`
+}
+
+// TODO: Should we support example or just examples?
+type Examples struct {
+	Example  interface{}   `json:"example,omitempty" diff:"example"`
+	Examples []interface{} `json:"examples,omitempty" diff:"examples"`
 }
 
 // TODO: externalDocs should be a $ref string?

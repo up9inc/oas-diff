@@ -55,6 +55,7 @@ type Parameter struct {
 	Description      string        `json:"description,omitempty" diff:"description"`
 	CollectionFormat string        `json:"collectionFormat,omitempty" diff:"collectionFormat"`
 	Type             string        `json:"type,omitempty" diff:"type"`
+	Style            string        `json:"style,omitempty" diff:"style"`
 	Format           string        `json:"format,omitempty" diff:"format"`
 	Pattern          string        `json:"pattern,omitempty" diff:"pattern"`
 	AllowEmptyValue  bool          `json:"allowEmptyValue,omitempty" diff:"allowEmptyValue"`
@@ -73,6 +74,7 @@ type Parameter struct {
 	MinLength        uint64        `json:"minLength,omitempty" diff:"minLength"`
 	MinItems         uint64        `json:"minItems,omitempty" diff:"minItems"`
 	Default          interface{}   `json:"default,omitempty" diff:"default"`
+	Example          interface{}   `json:"example,omitempty" diff:"example"`
 }
 
 type Response struct {

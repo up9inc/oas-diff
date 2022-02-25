@@ -17,8 +17,8 @@ type SchemaRef struct {
 }
 
 type ExternalDocs struct {
-	Description string `json:"description,omitempty"`
-	URL         string `json:"url,omitempty"`
+	Description string `json:"description,omitempty" diff:"description"`
+	URL         string `json:"url,omitempty" diff:"url"`
 }
 
 type SecurityRequirements []map[string][]string

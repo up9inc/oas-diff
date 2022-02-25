@@ -63,78 +63,82 @@ func (p *pathsDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile
 func (p *pathsDiff) handleChanges(changes lib.Changelog) (err error) {
 	for _, c := range changes {
 		key := c.Path[0]
-		lastPath := c.Path[len(c.Path)-1]
-		penultPath := lastPath
-		if len(c.Path) > 1 {
-			penultPath = c.Path[len(c.Path)-2]
+
+		var isServersArray bool
+		var isParametersArray bool
+
+		// Find array properties related to paths model
+		serversName := model.Servers{}.GetName()
+		parametersName := model.Parameters{}.GetName()
+
+		for _, path := range c.Path {
+			switch path {
+			case serversName:
+				isServersArray = true
+			case parametersName:
+				isParametersArray = true
+			}
 		}
 
-		// this change is an array
-		if penultPath != lastPath && model.IsArrayProperty(penultPath) {
-			// lastPath -> array identifier
-			// penultPath -> array property name
+		// paths.servers
+		if isServersArray {
+			err = p.handleArrayChange(p.data[key].Servers, p.data2[key].Servers, c)
+			if err != nil {
+				return err
+			}
+			continue
+		}
 
-			// paths.servers
-			if penultPath == "servers" {
-				err = p.handleArrayChange(p.data[key].Servers, p.data2[key].Servers, c)
+		// paths.parameters || paths.operation.parameters
+		if isParametersArray {
+			// paths.parameters
+			if len(c.Path) == 3 {
+				err = p.handleArrayChange(p.data[key].Parameters, p.data2[key].Parameters, c)
 				if err != nil {
 					return err
 				}
 				continue
 			}
+			// paths.operation.parameters
+			if len(c.Path) > 3 {
+				var data model.Array
+				var data2 model.Array
 
-			// TODO: Identifier not working for paths.operation.parameters.* on update operation
-			// paths.parameters || paths.operation.parameters
-			if penultPath == "parameters" {
-				// paths.parameters
-				if len(c.Path) == 3 {
-					err = p.handleArrayChange(p.data[key].Parameters, p.data2[key].Parameters, c)
-					if err != nil {
-						return err
-					}
-					continue
+				switch c.Path[1] {
+				case "connect":
+					data = p.data[key].Connect.Parameters
+					data2 = p.data2[key].Connect.Parameters
+				case "delete":
+					data = p.data[key].Delete.Parameters
+					data2 = p.data2[key].Delete.Parameters
+				case "get":
+					data = p.data[key].Get.Parameters
+					data2 = p.data2[key].Get.Parameters
+				case "head":
+					data = p.data[key].Head.Parameters
+					data2 = p.data2[key].Head.Parameters
+				case "options":
+					data = p.data[key].Options.Parameters
+					data2 = p.data2[key].Options.Parameters
+				case "patch":
+					data = p.data[key].Patch.Parameters
+					data2 = p.data2[key].Patch.Parameters
+				case "post":
+					data = p.data[key].Post.Parameters
+					data2 = p.data2[key].Post.Parameters
+				case "put":
+					data = p.data[key].Put.Parameters
+					data2 = p.data2[key].Put.Parameters
+				case "trace":
+					data = p.data[key].Trace.Parameters
+					data2 = p.data2[key].Trace.Parameters
+
 				}
-				// paths.operation.parameters
-				if len(c.Path) > 3 {
-					var data model.Array
-					var data2 model.Array
-
-					switch c.Path[1] {
-					case "connect":
-						data = p.data[key].Connect.Parameters
-						data2 = p.data2[key].Connect.Parameters
-					case "delete":
-						data = p.data[key].Delete.Parameters
-						data2 = p.data2[key].Delete.Parameters
-					case "get":
-						data = p.data[key].Get.Parameters
-						data2 = p.data2[key].Get.Parameters
-					case "head":
-						data = p.data[key].Head.Parameters
-						data2 = p.data2[key].Head.Parameters
-					case "options":
-						data = p.data[key].Options.Parameters
-						data2 = p.data2[key].Options.Parameters
-					case "patch":
-						data = p.data[key].Patch.Parameters
-						data2 = p.data2[key].Patch.Parameters
-					case "post":
-						data = p.data[key].Post.Parameters
-						data2 = p.data2[key].Post.Parameters
-					case "put":
-						data = p.data[key].Put.Parameters
-						data2 = p.data2[key].Put.Parameters
-					case "trace":
-						data = p.data[key].Trace.Parameters
-						data2 = p.data2[key].Trace.Parameters
-
-					}
-					err = p.handleArrayChange(data, data2, c)
-					if err != nil {
-						return err
-					}
-					continue
+				err = p.handleArrayChange(data, data2, c)
+				if err != nil {
+					return err
 				}
+				continue
 			}
 		}
 

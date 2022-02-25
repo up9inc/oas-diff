@@ -58,13 +58,6 @@ func (i *internalDiff) handleChanges(changes lib.Changelog) {
 }
 
 func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Change) (err error) {
-	lastPath := change.Path[len(change.Path)-1]
-	penultPath := lastPath
-	if len(change.Path) > 1 {
-		penultPath = change.Path[len(change.Path)-2]
-	}
-	var identifierValue string
-
 	if change.Type == "create" || change.Type == "delete" {
 		// create will display the path as the new element url value
 		// the last path value is the identifier value of the array
@@ -72,7 +65,6 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 		// creation is always from file2
 		// deletion is always from file1
 
-		identifierValue = lastPath
 		filePath := i.filePath
 
 		if change.Type == "create" {
@@ -90,16 +82,29 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 		// we have to figure out if it was updated from file1 or file2
 
 		// TODO: for now let's just assume file1 as the source of the update - when --include-file-path
-		identifierValue = penultPath
 		filePath := i.filePath
 		change.Path = i.buildArrayPath(change.Path, filePath)
+	}
+
+	// find the array identifier and value
+	identifierName := data.GetIdentifierName()
+	identifier := Identifier{}
+	if len(change.Path) <= 2 {
+		identifier[identifierName] = change.Path[0]
+	} else {
+		for pi, pv := range change.Path {
+			if pv == data.GetName() {
+				identifier[identifierName] = change.Path[pi+1]
+				break
+			}
+		}
 	}
 
 	i.changelog = append(i.changelog,
 		&changelog{
 			Type:       change.Type,
 			Path:       change.Path,
-			Identifier: Identifier{data.GetIdentifierName(): identifierValue},
+			Identifier: identifier,
 			From:       change.From,
 			To:         change.To,
 		},

@@ -1,6 +1,7 @@
 package model
 
 type Array interface {
+	GetIdentifierName() string
 	SearchByIdentifier(identifier interface{}) (int, error)
 }
 

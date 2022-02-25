@@ -40,6 +40,10 @@ func (s *Servers) Parse(file file.JsonFile) error {
 	return nil
 }
 
+func (s Servers) GetIdentifierName() string {
+	return "url"
+}
+
 func (s Servers) SearchByIdentifier(identifier interface{}) (int, error) {
 	url, ok := identifier.(string)
 	if !ok {

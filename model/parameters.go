@@ -36,6 +36,10 @@ type Parameter struct {
 	Examples
 }
 
+func (p Parameters) GetIdentifierName() string {
+	return "name"
+}
+
 func (p Parameters) SearchByIdentifier(identifier interface{}) (int, error) {
 	name, ok := identifier.(string)
 	if !ok {

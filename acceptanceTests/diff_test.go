@@ -118,6 +118,9 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		assert.Len(servers[index].Path, 1)
 		assert.Equal([]string{identifier}, servers[index].Path)
 	}
+	assert.Equal(differentiator.Identifier{
+		model.Servers{}.GetIdentifierName(): identifier,
+	}, servers[index].Identifier)
 	assert.Equal(model.Server{
 		URL:         identifier,
 		Description: "some description",
@@ -136,6 +139,9 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		assert.Len(servers[index].Path, 2)
 		assert.Equal([]string{identifier, property}, servers[index].Path)
 	}
+	assert.Equal(differentiator.Identifier{
+		model.Servers{}.GetIdentifierName(): identifier,
+	}, servers[index].Identifier)
 	assert.Equal("refael salt bae", servers[index].From)
 	assert.Equal("refael up9-demo-link all", servers[index].To)
 
@@ -150,6 +156,9 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		assert.Len(servers[index].Path, 1)
 		assert.Equal([]string{identifier}, servers[index].Path)
 	}
+	assert.Equal(differentiator.Identifier{
+		model.Servers{}.GetIdentifierName(): identifier,
+	}, servers[index].Identifier)
 	assert.Equal(nil, servers[index].From)
 	assert.Equal(model.Server{
 		URL:         identifier,
@@ -167,6 +176,9 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		assert.Len(servers[index].Path, 1)
 		assert.Equal([]string{identifier}, servers[index].Path)
 	}
+	assert.Equal(differentiator.Identifier{
+		model.Servers{}.GetIdentifierName(): identifier,
+	}, servers[index].Identifier)
 	assert.Equal(nil, servers[index].From)
 	assert.Equal(model.Server{
 		URL:         identifier,
@@ -189,6 +201,9 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		assert.Len(paths[index].Path, 4)
 		assert.Equal([]string{basePath[0], basePath[1], basePath[2], identifier}, paths[index].Path)
 	}
+	assert.Equal(differentiator.Identifier{
+		model.Parameters{}.GetIdentifierName(): identifier,
+	}, paths[index].Identifier)
 	assert.Equal(model.Parameter{
 		Name: identifier,
 		In:   "header",

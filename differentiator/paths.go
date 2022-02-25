@@ -83,6 +83,7 @@ func (p *pathsDiff) handleChanges(changes lib.Changelog) (err error) {
 				continue
 			}
 
+			// TODO: Identifier not working for paths.operation.parameters.* on update operation
 			// paths.parameters || paths.operation.parameters
 			if penultPath == "parameters" {
 				// paths.parameters

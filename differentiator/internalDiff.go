@@ -22,7 +22,7 @@ type internalDiff struct {
 	changelog []*changelog
 }
 
-type identifier map[string]string
+type Identifier map[string]string
 
 func NewInternalDiff(key string) *internalDiff {
 	return &internalDiff{
@@ -99,7 +99,7 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 		&changelog{
 			Type:       change.Type,
 			Path:       change.Path,
-			Identifier: identifier{data.GetIdentifierName(): identifierValue},
+			Identifier: Identifier{data.GetIdentifierName(): identifierValue},
 			From:       change.From,
 			To:         change.To,
 		},

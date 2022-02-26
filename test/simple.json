@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Simple example",
+    "title": "Simple Example",
     "version": "1.0.0"
   },
   "servers": [
@@ -11,7 +11,7 @@
     },
     {
       "url": "http://refael.shipping.sock-shop",
-      "description": "refael up9-demo-link alla"
+      "description": "refael up9-demo-link all"
     }
   ],
   "paths": {
@@ -24,7 +24,7 @@
           "schema": {
             "type": "string"
           }
-        }          
+        }
       ],
       "get": {
         "parameters": [
@@ -35,6 +35,17 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "pattern": ".+(_|-|\\.).+"
+            },
+            "example": "some-uuid-maybe"
           }
         ]
       }

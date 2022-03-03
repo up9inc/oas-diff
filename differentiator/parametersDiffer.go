@@ -57,10 +57,14 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 			for _, a := range aIds {
 				for _, b := range bIds {
 					if a.name != b.name && strings.EqualFold(a.name, b.name) {
-						// we don't want this comparison
-						// remove the data
-						aValue[a.index] = nil
-						bValue[b.index] = nil
+						// Only remove the data for headers when we want to completly ignore it and all its sub data
+						//aValue[a.index] = nil
+						//bValue[b.index] = nil
+
+						// we don't want this case sensitive identifier comparison
+						// set lower case for both identifiers and keep comparing
+						aValue[a.index].Name = strings.ToLower(aValue[a.index].Name)
+						bValue[b.index].Name = strings.ToLower(bValue[b.index].Name)
 					}
 				}
 			}

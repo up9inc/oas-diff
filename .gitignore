@@ -15,4 +15,5 @@
 # vendor/
 
 build/
+lib/
 changelog.json

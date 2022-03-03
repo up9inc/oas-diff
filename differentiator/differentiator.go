@@ -29,7 +29,7 @@ type differentiator struct {
 }
 
 func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Differentiator {
-	// custon differs
+	// custom differs
 	stringDiffer := NewStringDiffer(opts)
 	parametersDiffer := NewParameterDiffer(opts)
 

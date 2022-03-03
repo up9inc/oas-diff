@@ -18,8 +18,13 @@ jobs:
         with:
           go-version: '^1.17'
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Checkout lib fork repo
+        uses: actions/checkout@v3
+        with:
+          path: lib
 
       - name: Acceptance Tests
         run: make acceptance-test

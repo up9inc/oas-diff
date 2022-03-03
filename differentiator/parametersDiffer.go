@@ -25,7 +25,7 @@ func (p *ParametersDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.Parameters{}))
 }
 
-func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value) error {
+func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	return p.differ.DiffSlice(path, a, b)
 }
 

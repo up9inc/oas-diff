@@ -25,32 +25,20 @@ func (s *StringDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf((*string)(nil)).Elem())
 }
 
-func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value) error {
-	if a.Kind() == reflect.Invalid {
-		cl.Add(lib.CREATE, path, nil, b.Interface())
-		return nil
-	}
-
-	if b.Kind() == reflect.Invalid {
-		cl.Add(lib.DELETE, path, a.Interface(), nil)
-		return nil
-	}
-
-	var source, target string
-	source, _ = a.Interface().(string)
-	target, _ = b.Interface().(string)
-
+func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	// loose flag logic
 	if s.opts.Loose {
+		var source, target string
+		source, _ = a.Interface().(string)
+		target, _ = b.Interface().(string)
+
 		if !strings.EqualFold(source, target) {
 			cl.Add(lib.UPDATE, path, a.Interface(), b.Interface())
 		}
-	} else {
-		if strings.Compare(source, target) != 0 {
-			cl.Add(lib.UPDATE, path, a.Interface(), b.Interface())
-		}
+		return nil
 	}
 
-	return nil
+	return s.differ.DiffString(path, a, b, parent)
 }
 
 func (s *StringDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

@@ -22,4 +22,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
-replace github.com/up9inc/oas-diff v0.0.0 => ../
+replace (
+	github.com/up9inc/oas-diff v0.0.0 => ../
+	github.com/r3labs/diff/v2 v2.14.8 => ../lib
+)

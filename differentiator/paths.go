@@ -24,11 +24,14 @@ func NewPathsDiff() *pathsDiff {
 	}
 }
 
-func (p *pathsDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions) error {
+func (p *pathsDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
 	var err error
 
 	// opts
 	p.opts = opts
+
+	// differ
+	p.differ = differ
 
 	// schema
 	err = p.schema.Build(validator)
@@ -51,7 +54,7 @@ func (p *pathsDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile
 	}
 
 	// paths changelog
-	changes, err := p.diff(p.data, p.data2)
+	changes, err := p.differ.Diff(p.data, p.data2)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package differentiator
 
 import (
+	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
 	"github.com/up9inc/oas-diff/validator"
@@ -23,11 +24,14 @@ func NewServersDiff() *serversDiff {
 	}
 }
 
-func (s *serversDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions) error {
+func (s *serversDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
 	var err error
 
 	// opts
 	s.opts = opts
+
+	// differ
+	s.differ = differ
 
 	// schema
 	err = s.schema.Build(validator)
@@ -50,7 +54,7 @@ func (s *serversDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFi
 	}
 
 	// servers changelog
-	changes, err := s.diff(s.data, s.data2)
+	changes, err := s.differ.Diff(s.data, s.data2)
 	if err != nil {
 		return err
 	}

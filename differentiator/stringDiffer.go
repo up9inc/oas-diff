@@ -8,22 +8,24 @@ import (
 )
 
 type StringDiffer struct {
-	opts DifferentiatorOptions
+	opts   DifferentiatorOptions
+	differ *lib.Differ
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewStringDiffer(opts DifferentiatorOptions) *StringDiffer {
 	return &StringDiffer{
-		opts: opts,
+		opts:   opts,
+		differ: nil,
 	}
 }
 
-func (differ *StringDiffer) Match(a, b reflect.Value) bool {
+func (s *StringDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf((*string)(nil)).Elem())
 }
 
-func (differ *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value) error {
+func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value) error {
 	if a.Kind() == reflect.Invalid {
 		cl.Add(lib.CREATE, path, nil, b.Interface())
 		return nil
@@ -38,7 +40,7 @@ func (differ *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.
 	source, _ = a.Interface().(string)
 	target, _ = b.Interface().(string)
 
-	if differ.opts.Loose {
+	if s.opts.Loose {
 		if !strings.EqualFold(source, target) {
 			cl.Add(lib.UPDATE, path, a.Interface(), b.Interface())
 		}
@@ -51,6 +53,6 @@ func (differ *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.
 	return nil
 }
 
-func (differ *StringDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
-	differ.DiffFunc = dfunc
+func (s *StringDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+	s.DiffFunc = dfunc
 }

@@ -8,11 +8,12 @@ import (
 )
 
 type InternalDiff interface {
-	InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions) error
+	InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error
 }
 
 type internalDiff struct {
 	opts   DifferentiatorOptions
+	differ *lib.Differ
 	key    string
 	schema *schema
 
@@ -30,10 +31,6 @@ func NewInternalDiff(key string) *internalDiff {
 		schema:    NewSchema(key),
 		changelog: make([]*changelog, 0),
 	}
-}
-
-func (i *internalDiff) diff(a, b interface{}) (lib.Changelog, error) {
-	return lib.Diff(a, b, lib.CustomValueDiffers(NewStringDiffer(i.opts)), lib.StructMapKeySupport(), lib.DisableStructValues(), lib.SliceOrdering(false))
 }
 
 // TODO: Include source file information in path - GJSON query?

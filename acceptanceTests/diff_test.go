@@ -254,7 +254,7 @@ func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {
 	opts := differentiator.DifferentiatorOptions{
 		IncludeFilePath: true,
 	}
-	d.diff = differentiator.NewDiff(d.vall, opts)
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
 	SimpleDiff(d, opts)
 }
 
@@ -262,6 +262,6 @@ func (d *DiffSuite) TestSimpleDiffWithoutFilePath() {
 	opts := differentiator.DifferentiatorOptions{
 		IncludeFilePath: false,
 	}
-	d.diff = differentiator.NewDiff(d.vall, opts)
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
 	SimpleDiff(d, opts)
 }

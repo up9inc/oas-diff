@@ -46,25 +46,20 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		bValue, bOk := b.Interface().(model.Parameters)
 
 		if aOk && bOk {
-			var aIds, bIds []struct {
-				name  string
-				index int
-			}
-
-			aIds = p.getParametersIdentifiers(aValue)
-			bIds = p.getParametersIdentifiers(bValue)
+			aIds := aValue.FilterIdentifiers()
+			bIds := bValue.FilterIdentifiers()
 
 			for _, a := range aIds {
 				for _, b := range bIds {
-					if a.name != b.name && strings.EqualFold(a.name, b.name) {
+					if a.Name != b.Name && strings.EqualFold(a.Name, b.Name) {
 						// Only remove the data for headers when we want to completly ignore it and all its sub data
 						//aValue[a.index] = nil
 						//bValue[b.index] = nil
 
 						// we don't want this case sensitive identifier comparison
 						// set lower case for both identifiers and keep comparing
-						aValue[a.index].Name = strings.ToLower(aValue[a.index].Name)
-						bValue[b.index].Name = strings.ToLower(bValue[b.index].Name)
+						aValue[a.Index].Name = strings.ToLower(aValue[a.Index].Name)
+						bValue[b.Index].Name = strings.ToLower(bValue[b.Index].Name)
 					}
 				}
 			}
@@ -76,28 +71,4 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 
 func (p *ParametersDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	p.DiffFunc = dfunc
-}
-
-func (p *ParametersDiffer) getParametersIdentifiers(params model.Parameters) []struct {
-	name  string
-	index int
-} {
-	var result []struct {
-		name  string
-		index int
-	}
-	for aI, aP := range params {
-		// name is the identifier
-		if len(aP.Name) > 0 {
-			result = append(result, struct {
-				name  string
-				index int
-			}{
-				name:  aP.Name,
-				index: aI,
-			})
-		}
-	}
-
-	return result
 }

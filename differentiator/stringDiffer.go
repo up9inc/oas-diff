@@ -28,6 +28,16 @@ func (s *StringDiffer) Match(a, b reflect.Value) bool {
 func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	// loose flag logic
 	if s.opts.Loose {
+		if a.Kind() == reflect.Invalid {
+			cl.Add(lib.CREATE, path, nil, b.Interface())
+			return nil
+		}
+
+		if b.Kind() == reflect.Invalid {
+			cl.Add(lib.DELETE, path, a.Interface(), nil)
+			return nil
+		}
+
 		var source, target string
 		source, _ = a.Interface().(string)
 		target, _ = b.Interface().(string)

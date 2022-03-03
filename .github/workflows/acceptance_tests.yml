@@ -24,6 +24,8 @@ jobs:
       - name: Checkout lib fork repo
         uses: actions/checkout@v3
         with:
+          repository: up9inc/diff
+          ref: v2
           path: lib
 
       - name: Acceptance Tests

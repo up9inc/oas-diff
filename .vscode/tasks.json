@@ -9,9 +9,14 @@
             "command": "make clean && make build-debug"
         },
         {
+            "label": "test",
+            "type": "shell",
+            "command": "make acceptance-test"
+        }, 
+        {
             "label": "run",
             "type": "shell",
-            "command": "go run -race main.go"
+            "command": "go run -race main.go diff --file test/simple.json --file2 test/simple2.json"
         }        
     ]
 }

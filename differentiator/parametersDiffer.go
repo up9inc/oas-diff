@@ -2,6 +2,7 @@ package differentiator
 
 import (
 	"reflect"
+	"strings"
 
 	lib "github.com/r3labs/diff/v2"
 	"github.com/up9inc/oas-diff/model"
@@ -26,9 +27,73 @@ func (p *ParametersDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if p.opts.Loose {
+		if a.Kind() == reflect.Invalid {
+			cl.Add(lib.CREATE, path, nil, lib.ExportInterface(b))
+			return nil
+		}
+
+		if b.Kind() == reflect.Invalid {
+			cl.Add(lib.DELETE, path, lib.ExportInterface(a), nil)
+			return nil
+		}
+
+		if a.Kind() != b.Kind() {
+			return lib.ErrTypeMismatch
+		}
+
+		aValue, aOk := a.Interface().(model.Parameters)
+		bValue, bOk := b.Interface().(model.Parameters)
+
+		if aOk && bOk {
+			var aIds, bIds []struct {
+				name  string
+				index int
+			}
+
+			aIds = p.getParametersIdentifiers(aValue)
+			bIds = p.getParametersIdentifiers(bValue)
+
+			for _, a := range aIds {
+				for _, b := range bIds {
+					if a.name != b.name && strings.EqualFold(a.name, b.name) {
+						// we don't want this comparison
+						// remove the data
+						aValue[a.index] = nil
+						bValue[b.index] = nil
+					}
+				}
+			}
+		}
+	}
+
 	return p.differ.DiffSlice(path, a, b)
 }
 
 func (p *ParametersDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	p.DiffFunc = dfunc
+}
+
+func (p *ParametersDiffer) getParametersIdentifiers(params model.Parameters) []struct {
+	name  string
+	index int
+} {
+	var result []struct {
+		name  string
+		index int
+	}
+	for aI, aP := range params {
+		// name is the identifier
+		if len(aP.Name) > 0 {
+			result = append(result, struct {
+				name  string
+				index int
+			}{
+				name:  aP.Name,
+				index: aI,
+			})
+		}
+	}
+
+	return result
 }

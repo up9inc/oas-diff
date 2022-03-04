@@ -18,7 +18,25 @@
                 "--file",
                 "test/simple.json",
                 "--file2",
-                "test/simple2.json"
+                "test/simple2.json",
+            ]
+        },
+        {
+            "name": "Debug Diff Loose",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "debugAdapter": "dlv-dap",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/main.go",
+            "args": [
+                "diff",
+                "--file",
+                "test/simple.json",
+                "--file2",
+                "test/simple2.json",
+                "--loose"
             ]
         }
     ]        

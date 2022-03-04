@@ -12,7 +12,12 @@
             "label": "test",
             "type": "shell",
             "command": "make acceptance-test"
-        }, 
+        },
+        {
+            "label": "run-loose",
+            "type": "shell",
+            "command": "go run -race main.go diff --file test/simple.json --file2 test/simple2.json --loose"
+        },    
         {
             "label": "run",
             "type": "shell",

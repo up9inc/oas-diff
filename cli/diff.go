@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 
 	differentiator "github.com/up9inc/oas-diff/differentiator"
 	file "github.com/up9inc/oas-diff/json"
@@ -28,6 +29,7 @@ func RegisterDiffCmd() *cli.Command {
 }
 
 func diffCmd(c *cli.Context) error {
+	isLoose := c.Bool(LooseFlag.Name)
 	filePath := c.String(FileFlag.Name)
 	filePath2 := c.String(FileFlag2.Name)
 
@@ -45,7 +47,7 @@ func diffCmd(c *cli.Context) error {
 
 	val := validator.NewValidator()
 	diff := differentiator.NewDifferentiator(val, differentiator.DifferentiatorOptions{
-		Loose:               c.Bool(LooseFlag.Name),
+		Loose:               isLoose,
 		IncludeFilePath:     c.Bool(IncludeFilePathFlag.Name),
 		ExcludeDescriptions: c.Bool(ExcludeDescriptionsFlag.Name),
 	})
@@ -60,13 +62,23 @@ func diffCmd(c *cli.Context) error {
 		panic(err)
 	}
 
-	outputPath := "changelog.json"
+	outputPath := "changelog"
+	if isLoose {
+		outputPath = fmt.Sprintf("%s%s", outputPath, "-loose")
+	}
+	outputPath = fmt.Sprintf("%s%s", outputPath, ".json")
+
 	err = ioutil.WriteFile(outputPath, output, 0644)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(Green(fmt.Sprintf("report saved: %s", outputPath)))
+	dirPath, err := filepath.Abs("./")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(Green(fmt.Sprintf("report saved: %s", fmt.Sprintf("%s/%s", dirPath, outputPath))))
 
 	return nil
 }

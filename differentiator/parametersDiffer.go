@@ -26,6 +26,8 @@ func (p *ParametersDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.Parameters{}))
 }
 
+// TODO: Header identification for the loose flag logic
+// TODO: Test if response Header is catched here
 func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if p.opts.Loose {
 		if a.Kind() == reflect.Invalid {

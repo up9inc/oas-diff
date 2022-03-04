@@ -62,11 +62,11 @@ func (p Parameters) SearchByIdentifier(identifier interface{}) (int, error) {
 	return -1, nil
 }
 
-func (p Parameters) FilterIdentifiers() []ArrayIdentifierFilter {
-	var result []ArrayIdentifierFilter
+func (p Parameters) FilterIdentifiers() []*ArrayIdentifierFilter {
+	var result []*ArrayIdentifierFilter
 	for i, d := range p {
 		if len(d.Name) > 0 {
-			result = append(result, ArrayIdentifierFilter{
+			result = append(result, &ArrayIdentifierFilter{
 				Name:  d.Name,
 				Index: i,
 			})

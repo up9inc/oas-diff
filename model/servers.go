@@ -62,11 +62,11 @@ func (s Servers) SearchByIdentifier(identifier interface{}) (int, error) {
 	return -1, nil
 }
 
-func (s Servers) FilterIdentifiers() []ArrayIdentifierFilter {
-	var result []ArrayIdentifierFilter
+func (s Servers) FilterIdentifiers() []*ArrayIdentifierFilter {
+	var result []*ArrayIdentifierFilter
 	for i, d := range s {
 		if len(d.URL) > 0 {
-			result = append(result, ArrayIdentifierFilter{
+			result = append(result, &ArrayIdentifierFilter{
 				Name:  d.URL,
 				Index: i,
 			})

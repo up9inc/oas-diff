@@ -42,6 +42,7 @@ func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value
 		source, _ = a.Interface().(string)
 		target, _ = b.Interface().(string)
 
+		// TODO: Ignore EqualFold when the property is regex?
 		if !strings.EqualFold(source, target) {
 			cl.Add(lib.UPDATE, path, a.Interface(), b.Interface())
 		}

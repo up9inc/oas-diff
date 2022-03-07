@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 )
 
 // make sure we implement the Array interface
@@ -73,4 +74,13 @@ func (p Parameters) FilterIdentifiers() []*ArrayIdentifierFilter {
 		}
 	}
 	return result
+}
+
+func (p Parameter) IsHeader() bool {
+	return p.In == "header" || p.In == "Header" || p.In == "HEADER"
+}
+
+func (p Parameter) IsIgnoredWhenLoose() bool {
+	name := strings.ToLower(p.Name)
+	return strings.HasPrefix(name, "x-") || name == "user-agent"
 }

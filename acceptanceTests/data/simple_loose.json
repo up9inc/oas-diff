@@ -1,0 +1,44 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Simple ExAmPlE",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "SOME URL",
+      "description": "SOME DESC"
+    },
+    {
+      "url": "new server url",
+      "description": "new server url"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "ACCEPT",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "STRING",
+              "pattern": ".+(_|-abc-|\\.).+"
+            },
+            "example": "some-uuid"
+          }
+        ]
+      }
+    }
+  }
+}

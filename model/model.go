@@ -32,6 +32,7 @@ type Schema struct {
 	Deprecated      bool `json:"deprecated,omitempty" diff:"deprecated"`
 
 	// String
+	Ref         string   `json:"$ref,omitempty" diff:"$ref"`
 	Comment     string   `json:"$comment,omitempty" diff:"$comment"`
 	Type        string   `json:"type,omitempty" diff:"type"`
 	Title       string   `json:"title,omitempty" diff:"title"`

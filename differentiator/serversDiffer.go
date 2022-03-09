@@ -99,11 +99,13 @@ func (s *serversDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Valu
 
 			for _, a := range aIds {
 				for _, b := range bIds {
-					if a.Name != b.Name && strings.EqualFold(a.Name, b.Name) {
-						// we don't want this case sensitive identifier comparison
-						// set lower case for both identifiers and keep comparing
-						aValue[a.Index].URL = strings.ToLower(aValue[a.Index].URL)
-						bValue[b.Index].URL = strings.ToLower(bValue[b.Index].URL)
+					if a != nil && b != nil {
+						if a.Name != b.Name && strings.EqualFold(a.Name, b.Name) {
+							// we don't want this case sensitive identifier comparison
+							// set lower case for both identifiers and keep comparing
+							aValue[a.Index].URL = strings.ToLower(aValue[a.Index].URL)
+							bValue[b.Index].URL = strings.ToLower(bValue[b.Index].URL)
+						}
 					}
 				}
 			}

@@ -49,25 +49,27 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		if aOk && bOk {
 			for ai, a := range aValue {
 				for bi, b := range bValue {
-					// Ignore array Identifier case sensitive
-					if len(a.Name) > 0 && len(b.Name) > 0 && a.Name != b.Name && strings.EqualFold(a.Name, b.Name) {
-						// we don't want this case sensitive identifier comparison
-						// set lower case for both identifiers and keep comparing
-						aValue[ai].Name = strings.ToLower(aValue[ai].Name)
-						bValue[bi].Name = strings.ToLower(bValue[bi].Name)
-					}
-
-					// Headers filter
-					// TODO: Support reggex value
-					if a.IsHeader() {
-						// starts with x-
-						if a.IsIgnoredWhenLoose() {
-							aValue[ai] = nil
+					if a != nil && b != nil {
+						// Ignore array Identifier case sensitive
+						if len(a.Name) > 0 && len(b.Name) > 0 && a.Name != b.Name && strings.EqualFold(a.Name, b.Name) {
+							// we don't want this case sensitive identifier comparison
+							// set lower case for both identifiers and keep comparing
+							aValue[ai].Name = strings.ToLower(aValue[ai].Name)
+							bValue[bi].Name = strings.ToLower(bValue[bi].Name)
 						}
-					}
-					if b.IsHeader() {
-						if b.IsIgnoredWhenLoose() {
-							bValue[bi] = nil
+
+						// Headers filter
+						// TODO: Support reggex value
+						if a.IsHeader() {
+							// starts with x-
+							if a.IsIgnoredWhenLoose() {
+								aValue[ai] = nil
+							}
+						}
+						if b.IsHeader() {
+							if b.IsIgnoredWhenLoose() {
+								bValue[bi] = nil
+							}
 						}
 					}
 				}

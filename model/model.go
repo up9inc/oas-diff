@@ -12,6 +12,7 @@ type Model interface {
 type Content map[string]*MediaType
 type SecurityRequirements []map[string][]string
 
+// TODO: []*Schema should be handled as an array like servers/parameters? If we do, what will be the identifier?
 // TODO: Remove omitempty from required properties related to OAS 3.1
 // TODO: Support Extensions
 // TODO: Numbers should be uint64 or int/uint32?

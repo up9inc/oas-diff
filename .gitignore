@@ -16,4 +16,5 @@
 
 build/
 lib/
+test/
 changelog.json

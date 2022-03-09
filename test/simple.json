@@ -30,14 +30,14 @@
         "parameters": [
           {
             "in": "header",
-            "name": "accept",
+            "name": "x-accept",
             "required": true,
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "id",
+            "name": "Id",
             "in": "path",
             "required": true,
             "style": "simple",

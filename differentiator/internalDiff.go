@@ -72,7 +72,7 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 	}
 
 	// TODO: Find the source file/index of the updated element property - GJSON query?
-	// ISSUE: The identifier will always be present on both files, we need more info than just the identifier to find the source of the update
+	// ISSUE: The array identifier value will always be present on both files, we need more info than just the identifier to find the source of the update
 	if change.Type == "update" {
 		// the last path value is the property name that was updated
 		// the penult path value is the identifier value of the array
@@ -83,25 +83,11 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 		change.Path = i.buildArrayPath(change.Path, filePath)
 	}
 
-	// find the array identifier and value
-	identifierName := data.GetIdentifierName()
-	identifier := Identifier{}
-	if len(change.Path) <= 2 {
-		identifier[identifierName] = change.Path[0]
-	} else {
-		for pi, pv := range change.Path {
-			if pv == data.GetName() {
-				identifier[identifierName] = change.Path[pi+1]
-				break
-			}
-		}
-	}
-
 	i.changelog = append(i.changelog,
 		&changelog{
 			Type:       change.Type,
 			Path:       change.Path,
-			Identifier: identifier,
+			Identifier: i.buildArrayIdentifier(change.Path, data),
 			From:       change.From,
 			To:         change.To,
 		},
@@ -129,4 +115,22 @@ func (i *internalDiff) buildArrayPath(path []string, filePath string) []string {
 		return auxPath
 	}
 	return path
+}
+
+func (i *internalDiff) buildArrayIdentifier(path []string, data model.Array) Identifier {
+	// TODO: Support multiple identifiers for multiple nested arrays paths
+	identifierName := data.GetIdentifierName()
+	identifier := Identifier{}
+	if len(path) <= 2 {
+		identifier[identifierName] = path[0]
+	} else {
+		for pi, pv := range path {
+			if pv == data.GetName() {
+				identifier[identifierName] = path[pi+1]
+				break
+			}
+		}
+	}
+
+	return identifier
 }

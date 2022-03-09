@@ -36,9 +36,11 @@ type Operation struct {
 	Tags         []string              `json:"tags,omitempty" diff:"tags"`
 	OperationID  string                `json:"operationId,omitempty" diff:"operationId"`
 	Parameters   Parameters            `json:"parameters,omitempty" diff:"parameters"`
+	RequestBody  *RequestBody          `json:"requestBody,omitempty" diff:"requestBody"`
 	Responses    map[string]*Response  `json:"responses" diff:"responses"`
 	Consumes     []string              `json:"consumes,omitempty" diff:"consumes"`
 	Produces     []string              `json:"produces,omitempty" diff:"produces"`
+	Servers      Servers               `json:"servers,omitempty" diff:"servers"`
 	Security     *SecurityRequirements `json:"security,omitempty" diff:"security"`
 }
 

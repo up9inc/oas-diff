@@ -9,6 +9,9 @@ type Model interface {
 	Parse(file file.JsonFile) error
 }
 
+type Content map[string]*MediaType
+type SecurityRequirements []map[string][]string
+
 // TODO: Remove omitempty from required properties related to OAS 3.1
 // TODO: Support Extensions
 // TODO: Numbers should be uint64 or int/uint32?
@@ -51,4 +54,26 @@ type ExternalDocs struct {
 	URL         string `json:"url,omitempty" diff:"url"`
 }
 
-type SecurityRequirements []map[string][]string
+type MediaType struct {
+	Schema   *Schema              `json:"schema,omitempty" diff:"schema"`
+	Example  interface{}          `json:"example,omitempty" diff:"example"`
+	Examples Examples             `json:"examples,omitempty" diff:"examples"`
+	Encoding map[string]*Encoding `json:"encoding,omitempty" diff:"encoding"`
+}
+
+type Encoding struct {
+	ContentType   string  `json:"contentType,omitempty" diff:"contentType"`
+	Headers       Headers `json:"headers,omitempty" diff:"headers"`
+	Style         string  `json:"style,omitempty" diff:"style"`
+	Explode       *bool   `json:"explode,omitempty" diff:"explode"`
+	AllowReserved bool    `json:"allowReserved,omitempty" diff:"allowReserved"`
+}
+
+type Examples map[string]*Example
+
+type Example struct {
+	Summary       string      `json:"summary,omitempty" diff:"summary"`
+	Description   string      `json:"description,omitempty" diff:"description"`
+	Value         interface{} `json:"value,omitempty" diff:"value"`
+	ExternalValue string      `json:"externalValue,omitempty" diff:"externalValue"`
+}

@@ -333,7 +333,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("update", paths[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(paths[index].Path, 7)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], property}, paths[index].Path)
+		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE_LOOSE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], property}, paths[index].Path)
 	} else {
 		assert.Len(paths[index].Path, 5)
 		assert.Equal([]string{basePath[0], basePath[1], basePath[2], basePath[3], property}, paths[index].Path)
@@ -363,7 +363,7 @@ func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {
 	SimpleDiff(d, opts)
 }
 
-func (d *DiffSuite) TestSimpleDiffWithoutFilePath() {
+func (d *DiffSuite) TestSimpleDiff() {
 	d.jsonFile1 = file.NewJsonFile(FILE1)
 	d.jsonFile2 = file.NewJsonFile(FILE2)
 
@@ -381,7 +381,7 @@ func (d *DiffSuite) TestSimpleDiffWithoutFilePath() {
 	SimpleDiff(d, opts)
 }
 
-func (d *DiffSuite) TestSimpleLooseDiffWithoutFilePath() {
+func (d *DiffSuite) TestSimpleLooseDiff() {
 	d.jsonFile1 = file.NewJsonFile(FILE_LOOSE1)
 	d.jsonFile2 = file.NewJsonFile(FILE_LOOSE2)
 
@@ -394,6 +394,25 @@ func (d *DiffSuite) TestSimpleLooseDiffWithoutFilePath() {
 
 	opts := differentiator.DifferentiatorOptions{
 		IncludeFilePath: false,
+		Loose:           true,
+	}
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
+	SimpleDiffLoose(d, opts)
+}
+
+func (d *DiffSuite) TestSimpleLooseDiffWithFullFilePath() {
+	d.jsonFile1 = file.NewJsonFile(FILE_LOOSE1)
+	d.jsonFile2 = file.NewJsonFile(FILE_LOOSE2)
+
+	d.vall = validator.NewValidator()
+	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	if err != nil {
+		d.T().Error(err)
+		return
+	}
+
+	opts := differentiator.DifferentiatorOptions{
+		IncludeFilePath: true,
 		Loose:           true,
 	}
 	d.diff = differentiator.NewDifferentiator(d.vall, opts)

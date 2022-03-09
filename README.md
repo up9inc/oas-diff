@@ -5,6 +5,10 @@ OAS 3.1 Validation and Diff Tool
 - Go 1.17+
 
 ## Run
+- Setup (Just once)
+    ````
+    ./setup.sh
+    ````
 - Build
     ````
     make build

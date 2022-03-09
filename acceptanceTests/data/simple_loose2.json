@@ -2,7 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Simple example",
-    "version": "1.1.0"
+    "version": "1.1.0",
+    "description": "new desc"
   },
   "servers": [
     {

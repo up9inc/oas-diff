@@ -26,6 +26,10 @@ func (s *StringDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if s.opts.ExcludeDescriptions && s.IsDescription(path) {
+		return nil
+	}
+
 	// loose flag logic
 	if s.opts.Loose {
 		if a.Kind() == reflect.Invalid {
@@ -54,4 +58,8 @@ func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value
 
 func (s *StringDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	s.DiffFunc = dfunc
+}
+
+func (s *StringDiffer) IsDescription(path []string) bool {
+	return path[len(path)-1] == "description"
 }

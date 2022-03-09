@@ -289,37 +289,60 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	// info
 	info := output[model.OAS_INFO_KEY]
-	assert.Len(info, 1, "info should have 1 change")
 
-	// info[0]
-	index = 0
-	assert.Equal("update", info[index].Type)
-	assert.Len(info[index].Path, 1)
-	assert.Equal([]string{"version"}, info[index].Path)
-	assert.Equal("1.0.0", info[index].From)
-	assert.Equal("1.1.0", info[index].To)
+	if opts.ExcludeDescriptions {
+		assert.Len(info, 1, "info should have 1 change")
+
+		// info[0]
+		index = 0
+		assert.Equal("update", info[index].Type)
+		assert.Len(info[index].Path, 1)
+		assert.Equal([]string{"version"}, info[index].Path)
+		assert.Equal("1.0.0", info[index].From)
+		assert.Equal("1.1.0", info[index].To)
+	} else {
+		assert.Len(info, 2, "info should have 2 changes")
+
+		// info[0]
+		index = 0
+		assert.Equal("update", info[index].Type)
+		assert.Len(info[index].Path, 1)
+		assert.Equal([]string{"description"}, info[index].Path)
+		assert.Equal("", info[index].From)
+		assert.Equal("new desc", info[index].To)
+
+		// info[1]
+		index = 1
+		assert.Equal("update", info[index].Type)
+		assert.Len(info[index].Path, 1)
+		assert.Equal([]string{"version"}, info[index].Path)
+		assert.Equal("1.0.0", info[index].From)
+		assert.Equal("1.1.0", info[index].To)
+	}
 
 	// servers
-	servers := output[model.OAS_SERVERS_KEY]
-	assert.Len(servers, 1, "servers should have 1 change")
+	if !opts.ExcludeDescriptions {
+		servers := output[model.OAS_SERVERS_KEY]
+		assert.Len(servers, 1, "servers should have 1 change")
 
-	// servers[0] -> position 0
-	index = 0
-	identifier = "some url"
-	property = "description"
-	assert.Equal("update", servers[index].Type)
-	if opts.IncludeFilePath {
-		assert.Len(servers[index].Path, 4)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE_LOOSE1), model.OAS_SERVERS_KEY, identifier, property}, servers[index].Path)
-	} else {
-		assert.Len(servers[index].Path, 2)
-		assert.Equal([]string{identifier, property}, servers[index].Path)
+		// servers[0] -> position 0
+		index = 0
+		identifier = "some url"
+		property = "description"
+		assert.Equal("update", servers[index].Type)
+		if opts.IncludeFilePath {
+			assert.Len(servers[index].Path, 4)
+			assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE_LOOSE1), model.OAS_SERVERS_KEY, identifier, property}, servers[index].Path)
+		} else {
+			assert.Len(servers[index].Path, 2)
+			assert.Equal([]string{identifier, property}, servers[index].Path)
+		}
+		assert.Equal(differentiator.Identifier{
+			model.Servers{}.GetIdentifierName(): identifier,
+		}, servers[index].Identifier)
+		assert.Equal("SOME DESC", servers[index].From)
+		assert.Equal("some desc updated", servers[index].To)
 	}
-	assert.Equal(differentiator.Identifier{
-		model.Servers{}.GetIdentifierName(): identifier,
-	}, servers[index].Identifier)
-	assert.Equal("SOME DESC", servers[index].From)
-	assert.Equal("some desc updated", servers[index].To)
 
 	// paths
 	paths := output[model.OAS_PATHS_KEY]
@@ -414,6 +437,25 @@ func (d *DiffSuite) TestSimpleLooseDiffWithFullFilePath() {
 	opts := differentiator.DifferentiatorOptions{
 		IncludeFilePath: true,
 		Loose:           true,
+	}
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
+	SimpleDiffLoose(d, opts)
+}
+
+func (d *DiffSuite) TestSimpleLooseDiffWithExcludeDescriptions() {
+	d.jsonFile1 = file.NewJsonFile(FILE_LOOSE1)
+	d.jsonFile2 = file.NewJsonFile(FILE_LOOSE2)
+
+	d.vall = validator.NewValidator()
+	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	if err != nil {
+		d.T().Error(err)
+		return
+	}
+
+	opts := differentiator.DifferentiatorOptions{
+		Loose:               true,
+		ExcludeDescriptions: true,
 	}
 	d.diff = differentiator.NewDifferentiator(d.vall, opts)
 	SimpleDiffLoose(d, opts)

@@ -14,13 +14,16 @@ var _ Model = (*Servers)(nil)
 var _ Array = (*Servers)(nil)
 
 type Servers []*Server
+type Variables map[string]*ServerVariable
 
+// https://spec.openapis.org/oas/v3.1.0#server-object
 type Server struct {
-	URL         string                     `json:"url" diff:"url,identifier"`
-	Description string                     `json:"description,omitempty" diff:"description"`
-	Variables   map[string]*ServerVariable `json:"variables,omitempty" diff:"variables"`
+	URL         string    `json:"url" diff:"url,identifier"`
+	Description string    `json:"description,omitempty" diff:"description"`
+	Variables   Variables `json:"variables,omitempty" diff:"variables"`
 }
 
+// https://spec.openapis.org/oas/v3.1.0#server-variable-object
 type ServerVariable struct {
 	Enum        []string `json:"enum,omitempty" diff:"enum"`
 	Default     string   `json:"default,omitempty" diff:"default"`

@@ -10,6 +10,7 @@ var _ Array = (*Parameters)(nil)
 
 type Parameters []*Parameter
 
+// https://spec.openapis.org/oas/v3.1.0#parameter-object
 type Parameter struct {
 	Name             string                 `json:"name,omitempty" diff:"name,identifier"`
 	In               string                 `json:"in,omitempty" diff:"in"`

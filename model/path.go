@@ -12,6 +12,7 @@ var _ Model = (*Paths)(nil)
 
 type Paths map[string]*PathItem
 
+// https://spec.openapis.org/oas/v3.1.0#path-item-object
 type PathItem struct {
 	Ref         string     `json:"$ref,omitempty" diff:"$ref"`
 	Summary     string     `json:"summary,omitempty" diff:"summary"`
@@ -27,21 +28,6 @@ type PathItem struct {
 	Trace       *Operation `json:"trace,omitempty" diff:"trace"`
 	Servers     Servers    `json:"servers,omitempty" diff:"servers"`
 	Parameters  Parameters `json:"parameters,omitempty" diff:"parameters"`
-}
-
-type Operation struct {
-	Summary      string                `json:"summary,omitempty" diff:"summary"`
-	Description  string                `json:"description,omitempty" diff:"description"`
-	ExternalDocs *ExternalDocs         `json:"externalDocs,omitempty" diff:"externalDocs"`
-	Tags         []string              `json:"tags,omitempty" diff:"tags"`
-	OperationID  string                `json:"operationId,omitempty" diff:"operationId"`
-	Parameters   Parameters            `json:"parameters,omitempty" diff:"parameters"`
-	RequestBody  *RequestBody          `json:"requestBody,omitempty" diff:"requestBody"`
-	Responses    map[string]*Response  `json:"responses" diff:"responses"`
-	Consumes     []string              `json:"consumes,omitempty" diff:"consumes"`
-	Produces     []string              `json:"produces,omitempty" diff:"produces"`
-	Servers      Servers               `json:"servers,omitempty" diff:"servers"`
-	Security     *SecurityRequirements `json:"security,omitempty" diff:"security"`
 }
 
 func (p *Paths) Parse(file file.JsonFile) error {

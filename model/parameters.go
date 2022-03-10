@@ -12,21 +12,24 @@ type Parameters []*Parameter
 
 type Parameter struct {
 	Name             string                 `json:"name,omitempty" diff:"name,identifier"`
-	Ref              string                 `json:"$ref,omitempty" diff:"$ref"`
 	In               string                 `json:"in,omitempty" diff:"in"`
 	Description      string                 `json:"description,omitempty" diff:"description"`
 	CollectionFormat string                 `json:"collectionFormat,omitempty" diff:"collectionFormat"`
 	Type             string                 `json:"type,omitempty" diff:"type"`
 	Style            string                 `json:"style,omitempty" diff:"style"`
+	Explode          bool                   `json:"explode,omitempty" diff:"explode"`
+	AllowReserved    bool                   `json:"allowReserved,omitempty" diff:"allowReserved"`
 	Format           string                 `json:"format,omitempty" diff:"format"`
 	Pattern          string                 `json:"pattern,omitempty" diff:"pattern"`
 	AllowEmptyValue  bool                   `json:"allowEmptyValue,omitempty" diff:"allowEmptyValue"`
 	Required         bool                   `json:"required,omitempty" diff:"required"`
+	Deprecated       bool                   `json:"deprecated,omitempty" diff:"deprecated"`
 	UniqueItems      bool                   `json:"uniqueItems,omitempty" diff:"uniqueItems"`
 	ExclusiveMin     bool                   `json:"exclusiveMinimum,omitempty" diff:"exclusiveMinimum"`
 	ExclusiveMax     bool                   `json:"exclusiveMaximum,omitempty" diff:"exclusiveMaximum"`
 	Schema           *Schema                `json:"schema,omitempty" diff:"schema"`
 	Items            *Schema                `json:"items,omitempty" diff:"items"`
+	Content          Content                `json:"content,omitempty" diff:"content"`
 	Enum             []interface{}          `json:"enum,omitempty" diff:"enum"`
 	MultipleOf       *float64               `json:"multipleOf,omitempty" diff:"multipleOf"`
 	Minimum          *float64               `json:"minimum,omitempty" diff:"minimum"`

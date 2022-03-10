@@ -1,6 +1,9 @@
 package differentiator
 
 import (
+	"reflect"
+	"strings"
+
 	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
@@ -8,23 +11,25 @@ import (
 )
 
 // make sure we implement the InternalDiff interface
-var _ InternalDiff = (*pathsDiff)(nil)
+var _ InternalDiff = (*pathsDiffer)(nil)
 
-type pathsDiff struct {
+type pathsDiffer struct {
 	*internalDiff
 	data  model.Paths
 	data2 model.Paths
+
+	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewPathsDiff() *pathsDiff {
-	return &pathsDiff{
+func NewPathsDiffer() *pathsDiffer {
+	return &pathsDiffer{
 		internalDiff: NewInternalDiff(model.OAS_PATHS_KEY),
 		data:         model.Paths{},
 		data2:        model.Paths{},
 	}
 }
 
-func (p *pathsDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
+func (p *pathsDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
 	var err error
 
 	// opts
@@ -63,7 +68,7 @@ func (p *pathsDiff) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile
 	return p.handleChanges(changes)
 }
 
-func (p *pathsDiff) handleChanges(changes lib.Changelog) (err error) {
+func (p *pathsDiffer) handleChanges(changes lib.Changelog) (err error) {
 	for _, c := range changes {
 		key := c.Path[0]
 
@@ -150,4 +155,36 @@ func (p *pathsDiff) handleChanges(changes lib.Changelog) (err error) {
 	}
 
 	return nil
+}
+
+func (p *pathsDiffer) Match(a, b reflect.Value) bool {
+	return lib.AreType(a, b, reflect.TypeOf(model.Paths{}))
+}
+
+func (p *pathsDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if p.opts.Loose {
+		aValue, aOk := a.Interface().(model.Paths)
+		bValue, bOk := b.Interface().(model.Paths)
+
+		if aOk && bOk {
+			for ak, av := range aValue {
+				for bk, bv := range bValue {
+					// Ignore map key case sensitive
+					if len(ak) > 0 && len(bk) > 0 && ak != bk && strings.EqualFold(ak, bk) {
+						delete(aValue, ak)
+						aValue[strings.ToLower(ak)] = av
+
+						delete(bValue, bk)
+						bValue[strings.ToLower(bk)] = bv
+					}
+				}
+			}
+		}
+	}
+
+	return p.differ.DiffMap(path, a, b)
+}
+
+func (p *pathsDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+	p.DiffFunc = dfunc
 }

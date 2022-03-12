@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"time"
 
 	differentiator "github.com/up9inc/oas-diff/differentiator"
 	file "github.com/up9inc/oas-diff/json"
@@ -66,7 +67,7 @@ func diffCmd(c *cli.Context) error {
 	if isLoose {
 		outputPath = fmt.Sprintf("%s%s", outputPath, "-loose")
 	}
-	outputPath = fmt.Sprintf("%s%s", outputPath, ".json")
+	outputPath = fmt.Sprintf("%s_%s%s", outputPath, time.Now().Format("15:04:05.000"), ".json")
 
 	err = ioutil.WriteFile(outputPath, output, 0644)
 	if err != nil {

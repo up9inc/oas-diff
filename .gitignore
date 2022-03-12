@@ -17,4 +17,4 @@
 build/
 lib/
 test/
-changelog.json
+changelog*.json

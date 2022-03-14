@@ -63,12 +63,7 @@ func diffCmd(c *cli.Context) error {
 		panic(err)
 	}
 
-	outputPath := "changelog"
-	if isLoose {
-		outputPath = fmt.Sprintf("%s%s", outputPath, "-loose")
-	}
-	outputPath = fmt.Sprintf("%s_%s%s", outputPath, time.Now().Format("15:04:05.000"), ".json")
-
+	outputPath := fmt.Sprintf("%s_%s%s", "changelog", time.Now().Format("15:04:05.000"), ".json")
 	err = ioutil.WriteFile(outputPath, output, 0644)
 	if err != nil {
 		return err

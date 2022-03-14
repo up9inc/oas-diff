@@ -83,11 +83,18 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
-	assert.NotNil(output, "changeMap is nil")
-	assert.Len(output, 3, "changeMap len should be 3")
-	assert.NotNil(output[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
-	assert.NotNil(output[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
-	assert.NotNil(output[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	// ExecutionStatus
+	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
+	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
+	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
+	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
+	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	// changeMap
+	assert.NotNil(output.Changelog, "changeMap is nil")
+	assert.Len(output.Changelog, 3, "changeMap len should be 3")
+	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
+	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
+	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
 
 	// aux vars
 	index := -1
@@ -95,7 +102,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	property := ""
 
 	// info
-	info := output[model.OAS_INFO_KEY]
+	info := output.Changelog[model.OAS_INFO_KEY]
 	assert.Len(info, 2, "info should have 2 changes")
 
 	// info[0]
@@ -115,7 +122,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("1.1.0", info[index].To)
 
 	// servers
-	servers := output[model.OAS_SERVERS_KEY]
+	servers := output.Changelog[model.OAS_SERVERS_KEY]
 	assert.Len(servers, 4, "servers should have 4 changes")
 
 	// servers[0] -> position 0
@@ -124,7 +131,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("delete", servers[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(servers[index].Path, 3)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
 	} else {
 		assert.Len(servers[index].Path, 1)
 		assert.Equal([]string{identifier}, servers[index].Path)
@@ -145,7 +152,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("update", servers[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(servers[index].Path, 4)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_SERVERS_KEY, identifier, property}, servers[index].Path)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_SERVERS_KEY, identifier, property}, servers[index].Path)
 	} else {
 		assert.Len(servers[index].Path, 2)
 		assert.Equal([]string{identifier, property}, servers[index].Path)
@@ -162,7 +169,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("create", servers[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(servers[index].Path, 3)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE2), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
+		assert.Equal([]string{d.jsonFile2.GetPath(), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
 	} else {
 		assert.Len(servers[index].Path, 1)
 		assert.Equal([]string{identifier}, servers[index].Path)
@@ -182,7 +189,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("create", servers[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(servers[index].Path, 3)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE2), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
+		assert.Equal([]string{d.jsonFile2.GetPath(), model.OAS_SERVERS_KEY, identifier}, servers[index].Path)
 	} else {
 		assert.Len(servers[index].Path, 1)
 		assert.Equal([]string{identifier}, servers[index].Path)
@@ -197,7 +204,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	}, servers[index].To)
 
 	// paths
-	paths := output[model.OAS_PATHS_KEY]
+	paths := output.Changelog[model.OAS_PATHS_KEY]
 	assert.Len(paths, 3, "paths should have 3 changes")
 
 	// paths[0]
@@ -207,7 +214,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("delete", paths[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(paths[index].Path, 6)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], identifier}, paths[index].Path)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], identifier}, paths[index].Path)
 	} else {
 		assert.Len(paths[index].Path, 4)
 		assert.Equal([]string{basePath[0], basePath[1], basePath[2], identifier}, paths[index].Path)
@@ -231,7 +238,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("update", paths[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(paths[index].Path, 8)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
 	} else {
 		assert.Len(paths[index].Path, 6)
 		assert.Equal(basePath, paths[index].Path)
@@ -249,7 +256,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("update", paths[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(paths[index].Path, 7)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4]}, paths[index].Path)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4]}, paths[index].Path)
 	} else {
 		assert.Len(paths[index].Path, 5)
 		assert.Equal(basePath, paths[index].Path)
@@ -276,11 +283,18 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
-	assert.NotNil(output, "changeMap is nil")
-	assert.Len(output, 3, "changeMap len should be 3")
-	assert.NotNil(output[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
-	assert.NotNil(output[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
-	assert.NotNil(output[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	// ExecutionStatus
+	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
+	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
+	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
+	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
+	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	// changeMap
+	assert.NotNil(output.Changelog, "changeMap is nil")
+	assert.Len(output.Changelog, 3, "changeMap len should be 3")
+	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
+	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
+	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
 
 	// aux vars
 	index := -1
@@ -288,7 +302,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	property := ""
 
 	// info
-	info := output[model.OAS_INFO_KEY]
+	info := output.Changelog[model.OAS_INFO_KEY]
 
 	if opts.ExcludeDescriptions {
 		assert.Len(info, 1, "info should have 1 change")
@@ -322,7 +336,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	// servers
 	if !opts.ExcludeDescriptions {
-		servers := output[model.OAS_SERVERS_KEY]
+		servers := output.Changelog[model.OAS_SERVERS_KEY]
 		assert.Len(servers, 1, "servers should have 1 change")
 
 		// servers[0] -> position 0
@@ -332,7 +346,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		assert.Equal("update", servers[index].Type)
 		if opts.IncludeFilePath {
 			assert.Len(servers[index].Path, 4)
-			assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE_LOOSE1), model.OAS_SERVERS_KEY, identifier, property}, servers[index].Path)
+			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_SERVERS_KEY, identifier, property}, servers[index].Path)
 		} else {
 			assert.Len(servers[index].Path, 2)
 			assert.Equal([]string{identifier, property}, servers[index].Path)
@@ -345,7 +359,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	}
 
 	// paths
-	paths := output[model.OAS_PATHS_KEY]
+	paths := output.Changelog[model.OAS_PATHS_KEY]
 	assert.Len(paths, 1, "paths should have 1 change")
 
 	// paths[0]
@@ -356,7 +370,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal("update", paths[index].Type)
 	if opts.IncludeFilePath {
 		assert.Len(paths[index].Path, 7)
-		assert.Equal([]string{fmt.Sprintf("%s/%s", d.absPath, FILE_LOOSE1), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], property}, paths[index].Path)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], property}, paths[index].Path)
 	} else {
 		assert.Len(paths[index].Path, 5)
 		assert.Equal([]string{basePath[0], basePath[1], basePath[2], basePath[3], property}, paths[index].Path)

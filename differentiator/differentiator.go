@@ -2,6 +2,7 @@ package differentiator
 
 import (
 	"fmt"
+	"time"
 
 	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
@@ -9,13 +10,13 @@ import (
 )
 
 type Differentiator interface {
-	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (changeMap, error)
+	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*changelogOutput, error)
 }
 
 type DifferentiatorOptions struct {
-	Loose               bool
-	IncludeFilePath     bool
-	ExcludeDescriptions bool
+	Loose               bool `json:"loose"`
+	IncludeFilePath     bool `json:"include-file-path"`
+	ExcludeDescriptions bool `json:"exclude-descriptions"`
 }
 
 type differentiator struct {
@@ -57,7 +58,9 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	return v
 }
 
-func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (changeMap, error) {
+func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*changelogOutput, error) {
+	start := time.Now()
+
 	err := d.validator.Validate(jsonFile)
 	if err != nil {
 		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile.GetPath())
@@ -68,29 +71,30 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile2.GetPath())
 	}
 
-	// change map
-	changeMap := NewChangeMap()
+	// output
+	//changeMap := NewChangeMap(d.opts)
+	output := NewChangelogOutput(start, jsonFile.GetPath(), jsonFile2.GetPath(), d.opts)
 
 	// info
 	err = d.info.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
 	if err != nil {
 		return nil, err
 	}
-	changeMap[d.info.key] = d.info.changelog
+	output.Changelog[d.info.key] = d.info.changelog
 
 	// servers
 	err = d.servers.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
 	if err != nil {
 		return nil, err
 	}
-	changeMap[d.servers.key] = d.servers.changelog
+	output.Changelog[d.servers.key] = d.servers.changelog
 
 	// paths
 	err = d.paths.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
 	if err != nil {
 		return nil, err
 	}
-	changeMap[d.paths.key] = d.paths.changelog
+	output.Changelog[d.paths.key] = d.paths.changelog
 
-	return changeMap, nil
+	return output, nil
 }

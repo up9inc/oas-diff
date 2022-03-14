@@ -20,8 +20,8 @@ func RegisterDiffCmd() *cli.Command {
 		Usage:   "Diff between two OAS 3.1 files",
 		Action:  diffCmd,
 		Flags: []cli.Flag{
-			FileFlag,
-			FileFlag2,
+			BaseFileFlag,
+			SecondFileFlag,
 			LooseFlag,
 			IncludeFilePathFlag,
 			ExcludeDescriptionsFlag,
@@ -31,16 +31,16 @@ func RegisterDiffCmd() *cli.Command {
 
 func diffCmd(c *cli.Context) error {
 	isLoose := c.Bool(LooseFlag.Name)
-	filePath := c.String(FileFlag.Name)
-	filePath2 := c.String(FileFlag2.Name)
+	baseFilePath := c.String(BaseFileFlag.Name)
+	secondFilePath := c.String(SecondFileFlag.Name)
 
-	jsonFile := file.NewJsonFile(filePath)
+	jsonFile := file.NewJsonFile(baseFilePath)
 	_, err := jsonFile.Read()
 	if err != nil {
 		return err
 	}
 
-	jsonFile2 := file.NewJsonFile(filePath2)
+	jsonFile2 := file.NewJsonFile(secondFilePath)
 	_, err = jsonFile2.Read()
 	if err != nil {
 		return err

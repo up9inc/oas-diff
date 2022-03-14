@@ -3,12 +3,12 @@ package cli
 import "github.com/urfave/cli/v2"
 
 var (
-	FileFlag = &cli.StringFlag{
+	BaseFileFlag = &cli.StringFlag{
 		Name:     "base-file",
 		Usage:    "Path of the base OAS 3.1 file",
 		Required: true,
 	}
-	FileFlag2 = &cli.StringFlag{
+	SecondFileFlag = &cli.StringFlag{
 		Name:     "second-file",
 		Usage:    "Path of the second OAS 3.1 file",
 		Required: true,

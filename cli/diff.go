@@ -22,6 +22,7 @@ func RegisterDiffCmd() *cli.Command {
 		Flags: []cli.Flag{
 			BaseFileFlag,
 			SecondFileFlag,
+			HtmlOutputFlag,
 			LooseFlag,
 			IncludeFilePathFlag,
 			ExcludeDescriptionsFlag,
@@ -30,9 +31,9 @@ func RegisterDiffCmd() *cli.Command {
 }
 
 func diffCmd(c *cli.Context) error {
-	isLoose := c.Bool(LooseFlag.Name)
 	baseFilePath := c.String(BaseFileFlag.Name)
 	secondFilePath := c.String(SecondFileFlag.Name)
+	isHtmlOutput := c.Bool(HtmlOutputFlag.Name)
 
 	jsonFile := file.NewJsonFile(baseFilePath)
 	_, err := jsonFile.Read()
@@ -48,7 +49,7 @@ func diffCmd(c *cli.Context) error {
 
 	val := validator.NewValidator()
 	diff := differentiator.NewDifferentiator(val, differentiator.DifferentiatorOptions{
-		Loose:               isLoose,
+		Loose:               c.Bool(LooseFlag.Name),
 		IncludeFilePath:     c.Bool(IncludeFilePathFlag.Name),
 		ExcludeDescriptions: c.Bool(ExcludeDescriptionsFlag.Name),
 	})
@@ -58,13 +59,24 @@ func diffCmd(c *cli.Context) error {
 		return err
 	}
 
-	output, err := json.MarshalIndent(changelog, "", "\t")
-	if err != nil {
-		panic(err)
+	var outputData []byte
+	outputPath := fmt.Sprintf("%s_%s", "changelog", time.Now().Format("15:04:05.000"))
+	if isHtmlOutput {
+		// TODO: HTML Template logic
+		outputPath = fmt.Sprintf("%s%s", outputPath, ".html")
+	} else {
+		outputPath = fmt.Sprintf("%s%s", outputPath, ".json")
+		outputData, err = json.MarshalIndent(changelog, "", "\t")
+		if err != nil {
+			return err
+		}
 	}
 
-	outputPath := fmt.Sprintf("%s_%s%s", "changelog", time.Now().Format("15:04:05.000"), ".json")
-	err = ioutil.WriteFile(outputPath, output, 0644)
+	return saveDiffOutputFile(outputPath, outputData)
+}
+
+func saveDiffOutputFile(path string, data []byte) error {
+	err := ioutil.WriteFile(path, data, 0644)
 	if err != nil {
 		return err
 	}
@@ -74,7 +86,7 @@ func diffCmd(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(Green(fmt.Sprintf("report saved: %s", fmt.Sprintf("%s/%s", dirPath, outputPath))))
+	fmt.Println(Green(fmt.Sprintf("report saved: %s", fmt.Sprintf("%s/%s", dirPath, path))))
 
 	return nil
 }

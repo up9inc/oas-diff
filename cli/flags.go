@@ -31,4 +31,9 @@ var (
 		Required: false,
 		Value:    false,
 	}
+	HtmlOutputFlag = &cli.BoolFlag{
+		Name:     "html",
+		Usage:    "save the changelog file as a html report",
+		Required: false,
+	}
 )

@@ -17,15 +17,34 @@ OAS 3.1 Validation and Diff Tool
     ````
     ./build/oasdiff --help
     ````
-
+## OPTIONS
+- Validate
+    ````
+   --base-file value  Path of the base OAS 3.1 file
+   --help, -h         show help (default: false)
+   ````
+- Diff
+    ````
+    --base-file value       Path of the base OAS 3.1 file
+    --second-file value     Path of the second OAS 3.1 file
+    --html                  save the changelog file as a html report (default: false)
+    --loose                 loosely diff (default: false)
+    --include-file-path     Whether or not to include the full file path from the diff changelog (default: false)
+    --exclude-descriptions  Whether or not to exclude descriptions from the diff changelog (default: false)
+    --help, -h              show help (default: false)
+    ````
 ## Examples
 - Validate
     ````
-    ./build/oasdiff validate --file test/shipping_invalid.json
+    ./build/oasdiff validate --base-file examples/invalid.json
     ````
 - Diff
     ````
-    ./build/oasdiff diff --file test/simple.json --file2 test/simple2.json
+    ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json
+    ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --loose
+    ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --exclude-descriptions
+    ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --loose --exclude-descriptions
+    ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --html
     ````
 ## Changelog Rules
 - Arrays

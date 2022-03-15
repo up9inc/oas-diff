@@ -2,20 +2,12 @@ package differentiator
 
 import "time"
 
-type changeMap map[string][]*changelog
-
-type executionStatus struct {
-	BaseFilePath   string                `json:"base-file"`
-	SecondFilePath string                `json:"second-file"`
-	StartTime      string                `json:"start-time"`
-	ExecutionTime  string                `json:"execution-time"`
-	ExecutionFlags DifferentiatorOptions `json:"execution-flags"`
-}
-
-type changelogOutput struct {
+type ChangelogOutput struct {
 	ExecutionStatus executionStatus `json:"execution-status"`
 	Changelog       changeMap       `json:"changelog"`
 }
+
+type changeMap map[string][]*changelog
 
 type changelog struct {
 	Type       string      `json:"type"`
@@ -25,8 +17,16 @@ type changelog struct {
 	To         interface{} `json:"to"`
 }
 
-func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string, opts DifferentiatorOptions) *changelogOutput {
-	return &changelogOutput{
+type executionStatus struct {
+	BaseFilePath   string                `json:"base-file"`
+	SecondFilePath string                `json:"second-file"`
+	StartTime      string                `json:"start-time"`
+	ExecutionTime  string                `json:"execution-time"`
+	ExecutionFlags DifferentiatorOptions `json:"execution-flags"`
+}
+
+func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string, opts DifferentiatorOptions) *ChangelogOutput {
+	return &ChangelogOutput{
 		ExecutionStatus: executionStatus{
 			BaseFilePath:   baseFilePath,
 			SecondFilePath: secondFilePath,

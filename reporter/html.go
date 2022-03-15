@@ -1,9 +1,21 @@
-package report
+package reporter
 
 import (
 	"bytes"
 	"text/template"
+
+	"github.com/up9inc/oas-diff/differentiator"
 )
+
+type htmlReporter struct {
+	changelog *differentiator.ChangelogOutput
+}
+
+func NewHTMLReporter(changelog *differentiator.ChangelogOutput) Reporter {
+	return &htmlReporter{
+		changelog: changelog,
+	}
+}
 
 type Todo struct {
 	Title string
@@ -15,8 +27,9 @@ type TodoPageData struct {
 	Todos     []Todo
 }
 
-func RenderReport() ([]byte, error) {
-	tmpl := template.Must(template.ParseFiles("report/template.html"))
+// TODO: Use the changelog data
+func (h *htmlReporter) Build() ([]byte, error) {
+	tmpl := template.Must(template.ParseFiles("reporter/template.html"))
 	data := TodoPageData{
 		PageTitle: "My TODO list",
 		Todos: []Todo{

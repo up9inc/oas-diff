@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os/exec"
@@ -11,7 +10,7 @@ import (
 
 	differentiator "github.com/up9inc/oas-diff/differentiator"
 	file "github.com/up9inc/oas-diff/json"
-	"github.com/up9inc/oas-diff/report"
+	"github.com/up9inc/oas-diff/reporter"
 	"github.com/up9inc/oas-diff/validator"
 	"github.com/urfave/cli/v2"
 )
@@ -63,20 +62,19 @@ func diffCmd(c *cli.Context) error {
 	}
 
 	// TODO: Should we save the changelog.json when html flag is present? this is good for debug
-	var outputData []byte
+	var rep reporter.Reporter
 	outputPath := fmt.Sprintf("%s_%s", "changelog", time.Now().Format("15:04:05.000"))
 	if isHtmlOutput {
+		rep = reporter.NewHTMLReporter(changelog)
 		outputPath = fmt.Sprintf("%s%s", outputPath, ".html")
-		outputData, err = report.RenderReport()
-		if err != nil {
-			return err
-		}
 	} else {
+		rep = reporter.NewJSONReporter(changelog)
 		outputPath = fmt.Sprintf("%s%s", outputPath, ".json")
-		outputData, err = json.MarshalIndent(changelog, "", "\t")
-		if err != nil {
-			return err
-		}
+	}
+
+	outputData, err := rep.Build()
+	if err != nil {
+		return err
 	}
 
 	err = saveDiffOutputFile(outputPath, outputData)

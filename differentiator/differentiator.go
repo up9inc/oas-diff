@@ -10,7 +10,7 @@ import (
 )
 
 type Differentiator interface {
-	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*changelogOutput, error)
+	Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*ChangelogOutput, error)
 }
 
 type DifferentiatorOptions struct {
@@ -58,7 +58,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	return v
 }
 
-func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*changelogOutput, error) {
+func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (*ChangelogOutput, error) {
 	start := time.Now()
 
 	err := d.validator.Validate(jsonFile)

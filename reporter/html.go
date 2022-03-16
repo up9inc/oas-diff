@@ -2,7 +2,8 @@ package reporter
 
 import (
 	"bytes"
-	"text/template"
+	"encoding/json"
+	"html/template"
 
 	"github.com/up9inc/oas-diff/differentiator"
 )
@@ -17,30 +18,17 @@ func NewHTMLReporter(changelog *differentiator.ChangelogOutput) Reporter {
 	}
 }
 
-type Todo struct {
-	Title string
-	Done  bool
-}
-
-type TodoPageData struct {
-	PageTitle string
-	Todos     []Todo
-}
-
-// TODO: Use the changelog data
 func (h *htmlReporter) Build() ([]byte, error) {
-	tmpl := template.Must(template.ParseFiles("reporter/template.html"))
-	data := TodoPageData{
-		PageTitle: "My TODO list",
-		Todos: []Todo{
-			{Title: "Task 1", Done: false},
-			{Title: "Task 2", Done: true},
-			{Title: "Task 3", Done: true},
-			{Title: "Task 4", Done: false},
-		},
+	// The issue with passing struct is that pointers won't be dereferenced
+	// Let's pass a JSON to the html template instead of a struct
+	data, err := json.Marshal(h.changelog)
+	if err != nil {
+		return nil, err
 	}
+
+	tmpl := template.Must(template.ParseFiles("reporter/template.html"))
 	var buf bytes.Buffer
-	err := tmpl.Execute(&buf, data)
+	err = tmpl.Execute(&buf, string(data))
 	if err != nil {
 		return nil, err
 	}

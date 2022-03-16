@@ -1,10 +1,195 @@
-<h1>{{.PageTitle}}</h1>
-<ul>
-    {{range .Todos}}
-        {{if .Done}}
-            <li class="done">{{.Title}}</li>
-        {{else}}
-            <li>{{.Title}}</li>
-        {{end}}
-    {{end}}
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        .summary {
+            padding-bottom: 0.5em;
+        }
+
+        .summary span {
+            margin-left: 1em;
+        }
+
+        .content {
+            padding: 1em 1em 0;
+        }
+
+        .card-header.bg-warning {
+            cursor: pointer;
+        }
+
+        .card-header .resp {
+            margin-left: 2em;
+            font-size: smaller;
+            opacity: 0.5;
+        }
+
+        .card-header .badge {
+            margin: 0 0.25em;
+            font-weight: normal;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="small float-right" style="padding: 0.5em 1em">Display:
+        <label class="text-success"><input type="checkbox" checked="checked" data-target="success"> Matched</label>
+        <label class="text-warning"><input type="checkbox" checked="checked" data-target="warning"> Partial</label>
+        <label class="text-danger"><input type="checkbox" checked="checked" data-target="danger"> Missing</label>
+        <label class="text-info"><input type="checkbox" checked="checked" data-target="info"> Extra</label>
+    </div>
+
+    <div class="content">
+        <h2 id="toplevel">Model Difference Report: <span class="matched text-success"></span>% Matched, <span
+                class="missing text-danger"></span>% Missing, <span class="extra text-info"></span>% Extra Items</h2>
+    </div>
+
+    <div id="content" class="content"></div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+<script>
+    const data = JSON.parse('{{.}}');
+    console.log(data)
+
+    const type_map = {
+        "ParameterQStr": "Query String",
+        "ParameterHeader": "Header",
+        "AssrtCmp": "Proposed Assertion",
+        "DLinkCmp": "Value Source",
+        "NetlinkCmp": "Client Connection",
+        "ParameterRespBody": "Response Body",
+        "ParameterReqBody": "Request Body",
+    };
+
+    function revisedRandId() {
+        return 'i_' + Math.round(Math.random() * 1000);
+    }
+
+    function detail_cards(data, container) {
+        let stats = {};
+        for (let n = 0; n < data.length; n++) {
+            let ditem = data[n];
+            stats[ditem['flag']] = stats[ditem['flag']] === undefined ? 1 : stats[ditem['flag']] + 1;
+            let card = $("<div class='card'></div>");
+            let cid = revisedRandId();
+            let chdr = $("<div class='card-header' data-toggle='collapse' role='button' aria-expanded='false'></div>");
+            chdr.attr('href', '#' + cid);
+            chdr.attr('aria-controls', cid);
+
+            let lbl = ditem['label'];
+            if (Array.isArray(lbl)) {
+                const path = lbl.shift().join('/');
+                const method = lbl.shift().toUpperCase();
+                chdr.append(method + ' ' + path + ' ');
+
+                const criteria = lbl.shift();
+                const standard = criteria.shift();
+                chdr.append(standard[2] + ' <span class="resp">HTTP ' + standard[1] + ' ' + lbl[3] + ' response</span>');
+
+                while (criteria.length) {
+                    chdr.append('<span class="resp">+' + criteria.shift() + '</span>');
+                }
+            } else {
+                chdr.append((type_map[ditem['type']] || ditem['type']) + ': ' + lbl);
+            }
+
+            card.append(chdr);
+            let match_hint;
+            if (ditem['flag'] === '-') {
+                card.addClass("danger");
+                chdr.addClass("bg-danger");
+                chdr.addClass("text-light");
+                match_hint = "missing in second";
+            } else if (ditem['flag'] === '+') {
+                card.addClass("info");
+                chdr.addClass("bg-info");
+                chdr.addClass("text-light");
+                match_hint = "only exists in second";
+            } else if (ditem['flag'] === '~') {
+                card.addClass("warning");
+                chdr.addClass("bg-warning");
+                chdr.addClass("text-dark");
+                match_hint = ((100 * ditem['score']).toFixed(2)) + "% match";
+            } else if (ditem['extra']) {
+                card.addClass("info");
+                chdr.addClass("bg-success");
+                chdr.addClass("text-light");
+                match_hint = "new data";
+            } else {
+                card.addClass("success");
+                chdr.addClass("bg-success");
+                chdr.addClass("text-light");
+                match_hint = "full match";
+                continue;
+            }
+
+            if (ditem['extra'] && ditem['flag'] !== '+') {
+                chdr.append(" <span class='float-right badge badge-light text-info'> +" + ((100 * ditem['extra']).toFixed(2)) + "% extra</span>");
+            }
+
+            let match_info = $("<span class='float-right badge badge-light text-success'></span>").append(match_hint);
+            chdr.append(match_info);
+
+            if (ditem['diff'].length || ditem.info) {
+                let cbody = $("<div class='card-body collapse small' id='" + cid + "'></div>");
+
+                if (ditem.info) {
+                    for (let ni = 0; ni < ditem.info.length; ni++) {
+                        chdr.append("<li>" + ditem.info[ni] + "</li>")
+                    }
+                }
+
+                if (ditem['diff'].length) {
+                    detail_cards(ditem['diff'], cbody);
+                }
+                card.append(cbody);
+            }
+
+            container.append(card);
+        }
+
+        let statspan = $("<div class='small summary'>Summary:</div>");
+        if (stats['=']) {
+            statspan.append("<span class='text-success'>" + stats['='] + " fully matched</span>")
+        }
+        if (stats['~']) {
+            statspan.append("<span class='text-warning'>" + stats['~'] + " partially matched</span>")
+        }
+        if (stats['-']) {
+            statspan.append("<span class='text-danger'>" + stats['-'] + " missing</span>")
+        }
+        if (stats['+']) {
+            statspan.append("<span class='text-info'>" + stats['+'] + " extra</span>")
+        }
+        container.prepend(statspan);
+    }
+
+    $("#toplevel span.matched").text((100 * data['score']).toFixed(1));
+    $("#toplevel span.missing").text((100 - 100 * data['score']).toFixed(1));
+    $("#toplevel span.extra").text((100 * data['extra']).toFixed(1));
+    detail_cards(data['diff'], $("#content"));
+
+    $("input").change(function () {
+        let item = $(this);
+        let blocks = $(".card." + item.data('target'));
+        if (item.prop('checked')) {
+            blocks.show();
+        } else {
+            blocks.hide();
+        }
+    });
+</script>
+
+</html>

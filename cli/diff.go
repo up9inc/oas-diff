@@ -61,29 +61,33 @@ func diffCmd(c *cli.Context) error {
 		return err
 	}
 
-	// TODO: Should we save the changelog.json when html flag is present? this is good for debug
-	var rep reporter.Reporter
 	outputPath := fmt.Sprintf("%s_%s", "changelog", time.Now().Format("15:04:05.000"))
-	if isHtmlOutput {
-		rep = reporter.NewHTMLReporter(changelog)
-		outputPath = fmt.Sprintf("%s%s", outputPath, ".html")
-	} else {
-		rep = reporter.NewJSONReporter(changelog)
-		outputPath = fmt.Sprintf("%s%s", outputPath, ".json")
-	}
-
+	rep := reporter.NewJSONReporter(changelog)
 	outputData, err := rep.Build()
 	if err != nil {
 		return err
 	}
 
-	err = saveDiffOutputFile(outputPath, outputData)
+	jsonOutput := fmt.Sprintf("%s%s", outputPath, ".json")
+	err = saveDiffOutputFile(jsonOutput, outputData)
 	if err != nil {
 		return err
 	}
 
 	if isHtmlOutput {
-		return openBrowser(outputPath)
+		rep = reporter.NewHTMLReporter(changelog)
+		outputData, err := rep.Build()
+		if err != nil {
+			return err
+		}
+
+		htmlOutput := fmt.Sprintf("%s%s", outputPath, ".html")
+		err = saveDiffOutputFile(htmlOutput, outputData)
+		if err != nil {
+			return err
+		}
+
+		return openBrowser(htmlOutput)
 	}
 
 	return nil

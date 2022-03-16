@@ -15,10 +15,11 @@
             "program": "${workspaceFolder}/main.go",
             "args": [
                 "diff",
-                "--file",
+                "--base-file",
                 "test/simple.json",
-                "--file2",
+                "--second-file",
                 "test/simple2.json",
+                "--html"
             ]
         },
         {

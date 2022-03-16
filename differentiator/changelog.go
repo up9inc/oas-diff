@@ -7,7 +7,7 @@ type ChangelogOutput struct {
 	Changelog       changeMap       `json:"changelog"`
 }
 
-type changeMap map[string][]*changelog
+type changeMap map[string][]changelog
 
 type changelog struct {
 	Type       string      `json:"type"`

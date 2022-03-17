@@ -9,26 +9,35 @@ import (
 )
 
 type htmlReporter struct {
-	changelog *differentiator.ChangelogOutput
+	output *differentiator.ChangelogOutput
 }
 
-func NewHTMLReporter(changelog *differentiator.ChangelogOutput) Reporter {
+type templateData struct {
+	Status    differentiator.ExecutionStatus
+	Changelog string
+}
+
+func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 	return &htmlReporter{
-		changelog: changelog,
+		output: output,
 	}
 }
 
 func (h *htmlReporter) Build() ([]byte, error) {
 	// The issue with passing struct is that pointers won't be dereferenced
 	// Let's pass a JSON to the html template instead of a struct
-	data, err := json.Marshal(h.changelog)
+	changelogJSON, err := json.Marshal(h.output.Changelog)
 	if err != nil {
 		return nil, err
 	}
+	data := templateData{
+		Status:    h.output.ExecutionStatus,
+		Changelog: string(changelogJSON),
+	}
 
-	tmpl := template.Must(template.ParseFiles("reporter/template.html"))
 	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, string(data))
+	tmpl := template.Must(template.ParseFiles("reporter/template.html"))
+	err = tmpl.Execute(&buf, data)
 	if err != nil {
 		return nil, err
 	}

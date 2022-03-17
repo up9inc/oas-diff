@@ -7,15 +7,15 @@ import (
 )
 
 type jsonReporter struct {
-	changelog *differentiator.ChangelogOutput
+	output *differentiator.ChangelogOutput
 }
 
-func NewJSONReporter(changelog *differentiator.ChangelogOutput) Reporter {
+func NewJSONReporter(output *differentiator.ChangelogOutput) Reporter {
 	return &jsonReporter{
-		changelog: changelog,
+		output: output,
 	}
 }
 
 func (j *jsonReporter) Build() ([]byte, error) {
-	return json.MarshalIndent(j.changelog, "", "\t")
+	return json.MarshalIndent(j.output, "", "\t")
 }

@@ -14,9 +14,9 @@ type ChangelogOutput struct {
 	Changelog       ChangeMap       `json:"changelog"`
 }
 
-type ChangeMap map[string][]changelog
+type ChangeMap map[string][]*Changelog
 
-type changelog struct {
+type Changelog struct {
 	Type       string      `json:"type"`
 	Path       []string    `json:"path"`
 	Identifier Identifier  `json:"identifier,omitempty"`

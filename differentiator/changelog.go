@@ -2,12 +2,19 @@ package differentiator
 
 import "time"
 
+type ExecutionStatus struct {
+	BaseFilePath   string                `json:"base-file"`
+	SecondFilePath string                `json:"second-file"`
+	StartTime      string                `json:"start-time"`
+	ExecutionTime  string                `json:"execution-time"`
+	ExecutionFlags DifferentiatorOptions `json:"execution-flags"`
+}
 type ChangelogOutput struct {
-	ExecutionStatus executionStatus `json:"execution-status"`
-	Changelog       changeMap       `json:"changelog"`
+	ExecutionStatus ExecutionStatus `json:"execution-status"`
+	Changelog       ChangeMap       `json:"changelog"`
 }
 
-type changeMap map[string][]changelog
+type ChangeMap map[string][]changelog
 
 type changelog struct {
 	Type       string      `json:"type"`
@@ -17,23 +24,15 @@ type changelog struct {
 	To         interface{} `json:"to"`
 }
 
-type executionStatus struct {
-	BaseFilePath   string                `json:"base-file"`
-	SecondFilePath string                `json:"second-file"`
-	StartTime      string                `json:"start-time"`
-	ExecutionTime  string                `json:"execution-time"`
-	ExecutionFlags DifferentiatorOptions `json:"execution-flags"`
-}
-
 func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string, opts DifferentiatorOptions) *ChangelogOutput {
 	return &ChangelogOutput{
-		ExecutionStatus: executionStatus{
+		ExecutionStatus: ExecutionStatus{
 			BaseFilePath:   baseFilePath,
 			SecondFilePath: secondFilePath,
 			StartTime:      startTime.Format(time.StampMilli),
 			ExecutionTime:  time.Since(startTime).String(),
 			ExecutionFlags: opts,
 		},
-		Changelog: make(changeMap, 0),
+		Changelog: make(ChangeMap, 0),
 	}
 }

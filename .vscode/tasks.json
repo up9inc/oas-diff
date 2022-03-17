@@ -24,6 +24,11 @@
             "command": "go run -race main.go diff --base-file test/simple.json --second-file test/simple2.json"
         },
         {
+            "label": "run-html",
+            "type": "shell",
+            "command": "go run -race main.go diff --base-file test/simple.json --second-file test/simple2.json --html"
+        },
+        {
             "label": "clean-changelog",
             "type": "shell",
             "command": "rm changelog*.json || true && rm changelog*.html || true"

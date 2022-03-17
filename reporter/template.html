@@ -104,15 +104,13 @@
     const changelog = JSON.parse('{{.Changelog}}');
     console.log(changelog)
 
-    const type_map = {
-        "ParameterQStr": "Query String",
-        "ParameterHeader": "Header",
-        "AssrtCmp": "Proposed Assertion",
-        "DLinkCmp": "Value Source",
-        "NetlinkCmp": "Client Connection",
-        "ParameterRespBody": "Response Body",
-        "ParameterReqBody": "Request Body",
-    };
+    const changelogByType = JSON.parse('{{.ChangelogByType}}');
+    console.log(changelogByType)
+
+    const info = changelog["info"]
+    const servers = changelog["servers"]
+    const paths = changelog["paths"]
+    console.log(paths)
 
     function revisedRandId() {
         return 'i_' + Math.round(Math.random() * 1000);
@@ -122,43 +120,47 @@
         let stats = {};
         for (let n = 0; n < data.length; n++) {
             let ditem = data[n];
+
+            // TODO: fix flag
             stats[ditem['flag']] = stats[ditem['flag']] === undefined ? 1 : stats[ditem['flag']] + 1;
+            
             let card = $("<div class='card'></div>");
             let cid = revisedRandId();
             let chdr = $("<div class='card-header' data-toggle='collapse' role='button' aria-expanded='false'></div>");
             chdr.attr('href', '#' + cid);
             chdr.attr('aria-controls', cid);
 
-            let lbl = ditem['label'];
+            let lbl = ditem['path'];
             if (Array.isArray(lbl)) {
-                const path = lbl.shift().join('/');
-                const method = lbl.shift().toUpperCase();
+                const path = lbl;
+                const method = lbl[1].toUpperCase();
                 chdr.append(method + ' ' + path + ' ');
 
-                const criteria = lbl.shift();
+                // what to do when we just have the path/method inside the label?
+                //const criteria = (lbl.length > 2) ? lbl[2] : lbl[1]
+                // TODO: What is criteria?
+                const criteria = JSON.parse(JSON.stringify(lbl));
                 const standard = criteria.shift();
                 chdr.append(standard[2] + ' <span class="resp">HTTP ' + standard[1] + ' ' + lbl[3] + ' response</span>');
 
                 while (criteria.length) {
                     chdr.append('<span class="resp">+' + criteria.shift() + '</span>');
                 }
-            } else {
-                chdr.append((type_map[ditem['type']] || ditem['type']) + ': ' + lbl);
             }
 
             card.append(chdr);
             let match_hint;
-            if (ditem['flag'] === '-') {
+            if (ditem['type'] === 'delete') {
                 card.addClass("danger");
                 chdr.addClass("bg-danger");
                 chdr.addClass("text-light");
                 match_hint = "missing in second";
-            } else if (ditem['flag'] === '+') {
+            } else if (ditem['type'] === 'create') {
                 card.addClass("info");
                 chdr.addClass("bg-info");
                 chdr.addClass("text-light");
                 match_hint = "only exists in second";
-            } else if (ditem['flag'] === '~') {
+            } else if (ditem['type'] === 'update') {
                 card.addClass("warning");
                 chdr.addClass("bg-warning");
                 chdr.addClass("text-dark");
@@ -217,10 +219,7 @@
         container.prepend(statspan);
     }
 
-    $("#toplevel span.matched").text((100 * data['score']).toFixed(1));
-    $("#toplevel span.missing").text((100 - 100 * data['score']).toFixed(1));
-    $("#toplevel span.extra").text((100 * data['extra']).toFixed(1));
-    detail_cards(data['diff'], $("#content"));
+    detail_cards(changelog['paths'], $("#content"));
 
     $("input").change(function () {
         let item = $(this);

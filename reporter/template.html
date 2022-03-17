@@ -46,15 +46,13 @@
                     <thead>
                         <tr>
                             <th>Report generated on: {{.Status.StartTime}}</th>
-                            <th class="float">Display:
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="success">
-                                    Info</label>
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="warning">
-                                    Servers</label>
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="danger">
-                                    Paths</label>
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="info">
-                                    Webhooks</label>
+                            <th class="small float">Display:
+                                <label class="text-success"><input type="checkbox" checked="checked" data-target="created">
+                                    Created</label>
+                                <label class="text-warning"><input type="checkbox" checked="checked" data-target="updated">
+                                    Updated</label>
+                                <label class="text-danger"><input type="checkbox" checked="checked" data-target="deleted">
+                                    Deleted</label>
                             </th>
                         </tr>
                     </thead>
@@ -151,17 +149,17 @@
             let match_hint;
 
             if (type=== 'create') {
-                card.addClass("success");
+                card.addClass("created");
                 chdr.addClass("bg-success");
                 chdr.addClass("text-light");
                 match_hint = "only exists in second";
             } else if (type=== 'update') {
-                card.addClass("warning");
+                card.addClass("updated");
                 chdr.addClass("bg-warning");
                 chdr.addClass("text-dark");
                 //match_hint = ((100 * ditem['score']).toFixed(2)) + "% match";
             } else if (type=== 'delete') {
-                card.addClass("danger");
+                card.addClass("deleted");
                 chdr.addClass("bg-danger");
                 chdr.addClass("text-light");
                 match_hint = "missing in second";

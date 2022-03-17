@@ -47,10 +47,14 @@
                         <tr>
                             <th>Report generated on: {{.Status.StartTime}}</th>
                             <th class="float">Display:
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="success"> Info</label>
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="warning"> Servers</label>
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="danger"> Paths</label>
-                                <label class="text-info"><input type="checkbox" checked="checked" data-target="info"> Webhooks</label>
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="success">
+                                    Info</label>
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="warning">
+                                    Servers</label>
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="danger">
+                                    Paths</label>
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="info">
+                                    Webhooks</label>
                             </th>
                         </tr>
                     </thead>
@@ -77,16 +81,16 @@
                                 --loose
                                 {{end}}
                                 {{if .Status.ExecutionFlags.IncludeFilePath}}
-                                 --include-file-path
+                                --include-file-path
                                 {{end}}
                                 {{if .Status.ExecutionFlags.ExcludeDescriptions}}
-                                 --exclude-descriptions
+                                --exclude-descriptions
                                 {{end}}
                             </td>
                         </tr>
                     </tbody>
                 </table>
-            </li>           
+            </li>
         </ul>
     </div>
 
@@ -104,122 +108,96 @@
     const changelog = JSON.parse('{{.Changelog}}');
     console.log(changelog)
 
-    const changelogByType = JSON.parse('{{.ChangelogByType}}');
-    console.log(changelogByType)
+    const pathChangelog = JSON.parse('{{.PathChangelog}}');
+    console.log(pathChangelog)
 
     const info = changelog["info"]
     const servers = changelog["servers"]
     const paths = changelog["paths"]
-    console.log(paths)
 
     function revisedRandId() {
         return 'i_' + Math.round(Math.random() * 1000);
     }
 
-    function detail_cards(data, container) {
-        let stats = {};
+    function path_detail_cards(data, container) {
         for (let n = 0; n < data.length; n++) {
             let ditem = data[n];
+            const type = ditem["changelog"]["type"]
+            const endpoint = ditem["endpoint"]
+            const method = ditem["operation"].toUpperCase()
+            const path = JSON.parse(JSON.stringify(ditem["changelog"]["path"]));
 
-            // TODO: fix flag
-            stats[ditem['flag']] = stats[ditem['flag']] === undefined ? 1 : stats[ditem['flag']] + 1;
-            
             let card = $("<div class='card'></div>");
             let cid = revisedRandId();
             let chdr = $("<div class='card-header' data-toggle='collapse' role='button' aria-expanded='false'></div>");
             chdr.attr('href', '#' + cid);
             chdr.attr('aria-controls', cid);
 
-            let lbl = ditem['path'];
-            if (Array.isArray(lbl)) {
-                const path = lbl;
-                const method = lbl[1].toUpperCase();
-                chdr.append(method + ' ' + path + ' ');
+            chdr.append(`<span class='float-left badge badge-light text-info'>${method}</span> ${endpoint}`);
+            //chdr.append(`<span class="resp">HTTP response</span>`);
 
-                // what to do when we just have the path/method inside the label?
-                //const criteria = (lbl.length > 2) ? lbl[2] : lbl[1]
-                // TODO: What is criteria?
-                const criteria = JSON.parse(JSON.stringify(lbl));
-                const standard = criteria.shift();
-                chdr.append(standard[2] + ' <span class="resp">HTTP ' + standard[1] + ' ' + lbl[3] + ' response</span>');
-
-                while (criteria.length) {
-                    chdr.append('<span class="resp">+' + criteria.shift() + '</span>');
-                }
+            /*                 const criteria = JSON.parse(JSON.stringify(lbl));
+                            const standard = criteria.shift();
+                            chdr.append(standard[2] + ' <span class="resp">HTTP ' + standard[1] + ' ' + lbl[3] + ' response</span>'); */
+            
+            path.shift()
+            path.shift()
+            while (path.length) {
+                chdr.append(`<span class="resp">${path.shift()}</span>`);
             }
+
 
             card.append(chdr);
             let match_hint;
-            if (ditem['type'] === 'delete') {
+
+            if (type=== 'create') {
+                card.addClass("success");
+                chdr.addClass("bg-success");
+                chdr.addClass("text-light");
+                match_hint = "only exists in second";
+            } else if (type=== 'update') {
+                card.addClass("warning");
+                chdr.addClass("bg-warning");
+                chdr.addClass("text-dark");
+                //match_hint = ((100 * ditem['score']).toFixed(2)) + "% match";
+            } else if (type=== 'delete') {
                 card.addClass("danger");
                 chdr.addClass("bg-danger");
                 chdr.addClass("text-light");
                 match_hint = "missing in second";
-            } else if (ditem['type'] === 'create') {
-                card.addClass("info");
-                chdr.addClass("bg-info");
-                chdr.addClass("text-light");
-                match_hint = "only exists in second";
-            } else if (ditem['type'] === 'update') {
-                card.addClass("warning");
-                chdr.addClass("bg-warning");
-                chdr.addClass("text-dark");
-                match_hint = ((100 * ditem['score']).toFixed(2)) + "% match";
-            } else if (ditem['extra']) {
-                card.addClass("info");
-                chdr.addClass("bg-success");
-                chdr.addClass("text-light");
-                match_hint = "new data";
-            } else {
-                card.addClass("success");
-                chdr.addClass("bg-success");
-                chdr.addClass("text-light");
-                match_hint = "full match";
-                continue;
             }
 
-            if (ditem['extra'] && ditem['flag'] !== '+') {
-                chdr.append(" <span class='float-right badge badge-light text-info'> +" + ((100 * ditem['extra']).toFixed(2)) + "% extra</span>");
-            }
+            // TODO: Meta-data?
+            chdr.append(`<span class='float-right badge badge-light text-info'>${type}</span>`);
 
-            let match_info = $("<span class='float-right badge badge-light text-success'></span>").append(match_hint);
+            const match_info = $("<span class='float-right badge badge-light text-success'></span>").append(match_hint);
             chdr.append(match_info);
 
-            if (ditem['diff'].length || ditem.info) {
-                let cbody = $("<div class='card-body collapse small' id='" + cid + "'></div>");
-
-                if (ditem.info) {
-                    for (let ni = 0; ni < ditem.info.length; ni++) {
-                        chdr.append("<li>" + ditem.info[ni] + "</li>")
-                    }
-                }
-
-                if (ditem['diff'].length) {
-                    detail_cards(ditem['diff'], cbody);
-                }
-                card.append(cbody);
-            }
+            /*             if (ditem['diff'].length || ditem.info) {
+                            let cbody = $("<div class='card-body collapse small' id='" + cid + "'></div>");
+            
+                            if (ditem.info) {
+                                for (let ni = 0; ni < ditem.info.length; ni++) {
+                                    chdr.append("<li>" + ditem.info[ni] + "</li>")
+                                }
+                            }
+            
+                            if (ditem['diff'].length) {
+                                path_detail_cards(ditem['diff'], cbody);
+                            }
+                            card.append(cbody);
+                        } */
 
             container.append(card);
+
         }
 
-        let statspan = $("<div class='small summary'>Summary:</div>");
-        if (stats['=']) {
-            statspan.append("<span class='text-success'>" + stats['='] + " fully matched</span>")
-        }
-        if (stats['~']) {
-            statspan.append("<span class='text-warning'>" + stats['~'] + " partially matched</span>")
-        }
-        if (stats['-']) {
-            statspan.append("<span class='text-danger'>" + stats['-'] + " missing</span>")
-        }
-        if (stats['+']) {
-            statspan.append("<span class='text-info'>" + stats['+'] + " extra</span>")
-        }
-        container.prepend(statspan);
+        let summarySpan = $("<div class='small summary'>Summary:</div>");
+        summarySpan.append(`<span class='text-info'>${data.length} changes</span>`)
+        container.prepend(summarySpan);
     }
 
-    detail_cards(changelog['paths'], $("#content"));
+    path_detail_cards(pathChangelog, $("#content"));
 
     $("input").change(function () {
         let item = $(this);

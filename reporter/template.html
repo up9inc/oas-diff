@@ -37,16 +37,57 @@
 
 <body>
 
-    <div class="small float-right" style="padding: 0.5em 1em">Display:
-        <label class="text-success"><input type="checkbox" checked="checked" data-target="success"> Matched</label>
-        <label class="text-warning"><input type="checkbox" checked="checked" data-target="warning"> Partial</label>
-        <label class="text-danger"><input type="checkbox" checked="checked" data-target="danger"> Missing</label>
-        <label class="text-info"><input type="checkbox" checked="checked" data-target="info"> Extra</label>
-    </div>
-
     <div class="content">
-        <h2 id="toplevel">Model Difference Report: <span class="matched text-success"></span>% Matched, <span
-                class="missing text-danger"></span>% Missing, <span class="extra text-info"></span>% Extra Items</h2>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <b></b>
+                <h5 class="text-center" style="color:#393085"><b> </b></h5>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Report generated on: {{.Status.StartTime}}</th>
+                            <th class="float">Display:
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="success"> Info</label>
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="warning"> Servers</label>
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="danger"> Paths</label>
+                                <label class="text-info"><input type="checkbox" checked="checked" data-target="info"> Webhooks</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Base File</td>
+                            <td>{{.Status.BaseFilePath}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>Second File</td>
+                            <td>{{.Status.SecondFilePath}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>Execution Time</td>
+                            <td>{{.Status.ExecutionTime}}</td>
+
+                        </tr>
+                        <tr>
+                            <td>Flags</td>
+                            <td>
+                                {{if .Status.ExecutionFlags.Loose}}
+                                --loose
+                                {{end}}
+                                {{if .Status.ExecutionFlags.IncludeFilePath}}
+                                 --include-file-path
+                                {{end}}
+                                {{if .Status.ExecutionFlags.ExcludeDescriptions}}
+                                 --exclude-descriptions
+                                {{end}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </li>           
+        </ul>
     </div>
 
     <div id="content" class="content"></div>
@@ -60,8 +101,8 @@
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
 <script>
-    const data = JSON.parse('{{.}}');
-    console.log(data)
+    const changelog = JSON.parse('{{.Changelog}}');
+    console.log(changelog)
 
     const type_map = {
         "ParameterQStr": "Query String",

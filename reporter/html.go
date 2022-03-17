@@ -3,8 +3,8 @@ package reporter
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"html/template"
+	"sort"
 
 	"github.com/up9inc/oas-diff/differentiator"
 	"github.com/up9inc/oas-diff/model"
@@ -14,23 +14,23 @@ type htmlReporter struct {
 	output *differentiator.ChangelogOutput
 }
 
-type changelogByPath struct {
+type pathChangelog struct {
 	Key       string                    `json:"key"`
-	Path      string                    `json:"path"`
+	Endpoint  string                    `json:"endpoint"`
 	Operation string                    `json:"operation"`
 	Changelog *differentiator.Changelog `json:"changelog"`
 }
 
-type changelogByType struct {
-	Created []*changelogByPath `json:"created"`
-	Updated []*changelogByPath `json:"updated"`
-	Deleted []*changelogByPath `json:"deleted"`
-}
+type ByType []*pathChangelog
+
+func (t ByType) Len() int           { return len(t) }
+func (t ByType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelog.Type }
+func (t ByType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 
 type templateData struct {
-	Status          differentiator.ExecutionStatus
-	Changelog       string
-	ChangelogByType string
+	Status        differentiator.ExecutionStatus
+	Changelog     string
+	PathChangelog string
 }
 
 func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
@@ -46,15 +46,16 @@ func (h *htmlReporter) Build() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	changelogByTypeJSON, err := json.Marshal(h.groupByType())
+
+	pathChangelogJSON, err := json.Marshal(h.buildPathChangelog())
 	if err != nil {
 		return nil, err
 	}
 
 	data := templateData{
-		Status:          h.output.ExecutionStatus,
-		Changelog:       string(changelogJSON),
-		ChangelogByType: string(changelogByTypeJSON),
+		Status:        h.output.ExecutionStatus,
+		Changelog:     string(changelogJSON),
+		PathChangelog: string(pathChangelogJSON),
 	}
 
 	var buf bytes.Buffer
@@ -66,54 +67,33 @@ func (h *htmlReporter) Build() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (h *htmlReporter) groupByType() *changelogByType {
-	pathGroup := h.groupByPath()
-	created := make([]*changelogByPath, 0)
-	updated := make([]*changelogByPath, 0)
-	deleted := make([]*changelogByPath, 0)
-
-	for _, p := range pathGroup {
-		switch p.Changelog.Type {
-		case "create":
-			created = append(created, p)
-		case "update":
-			updated = append(updated, p)
-		case "delete":
-			deleted = append(deleted, p)
-		default:
-			panic(fmt.Sprintf("invalid changelog type: %s", p.Changelog.Type))
-		}
-	}
-
-	return &changelogByType{
-		Created: created,
-		Updated: updated,
-		Deleted: deleted,
-	}
-}
-
-func (h *htmlReporter) groupByPath() []*changelogByPath {
-	result := make([]*changelogByPath, 0)
+func (h *htmlReporter) buildPathChangelog() []*pathChangelog {
+	result := make([]*pathChangelog, 0)
 
 	for k, v := range h.output.Changelog {
 		for _, c := range v {
-			// TODO: Default value for operation when we don't have the operation method in path
-			var path, op string
-			if k == model.OAS_PATHS_KEY || k == model.OAS_WEBHOOKS_KEY {
-				if len(c.Path) > 1 && c.Path[1] != "parameters" {
-					path = c.Path[0]
-					op = c.Path[1]
-				}
+			// ignore others non-paths keys
+			if k != model.OAS_PATHS_KEY && k != model.OAS_WEBHOOKS_KEY {
+				continue
 			}
 
-			result = append(result, &changelogByPath{
+			var op string
+			endpoint := c.Path[0]
+			if len(c.Path) > 1 && c.Path[1] != "parameters" {
+				op = c.Path[1]
+			}
+
+			result = append(result, &pathChangelog{
 				Key:       k,
-				Path:      path,
+				Endpoint:  endpoint,
 				Operation: op,
 				Changelog: c,
 			})
 		}
 	}
+
+	// sort by type
+	sort.Sort(ByType(result))
 
 	return result
 }

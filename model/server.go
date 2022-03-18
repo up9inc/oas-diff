@@ -13,8 +13,8 @@ var _ Model = (*Servers)(nil)
 // make sure we implement the Array interface
 var _ Array = (*Servers)(nil)
 
-type Servers []*Server
-type Variables map[string]*ServerVariable
+type Servers []Server
+type Variables map[string]ServerVariable
 
 // https://spec.openapis.org/oas/v3.1.0#server-object
 type Server struct {

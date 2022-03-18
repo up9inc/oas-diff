@@ -12,13 +12,13 @@ var _ Model = (*Info)(nil)
 
 // https://spec.openapis.org/oas/v3.1.0#info-object
 type Info struct {
-	Title          string   `json:"title" diff:"title"`
-	Summary        string   `json:"summary,omitempty" diff:"summary"`
-	Description    string   `json:"description,omitempty" diff:"description"`
-	TermsOfService string   `json:"termsOfService,omitempty" diff:"termsOfService"`
-	Contact        *Contact `json:"contact,omitempty" diff:"contact"`
-	License        *License `json:"license,omitempty" diff:"license"`
-	Version        string   `json:"version" diff:"version"`
+	Title          string  `json:"title" diff:"title"`
+	Summary        string  `json:"summary,omitempty" diff:"summary"`
+	Description    string  `json:"description,omitempty" diff:"description"`
+	TermsOfService string  `json:"termsOfService,omitempty" diff:"termsOfService"`
+	Contact        Contact `json:"contact,omitempty" diff:"contact"`
+	License        License `json:"license,omitempty" diff:"license"`
+	Version        string  `json:"version" diff:"version"`
 }
 
 // https://spec.openapis.org/oas/v3.1.0#contact-object

@@ -2,7 +2,6 @@ package reporter
 
 import (
 	"bytes"
-	"encoding/json"
 	"html/template"
 	"sort"
 
@@ -15,22 +14,31 @@ type htmlReporter struct {
 }
 
 type pathChangelog struct {
-	Key       string                    `json:"key"`
-	Endpoint  string                    `json:"endpoint"`
-	Operation string                    `json:"operation"`
-	Changelog *differentiator.Changelog `json:"changelog"`
+	Key       string                   `json:"key"`
+	Endpoint  string                   `json:"endpoint"`
+	Operation string                   `json:"operation"`
+	Changelog differentiator.Changelog `json:"changelog"`
 }
 
-type ByType []*pathChangelog
+type pathChangelogMap map[string][]pathChangelog
+
+type ByType []pathChangelog
 
 func (t ByType) Len() int           { return len(t) }
 func (t ByType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelog.Type }
 func (t ByType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 
+type ByOperation []*pathChangelog
+
+func (o ByOperation) Len() int           { return len(o) }
+func (o ByOperation) Less(i, j int) bool { return o[i].Operation < o[j].Operation }
+func (o ByOperation) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
+
 type templateData struct {
-	Status        differentiator.ExecutionStatus
-	Changelog     string
-	PathChangelog string
+	Status            differentiator.ExecutionStatus
+	Changelog         differentiator.ChangeMap
+	PathChangelogList []pathChangelog
+	PathChangelogMap  pathChangelogMap
 }
 
 func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
@@ -40,35 +48,24 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 }
 
 func (h *htmlReporter) Build() ([]byte, error) {
-	// The issue with passing struct is that pointers won't be dereferenced
-	// Let's pass a JSON to the html template instead of a struct
-	changelogJSON, err := json.Marshal(h.output.Changelog)
-	if err != nil {
-		return nil, err
-	}
-
-	pathChangelogJSON, err := json.Marshal(h.buildPathChangelog())
-	if err != nil {
-		return nil, err
-	}
-
 	data := templateData{
-		Status:        h.output.ExecutionStatus,
-		Changelog:     string(changelogJSON),
-		PathChangelog: string(pathChangelogJSON),
+		Status:            h.output.ExecutionStatus,
+		Changelog:         h.output.Changelog,
+		PathChangelogList: h.buildPathChangelogList(),
+		PathChangelogMap:  h.buildPathChangelogMap(),
 	}
 
 	var buf bytes.Buffer
 	tmpl := template.Must(template.ParseFiles("reporter/template.html"))
-	err = tmpl.Execute(&buf, data)
+	err := tmpl.Execute(&buf, data)
 	if err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
 }
 
-func (h *htmlReporter) buildPathChangelog() []*pathChangelog {
-	result := make([]*pathChangelog, 0)
+func (h *htmlReporter) buildPathChangelogList() []pathChangelog {
+	result := make([]pathChangelog, 0)
 
 	for k, v := range h.output.Changelog {
 		for _, c := range v {
@@ -83,7 +80,7 @@ func (h *htmlReporter) buildPathChangelog() []*pathChangelog {
 				op = c.Path[1]
 			}
 
-			result = append(result, &pathChangelog{
+			result = append(result, pathChangelog{
 				Key:       k,
 				Endpoint:  endpoint,
 				Operation: op,
@@ -94,6 +91,43 @@ func (h *htmlReporter) buildPathChangelog() []*pathChangelog {
 
 	// sort by type
 	sort.Sort(ByType(result))
+
+	return result
+}
+
+func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
+	result := make(pathChangelogMap, 0)
+
+	for k, v := range h.output.Changelog {
+		for _, c := range v {
+			// ignore others non-paths keys
+			if k != model.OAS_PATHS_KEY && k != model.OAS_WEBHOOKS_KEY {
+				continue
+			}
+
+			var op string
+			endpoint := c.Path[0]
+			if len(c.Path) > 1 && c.Path[1] != "parameters" {
+				op = c.Path[1]
+			}
+
+			_, ok := result[endpoint]
+			if !ok {
+				result[endpoint] = make([]pathChangelog, 0)
+			}
+			result[endpoint] = append(result[endpoint], pathChangelog{
+				Key:       k,
+				Endpoint:  endpoint,
+				Operation: op,
+				Changelog: c,
+			})
+		}
+	}
+
+	// sort by type
+	for _, v := range result {
+		sort.Sort(ByType(v))
+	}
 
 	return result
 }

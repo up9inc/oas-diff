@@ -1,6 +1,6 @@
 package model
 
-type Headers map[string]*Header
+type Headers map[string]Header
 
 // https://spec.openapis.org/oas/v3.1.0#header-object
 type Header struct {
@@ -18,15 +18,15 @@ type Header struct {
 	UniqueItems      bool                   `json:"uniqueItems,omitempty" diff:"uniqueItems"`
 	ExclusiveMin     bool                   `json:"exclusiveMinimum,omitempty" diff:"exclusiveMinimum"`
 	ExclusiveMax     bool                   `json:"exclusiveMaximum,omitempty" diff:"exclusiveMaximum"`
-	Schema           *Schema                `json:"schema,omitempty" diff:"schema"`
-	Items            *Schema                `json:"items,omitempty" diff:"items"`
+	Schema           Schema                 `json:"schema,omitempty" diff:"schema"`
+	Items            Schema                 `json:"items,omitempty" diff:"items"`
 	Content          Content                `json:"content,omitempty" diff:"content"`
 	Enum             []interface{}          `json:"enum,omitempty" diff:"enum"`
-	MultipleOf       *float64               `json:"multipleOf,omitempty" diff:"multipleOf"`
-	Minimum          *float64               `json:"minimum,omitempty" diff:"minimum"`
-	Maximum          *float64               `json:"maximum,omitempty" diff:"maximum"`
-	MaxLength        *uint64                `json:"maxLength,omitempty" diff:"maxLength"`
-	MaxItems         *uint64                `json:"maxItems,omitempty" diff:"maxItems"`
+	MultipleOf       float64                `json:"multipleOf,omitempty" diff:"multipleOf"`
+	Minimum          float64                `json:"minimum,omitempty" diff:"minimum"`
+	Maximum          float64                `json:"maximum,omitempty" diff:"maximum"`
+	MaxLength        uint64                 `json:"maxLength,omitempty" diff:"maxLength"`
+	MaxItems         uint64                 `json:"maxItems,omitempty" diff:"maxItems"`
 	MinLength        uint64                 `json:"minLength,omitempty" diff:"minLength"`
 	MinItems         uint64                 `json:"minItems,omitempty" diff:"minItems"`
 	Default          interface{}            `json:"default,omitempty" diff:"default"`

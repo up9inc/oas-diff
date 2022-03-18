@@ -20,7 +20,7 @@ type internalDiff struct {
 	filePath  string
 	filePath2 string
 
-	changelog []*Changelog
+	changelog []Changelog
 }
 
 type Identifier map[string]string
@@ -29,7 +29,7 @@ func NewInternalDiff(key string) *internalDiff {
 	return &internalDiff{
 		key:       key,
 		schema:    NewSchema(key),
-		changelog: make([]*Changelog, 0),
+		changelog: make([]Changelog, 0),
 	}
 }
 
@@ -39,7 +39,7 @@ func (i *internalDiff) handleChange(change lib.Change) {
 
 	//path := strings.Join(change.Path, ".")
 	i.changelog = append(i.changelog,
-		&Changelog{
+		Changelog{
 			Type: change.Type,
 			Path: change.Path,
 			From: change.From,
@@ -84,7 +84,7 @@ func (i *internalDiff) handleArrayChange(data, data2 model.Array, change lib.Cha
 	}
 
 	i.changelog = append(i.changelog,
-		&Changelog{
+		Changelog{
 			Type:       change.Type,
 			Path:       change.Path,
 			Identifier: i.buildArrayIdentifier(change.Path, data),

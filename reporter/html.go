@@ -2,6 +2,7 @@ package reporter
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"sort"
 	"strings"
@@ -51,6 +52,24 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 func (h *htmlReporter) Build() ([]byte, error) {
 	funcMap := template.FuncMap{
 		"ToUpper": strings.ToUpper,
+		"ToLower": strings.ToLower,
+		"ToPrettyJSON": func(data interface{}) string {
+			j, _ := json.MarshalIndent(data, "", "\t")
+			return string(j)
+		},
+		"FormatPath": func(path []string) string { return strings.Join(path, " ") },
+		"GetTypeColor": func(t string) string {
+			switch t {
+			case "create":
+				return "success"
+			case "update":
+				return "warning"
+			case "delete":
+				return "danger"
+			}
+
+			return "info"
+		},
 	}
 
 	data := templateData{

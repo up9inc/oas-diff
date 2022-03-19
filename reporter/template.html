@@ -61,25 +61,31 @@
             <!-- []pathChangelog -->
             {{range $val}}
         
-            <!-- Type color -->
-            <div class="card-body text-{{.Changelog.Type | GetTypeColor }}">        
-                <h6 class="card-title"> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
-                <p class="card-text">{{.Changelog.From | ToPrettyJSON}}</p>
-            </div>
-            <div class="card-footer text-{{.Changelog.Type | GetTypeColor }}">
-                {{.Changelog.Type}}
+            <!-- Type color (create/update/delete) -->
+            {{$color := .Changelog.Type | GetTypeColor}}
+
+            <div class="text-{{$color}}">
+                <div class="card-body">        
+                    <h6 class="card-title card-header"> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
+                    <div class="row">
+                        {{if .Changelog.From | IsNotNil }}
+                        <div class="col">
+                            <pre class="card-text text-{{$color}}">{{.Changelog.From | ToPrettyJSON}}</pre>
+                        </div>
+                        {{end}}
+                        
+                        {{if .Changelog.To | IsNotNil }}
+                        <div class="col">
+                            <pre class="card-text text-{{$color}}">{{.Changelog.To | ToPrettyJSON}}</pre>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
             </div>
         {{end}}
     </div>
     {{end}}
 
 </body>
-<script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-    crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-    crossorigin="anonymous"></script>
 
 </html>

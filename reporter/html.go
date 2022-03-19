@@ -51,8 +51,9 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 
 func (h *htmlReporter) Build() ([]byte, error) {
 	funcMap := template.FuncMap{
-		"ToUpper": strings.ToUpper,
-		"ToLower": strings.ToLower,
+		"IsNotNil": func(data interface{}) bool { return data != nil },
+		"ToUpper":  strings.ToUpper,
+		"ToLower":  strings.ToLower,
 		"ToPrettyJSON": func(data interface{}) string {
 			j, _ := json.MarshalIndent(data, "", "\t")
 			return string(j)

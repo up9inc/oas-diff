@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 	"sort"
+	"strings"
 
 	"github.com/up9inc/oas-diff/differentiator"
 	"github.com/up9inc/oas-diff/model"
@@ -48,6 +49,10 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 }
 
 func (h *htmlReporter) Build() ([]byte, error) {
+	funcMap := template.FuncMap{
+		"ToUpper": strings.ToUpper,
+	}
+
 	data := templateData{
 		Status:            h.output.ExecutionStatus,
 		Changelog:         h.output.Changelog,
@@ -56,8 +61,11 @@ func (h *htmlReporter) Build() ([]byte, error) {
 	}
 
 	var buf bytes.Buffer
-	tmpl := template.Must(template.ParseFiles("reporter/template.html"))
-	err := tmpl.Execute(&buf, data)
+	tmpl, err := template.New("template.html").Funcs(funcMap).ParseFiles("reporter/template.html")
+	if err != nil {
+		return nil, err
+	}
+	err = tmpl.Execute(&buf, data)
 	if err != nil {
 		return nil, err
 	}

@@ -6,14 +6,14 @@ package model
 // https://spec.openapis.org/oas/v3.1.0#schema-object
 type Schema struct {
 	// Schema
-	OneOf      []Schema          `json:"oneOf,omitempty" diff:"oneOf"`
-	AnyOf      []Schema          `json:"anyOf,omitempty" diff:"anyOf"`
-	AllOf      []Schema          `json:"allOf,omitempty" diff:"allOf"`
-	Not        interface{}       `json:"not,omitempty" diff:"not"`
-	Properties map[string]Schema `json:"properties,omitempty" diff:"properties"`
-	Items      interface{}       `json:"items,omitempty" diff:"items"` // nil or *Schema or []*Schema
-	Enum       []interface{}     `json:"enum,omitempty" diff:"enum"`
-	Default    interface{}       `json:"default,omitempty" diff:"default"`
+	OneOf      []*Schema          `json:"oneOf,omitempty" diff:"oneOf"`
+	AnyOf      []*Schema          `json:"anyOf,omitempty" diff:"anyOf"`
+	AllOf      []*Schema          `json:"allOf,omitempty" diff:"allOf"`
+	Not        *Schema            `json:"not,omitempty" diff:"not"`
+	Properties map[string]*Schema `json:"properties,omitempty" diff:"properties"`
+	Items      interface{}        `json:"items,omitempty" diff:"items"` // nil or *Schema or []*Schema
+	Enum       []interface{}      `json:"enum,omitempty" diff:"enum"`
+	Default    interface{}        `json:"default,omitempty" diff:"default"`
 
 	// Bool
 	AllowEmptyValue bool `json:"allowEmptyValue,omitempty" diff:"allowEmptyValue"`
@@ -33,15 +33,15 @@ type Schema struct {
 	MinItems uint64 `json:"minItems,omitempty" diff:"minItems"`
 
 	// fixed fields
-	Discriminator Discriminator `json:"discriminator,omitempty" diff:"discriminator"`
-	XML           interface{}   `json:"xml,omitempty" diff:"xml"`
-	ExternalDocs  ExternalDocs  `json:"externalDocs,omitempty" diff:"externalDocs"`
-	Example       interface{}   `json:"example,omitempty" diff:"example"`
+	Discriminator *Discriminator `json:"discriminator,omitempty" diff:"discriminator"`
+	XML           interface{}    `json:"xml,omitempty" diff:"xml"`
+	ExternalDocs  *ExternalDocs  `json:"externalDocs,omitempty" diff:"externalDocs"`
+	Example       interface{}    `json:"example,omitempty" diff:"example"`
 
 	Examples []interface{} `json:"examples,omitempty" diff:"examples"`
 }
 
 type Discriminator struct {
-	PropertyName string            `json:"propertyName" diff:"propertyName"`
+	PropertyName string            `json:"propertyName,omitempty" diff:"propertyName"`
 	Mapping      map[string]string `json:"mapping,omitempty" diff:"mapping"`
 }

@@ -1,7 +1,7 @@
 package model
 
-type Responses map[string]Response
-type Links map[string]Link
+type Responses map[string]*Response
+type Links map[string]*Link
 
 // https://spec.openapis.org/oas/v3.1.0#response-object
 type Response struct {
@@ -18,5 +18,5 @@ type Link struct {
 	Parameters   map[string]interface{} `json:"parameters,omitempty" diff:"parameters"`
 	RequestBody  interface{}            `json:"requestBody,omitempty" diff:"requestBody"`
 	Description  string                 `json:"description,omitempty" diff:"description"`
-	Server       Server                 `json:"server,omitempty" diff:"server"`
+	Server       *Server                `json:"server,omitempty" diff:"server"`
 }

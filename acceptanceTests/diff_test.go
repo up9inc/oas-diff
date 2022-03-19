@@ -20,6 +20,7 @@ const (
 	FILE_LOOSE2     = "data/simple_loose2.json"
 )
 
+// TODO: Create a simple endpoint with an empty operation to make sure we don't have any extra fields for default values
 type DiffSuite struct {
 	suite.Suite
 
@@ -225,7 +226,7 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	assert.Equal(model.Parameter{
 		Name: identifier,
 		In:   "header",
-		Schema: model.Schema{
+		Schema: &model.Schema{
 			Type: "string",
 		},
 	}, paths[index].From)

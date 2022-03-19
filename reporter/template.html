@@ -55,24 +55,20 @@
     </ul>
 
     {{range $key, $val := .PathChangelogMap}}
-    <div class="card text-white mb-3 bg-info" style="max-width: 100rem;">
-        <div class="card-header">Path: {{$key}}</div>
+    <div class="card text-left bg-light border-secondary mb-3" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
+        <h3 class="card-header">{{$key}}</h3>
+           
+            <!-- []pathChangelog -->
             {{range $val}}
         
             <!-- Type color -->
-            {{if (eq .Changelog.Type "create") }}
-                <div class="card-body bg-success">
-            {{else if (eq .Changelog.Type "update") }}
-                <div class="card-body bg-warning">
-            {{else if (eq .Changelog.Type "delete") }}
-                <div class="card-body bg-danger">
-            {{else}}
-                <div class="card-body bg-info">
-            {{end}}   
-        
-            <h5 class="card-title">{{.Operation | ToUpper}}</h5>
-            <p class="card-text">{{.Changelog.Path}}</p>
-        </div>
+            <div class="card-body text-{{.Changelog.Type | GetTypeColor }}">        
+                <h6 class="card-title"> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
+                <p class="card-text">{{.Changelog.From | ToPrettyJSON}}</p>
+            </div>
+            <div class="card-footer text-{{.Changelog.Type | GetTypeColor }}">
+                {{.Changelog.Type}}
+            </div>
         {{end}}
     </div>
     {{end}}

@@ -15,6 +15,13 @@
                 "schema": {
                   "type": "object"
                 }
+              },
+              "application/x-binary": {
+                "encoding": {
+                  "base64": {
+                    "contentType": "base64"
+                  }
+                }
               }
             },
             "links": {

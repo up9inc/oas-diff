@@ -13,6 +13,13 @@
           },
           "200": {
             "description": "the success response",
+            "content": {
+              "Application/JSON": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
             "links": {
               "Address": {
                 "operationId": "some-id"

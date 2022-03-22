@@ -519,7 +519,7 @@ func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	if opts.Loose {
 		assert.Len(paths, 2, "paths should have 2 changes")
 	} else {
-		assert.Len(paths, 4, "paths should have 4 changes")
+		assert.Len(paths, 6, "paths should have 4 changes")
 	}
 
 	// paths[0]
@@ -543,6 +543,42 @@ func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 
 	} else {
 		index = 1
+		basePath = []string{"/example", "get", "responses", "200", "content", "application/json"}
+		assert.Equal("delete", paths[index].Type)
+		if opts.IncludeFilePath {
+			assert.Len(paths[index].Path, 8)
+			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
+		} else {
+			assert.Len(paths[index].Path, 6)
+			assert.Equal(basePath, paths[index].Path)
+		}
+		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
+		assert.Equal(model.MediaType{
+			Schema: &model.Schema{
+				Type: "object",
+			},
+		}, paths[index].From)
+		assert.Equal(nil, paths[index].To)
+
+		index = 2
+		basePath = []string{"/example", "get", "responses", "200", "content", "Application/JSON"}
+		assert.Equal("create", paths[index].Type)
+		if opts.IncludeFilePath {
+			assert.Len(paths[index].Path, 8)
+			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
+		} else {
+			assert.Len(paths[index].Path, 6)
+			assert.Equal(basePath, paths[index].Path)
+		}
+		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
+		assert.Equal(nil, paths[index].From)
+		assert.Equal(model.MediaType{
+			Schema: &model.Schema{
+				Type: "object",
+			},
+		}, paths[index].To)
+
+		index = 3
 		basePath = []string{"/example", "get", "responses", "200", "links", "address"}
 		assert.Equal("delete", paths[index].Type)
 		if opts.IncludeFilePath {
@@ -558,7 +594,7 @@ func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		}, paths[index].From)
 		assert.Equal(nil, paths[index].To)
 
-		index = 2
+		index = 4
 		basePath = []string{"/example", "get", "responses", "200", "links", "Address"}
 		assert.Equal("create", paths[index].Type)
 		if opts.IncludeFilePath {
@@ -575,7 +611,7 @@ func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		}, paths[index].To)
 
 		// update the index for the last path
-		index = 3
+		index = 5
 	}
 
 	basePath = []string{"/example", "get", "responses", "default"}

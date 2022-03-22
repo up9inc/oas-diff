@@ -10,6 +10,13 @@
         "responses": {
           "200": {
             "description": "A simple string response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
             "links": {
               "address": {
                 "operationId": "some-id"

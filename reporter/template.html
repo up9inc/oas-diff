@@ -9,6 +9,8 @@
 
 <body>
 
+    {{$status := .Status}}
+
     <ul class="list-group">
         <li class="list-group-item">
             <b></b>
@@ -56,27 +58,34 @@
 
     {{range $key, $val := .PathChangelogMap}}
     <div class="card text-left bg-light border-secondary mb-3" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
-        <h3 class="card-header">{{$key}}</h3>
-           
+        <div class="card-header">
+            <h3>{{$key}}</h3>
+           <h6>Changes: {{$val | PathLen}}</h6>
+        </div>
+
             <!-- []pathChangelog -->
             {{range $val}}
         
-            <!-- Type color (create/update/delete) -->
-            {{$color := .Changelog.Type | GetTypeColor}}
+            <!-- Type (create/update/delete) -->
+            {{$type := .Changelog.Type}}
+            {{$color := $type | GetTypeColor}}
 
             <div class="text-{{$color}}">
-                <div class="card-body">        
-                    <h6 class="card-title card-header"> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
+                <div class="card-body">
+                    <div class="card-title card-header">
+                        <h6> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
+                        <span>{{GetTypeInfo $type $status}}</span>
+                    </div>
                     <div class="row">
                         {{if .Changelog.From | IsNotNil }}
                         <div class="col">
-                            <pre class="card-text text-{{$color}}">{{.Changelog.From | ToPrettyJSON}}</pre>
+                            <pre class="card-text text-{{$type | GetFromTypeColor}}">{{.Changelog.From | ToPrettyJSON}}</pre>
                         </div>
                         {{end}}
                         
                         {{if .Changelog.To | IsNotNil }}
                         <div class="col">
-                            <pre class="card-text text-{{$color}}">{{.Changelog.To | ToPrettyJSON}}</pre>
+                            <pre class="card-text text-{{$type | GetToTypeColor}}">{{.Changelog.To | ToPrettyJSON}}</pre>
                         </div>
                         {{end}}
                     </div>

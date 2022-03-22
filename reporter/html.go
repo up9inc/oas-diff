@@ -3,6 +3,7 @@ package reporter
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"sort"
 	"strings"
@@ -51,6 +52,7 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 
 func (h *htmlReporter) Build() ([]byte, error) {
 	funcMap := template.FuncMap{
+		"PathLen":  func(data []pathChangelog) int { return len(data) },
 		"IsNotNil": func(data interface{}) bool { return data != nil },
 		"ToUpper":  strings.ToUpper,
 		"ToLower":  strings.ToLower,
@@ -59,12 +61,49 @@ func (h *htmlReporter) Build() ([]byte, error) {
 			return string(j)
 		},
 		"FormatPath": func(path []string) string { return strings.Join(path, " ") },
+		"GetTypeInfo": func(t string, s differentiator.ExecutionStatus) string {
+			switch t {
+			case "create":
+				return fmt.Sprintf("created from %s", s.SecondFilePath)
+			// TODO: Updated from source file info
+			case "update":
+				return "updated"
+			case "delete":
+				return fmt.Sprintf("deleted from %s", s.BaseFilePath)
+			}
+
+			return ""
+		},
 		"GetTypeColor": func(t string) string {
 			switch t {
 			case "create":
 				return "success"
 			case "update":
 				return "warning"
+			case "delete":
+				return "danger"
+			}
+
+			return ""
+		},
+		"GetFromTypeColor": func(t string) string {
+			switch t {
+			case "create":
+				return "success"
+			case "update":
+				return "danger"
+			case "delete":
+				return "danger"
+			}
+
+			return "info"
+		},
+		"GetToTypeColor": func(t string) string {
+			switch t {
+			case "create":
+				return "success"
+			case "update":
+				return "success"
 			case "delete":
 				return "danger"
 			}
@@ -135,7 +174,8 @@ func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
 
 			var op string
 			endpoint := c.Path[0]
-			if len(c.Path) > 1 && c.Path[1] != "parameters" {
+			//if len(c.Path) > 1 && c.Path[1] != "parameters" {
+			if len(c.Path) > 1 {
 				op = c.Path[1]
 			}
 

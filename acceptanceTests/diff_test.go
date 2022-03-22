@@ -21,6 +21,8 @@ const (
 	FILE_LOOSE2     = "data/simple_loose2.json"
 	FILE_HEADERS    = "data/headers.json"
 	FILE_HEADERS2   = "data/headers2.json"
+	FILE_RESPONSES  = "data/responses.json"
+	FILE_RESPONSES2 = "data/responses2.json"
 )
 
 // TODO: Create a simple endpoint with an empty operation to make sure we don't have any extra fields for default values
@@ -483,6 +485,73 @@ func HeadersDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	}
 }
 
+func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
+	validateDependencies(d)
+
+	assert := d.Assert()
+
+	_, err := d.jsonFile1.Read()
+	assert.NoError(err)
+
+	_, err = d.jsonFile2.Read()
+	assert.NoError(err)
+
+	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
+	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
+	// ExecutionStatus
+	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
+	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
+	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
+	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
+	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	// changeMap
+	assert.NotNil(output.Changelog, "changeMap is nil")
+	assert.Len(output.Changelog, 3, "changeMap len should be 3")
+	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
+	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
+	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+
+	// aux vars
+	index := -1
+
+	// paths
+	paths := output.Changelog[model.OAS_PATHS_KEY]
+	assert.Len(paths, 2, "paths should have 2 changes")
+
+	// paths[0]
+	index = 0
+	basePath := []string{"/example", "get", "responses", "200", "description"}
+	assert.Equal("update", paths[index].Type)
+	if opts.IncludeFilePath {
+		assert.Len(paths[index].Path, 7)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4]}, paths[index].Path)
+	} else {
+		assert.Len(paths[index].Path, 5)
+		assert.Equal(basePath, paths[index].Path)
+	}
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
+	assert.Equal("A simple string response", paths[index].From)
+	assert.Equal("the success response", paths[index].To)
+
+	// paths[1]
+	index = 1
+	basePath = []string{"/example", "get", "responses", "default"}
+	assert.Equal("create", paths[index].Type)
+	if opts.IncludeFilePath {
+		assert.Len(paths[index].Path, 6)
+		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3]}, paths[index].Path)
+	} else {
+		assert.Len(paths[index].Path, 4)
+		assert.Equal(basePath, paths[index].Path)
+	}
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
+	assert.Equal(nil, paths[index].From)
+	assert.Equal(model.Response{
+		Description: "the default response",
+	}, paths[index].To)
+
+}
+
 func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {
 	d.jsonFile1 = file.NewJsonFile(FILE1)
 	d.jsonFile2 = file.NewJsonFile(FILE2)
@@ -611,4 +680,41 @@ func (d *DiffSuite) TestHeadersLooseDiff() {
 	}
 	d.diff = differentiator.NewDifferentiator(d.vall, opts)
 	HeadersDiff(d, opts)
+}
+
+func (d *DiffSuite) TestResponsesDiff() {
+	d.jsonFile1 = file.NewJsonFile(FILE_RESPONSES)
+	d.jsonFile2 = file.NewJsonFile(FILE_RESPONSES2)
+
+	d.vall = validator.NewValidator()
+	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	if err != nil {
+		d.T().Error(err)
+		return
+	}
+
+	opts := differentiator.DifferentiatorOptions{
+		IncludeFilePath: false,
+	}
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
+	ResponsesDiff(d, opts)
+}
+
+func (d *DiffSuite) TestResponsesLooseDiff() {
+	d.jsonFile1 = file.NewJsonFile(FILE_RESPONSES)
+	d.jsonFile2 = file.NewJsonFile(FILE_RESPONSES2)
+
+	d.vall = validator.NewValidator()
+	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	if err != nil {
+		d.T().Error(err)
+		return
+	}
+
+	opts := differentiator.DifferentiatorOptions{
+		IncludeFilePath: false,
+		Loose:           true,
+	}
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
+	ResponsesDiff(d, opts)
 }

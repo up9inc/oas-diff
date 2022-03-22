@@ -1,0 +1,18 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "responses",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/example": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "A simple string response"
+          }
+        }
+      }
+    }
+  }
+}

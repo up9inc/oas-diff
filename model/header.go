@@ -14,5 +14,5 @@ type Header struct {
 	Schema          *Schema                `json:"schema,omitempty" diff:"schema"`
 	Example         interface{}            `json:"example,omitempty" diff:"example"`
 	Examples        map[string]interface{} `json:"examples,omitempty" diff:"examples"`
-	Content         Content                `json:"content,omitempty" diff:"content"`
+	Content         ContentMap             `json:"content,omitempty" diff:"content"`
 }

@@ -5,10 +5,10 @@ type Links map[string]*Link
 
 // https://spec.openapis.org/oas/v3.1.0#response-object
 type Response struct {
-	Description string  `json:"description,omitempty" diff:"description"`
-	Headers     Headers `json:"headers,omitempty" diff:"headers"`
-	Content     Content `json:"content,omitempty" diff:"content"`
-	Links       Links   `json:"links,omitempty" diff:"links"`
+	Description string     `json:"description,omitempty" diff:"description"`
+	Headers     Headers    `json:"headers,omitempty" diff:"headers"`
+	Content     ContentMap `json:"content,omitempty" diff:"content"`
+	Links       Links      `json:"links,omitempty" diff:"links"`
 }
 
 // https://spec.openapis.org/oas/v3.1.0#link-object

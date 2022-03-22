@@ -28,5 +28,8 @@ jobs:
           ref: feature/public_diff_functions
           path: lib
 
+      - name: Diff Lib Tests
+        run: make -C lib test
+
       - name: Acceptance Tests
         run: make acceptance-test

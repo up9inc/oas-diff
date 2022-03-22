@@ -1,7 +1,9 @@
-# oas-diff
+# OAS-DIFF
 OAS 3.1 Validation and Diff Tool
 
-## Requisits
+## Dependencies
+- Git
+- Make
 - Go 1.17+
 
 ## Run
@@ -17,7 +19,7 @@ OAS 3.1 Validation and Diff Tool
     ````
     ./build/oasdiff --help
     ````
-## OPTIONS
+## Options
 - Validate
     ````
    --base-file value  Path of the base OAS 3.1 file

@@ -46,6 +46,8 @@ func validateCmd(c *cli.Context) error {
 			for _, e := range output.Errors {
 				if len(e.InstanceLocation) > 0 {
 					sb.WriteString(fmt.Sprintf("'%s' %s\n", e.InstanceLocation, e.Error))
+				} else {
+					sb.WriteString(e.Error)
 				}
 			}
 

@@ -32,19 +32,33 @@ type differentiator struct {
 func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Differentiator {
 	// custom differs
 	stringDiffer := NewStringDiffer(opts)
+
+	// slices
 	serversDiffer := NewServersDiffer()
-	pathsDiffer := NewPathsDiffer()
 	parametersDiffer := NewParameterDiffer(opts)
 
-	differ, err := lib.NewDiffer(lib.CustomValueDiffers(stringDiffer), lib.CustomValueDiffers(serversDiffer), lib.CustomValueDiffers(pathsDiffer), lib.CustomValueDiffers(parametersDiffer), lib.StructMapKeySupport(), lib.DisableStructValues(), lib.SliceOrdering(false))
+	// maps
+	pathsDiffer := NewPathsDiffer()
+	headersDiffer := NewHeadersDiffer(opts)
+
+	differ, err := lib.NewDiffer(
+		lib.CustomValueDiffers(stringDiffer),
+		lib.CustomValueDiffers(serversDiffer),
+		lib.CustomValueDiffers(parametersDiffer),
+		lib.CustomValueDiffers(pathsDiffer),
+		lib.CustomValueDiffers(headersDiffer),
+		lib.StructMapKeySupport(),
+		lib.DisableStructValues(),
+		lib.SliceOrdering(false))
 	if err != nil {
 		panic(err)
 	}
 
 	stringDiffer.differ = differ
 	serversDiffer.differ = differ
-	pathsDiffer.differ = differ
 	parametersDiffer.differ = differ
+	pathsDiffer.differ = differ
+	headersDiffer.differ = differ
 
 	v := &differentiator{
 		validator: val,

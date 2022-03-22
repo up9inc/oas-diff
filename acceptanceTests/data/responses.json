@@ -9,7 +9,12 @@
       "get": {
         "responses": {
           "200": {
-            "description": "A simple string response"
+            "description": "A simple string response",
+            "links": {
+              "address": {
+                "operationId": "some-id"
+              }
+            }
           }
         }
       }

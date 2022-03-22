@@ -12,7 +12,12 @@
             "description": "the default response"
           },
           "200": {
-            "description": "the success response"
+            "description": "the success response",
+            "links": {
+              "Address": {
+                "operationId": "some-id"
+              }
+            }
           }
         }
       }

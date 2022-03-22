@@ -42,6 +42,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	headersDiffer := NewHeadersDiffer(opts)
 	responsesDiffer := NewResponsesDiffer(opts)
 	contentMapDiffer := NewContentMapDiffer(opts)
+	encodingMapDiffer := NewEncodingMapDiffer(opts)
 	linksDiffer := NewLinksDiffer(opts)
 
 	differ, err := lib.NewDiffer(
@@ -52,6 +53,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(headersDiffer),
 		lib.CustomValueDiffers(responsesDiffer),
 		lib.CustomValueDiffers(contentMapDiffer),
+		lib.CustomValueDiffers(encodingMapDiffer),
 		lib.CustomValueDiffers(linksDiffer),
 		lib.StructMapKeySupport(),
 		lib.DisableStructValues(),
@@ -67,6 +69,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	headersDiffer.differ = differ
 	responsesDiffer.differ = differ
 	contentMapDiffer.differ = differ
+	encodingMapDiffer.differ = differ
 	linksDiffer.differ = differ
 
 	v := &differentiator{

@@ -10,7 +10,6 @@
             "request": "launch",
             "mode": "debug",
             "debugAdapter": "dlv-dap",
-            "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/main.go",
             "args": [
@@ -28,7 +27,6 @@
             "request": "launch",
             "mode": "debug",
             "debugAdapter": "dlv-dap",
-            "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/main.go",
             "args": [
@@ -37,7 +35,8 @@
                 "test/simple.json",
                 "--second-file",
                 "test/simple2.json",
-                "--loose"
+                "--loose",
+                "--html"
             ]
         }
     ]        

@@ -40,6 +40,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	// maps
 	pathsDiffer := NewPathsDiffer()
 	headersDiffer := NewHeadersDiffer(opts)
+	responsesDiffer := NewResponsesDiffer(opts)
 
 	differ, err := lib.NewDiffer(
 		lib.CustomValueDiffers(stringDiffer),
@@ -47,6 +48,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(parametersDiffer),
 		lib.CustomValueDiffers(pathsDiffer),
 		lib.CustomValueDiffers(headersDiffer),
+		lib.CustomValueDiffers(responsesDiffer),
 		lib.StructMapKeySupport(),
 		lib.DisableStructValues(),
 		lib.SliceOrdering(false))
@@ -59,6 +61,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	parametersDiffer.differ = differ
 	pathsDiffer.differ = differ
 	headersDiffer.differ = differ
+	responsesDiffer.differ = differ
 
 	v := &differentiator{
 		validator: val,

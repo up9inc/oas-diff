@@ -1,4 +1,5 @@
-# OAS-DIFF
+[![acceptance tests](https://github.com/up9inc/oas-diff/actions/workflows/acceptance_tests.yml/badge.svg?branch=develop)](https://github.com/up9inc/oas-diff/actions/workflows/acceptance_tests.yml)
+# OAS-DIFF 
 OAS 3.1 Validation and Diff Tool
 
 ## Dependencies

@@ -61,7 +61,11 @@ func diffCmd(c *cli.Context) error {
 		return err
 	}
 
-	outputPath := fmt.Sprintf("%s_%s", "changelog", time.Now().Format("15:04:05.000"))
+	timeFormat := "15:04:05.000"
+	if runtime.GOOS == "windows" {
+		timeFormat = "15_04_05"
+	}
+	outputPath := fmt.Sprintf("%s_%s", "changelog", time.Now().Format(timeFormat))
 	rep := reporter.NewJSONReporter(changelog)
 	outputData, err := rep.Build()
 	if err != nil {

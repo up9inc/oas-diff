@@ -1,14 +1,14 @@
 .PHONY: build
 
 build:
-	@echo "building .."
-	@go build ${GCLFAGS} -o build/oasdiff main.go
-	@ls -l build
+	@echo "building oas-diff.."
+	@go build -race ${GCLFAGS} -o ./build oasdiff.go
+	@echo "binary saved to ./build folder"
 
 build-debug:
-	@echo "building for debug .."
-	@go build -gcflags=all="-N -l" -o build/oasdiff main.go
-	@ls -l build
+	@echo "building oas-diff for debug .."
+	@go build -race -gcflags=all="-N -l" -o ./build oasdiff.go
+	@echo "binary saved to ./build folder"
 
 clean:
 	@rm -rf build

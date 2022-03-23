@@ -10,15 +10,33 @@
             "request": "launch",
             "mode": "debug",
             "debugAdapter": "dlv-dap",
-            "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/main.go",
             "args": [
                 "diff",
-                "--file",
+                "--base-file",
                 "test/simple.json",
-                "--file2",
-                "test/simple2.json"
+                "--second-file",
+                "test/simple2.json",
+                "--html"
+            ]
+        },
+        {
+            "name": "Debug Diff Loose",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "debugAdapter": "dlv-dap",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/main.go",
+            "args": [
+                "diff",
+                "--base-file",
+                "test/simple.json",
+                "--second-file",
+                "test/simple2.json",
+                "--loose",
+                "--html"
             ]
         }
     ]        

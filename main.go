@@ -13,8 +13,10 @@ import (
 
 func main() {
 	app := &cli.App{
-		Name:  "oas-diff",
-		Usage: "Validate/Diff OAS 3.1 files",
+		Name:     "oas-diff",
+		Version:  "1.0.0-pre-alpha",
+		Usage:    "Validate/Diff OAS 3.1 files",
+		HideHelp: true,
 		Commands: []*cli.Command{
 			cmd.RegisterValidateCmd(),
 			cmd.RegisterDiffCmd(),

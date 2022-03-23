@@ -1,12 +1,16 @@
 package cli
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os/exec"
+	"path/filepath"
+	"runtime"
+	"time"
 
 	differentiator "github.com/up9inc/oas-diff/differentiator"
 	file "github.com/up9inc/oas-diff/json"
+	"github.com/up9inc/oas-diff/reporter"
 	"github.com/up9inc/oas-diff/validator"
 	"github.com/urfave/cli/v2"
 )
@@ -18,48 +22,107 @@ func RegisterDiffCmd() *cli.Command {
 		Usage:   "Diff between two OAS 3.1 files",
 		Action:  diffCmd,
 		Flags: []cli.Flag{
-			FileFlag,
-			FileFlag2,
+			BaseFileFlag,
+			SecondFileFlag,
+			HtmlOutputFlag,
+			LooseFlag,
+			IncludeFilePathFlag,
+			ExcludeDescriptionsFlag,
 		},
 	}
 }
 
 func diffCmd(c *cli.Context) error {
-	filePath := c.String(FileFlag.Name)
-	filePath2 := c.String(FileFlag2.Name)
+	baseFilePath := c.String(BaseFileFlag.Name)
+	secondFilePath := c.String(SecondFileFlag.Name)
+	isHtmlOutput := c.Bool(HtmlOutputFlag.Name)
 
-	jsonFile := file.NewJsonFile(filePath)
+	jsonFile := file.NewJsonFile(baseFilePath)
 	_, err := jsonFile.Read()
 	if err != nil {
 		return err
 	}
 
-	jsonFile2 := file.NewJsonFile(filePath2)
+	jsonFile2 := file.NewJsonFile(secondFilePath)
 	_, err = jsonFile2.Read()
 	if err != nil {
 		return err
 	}
 
 	val := validator.NewValidator()
-	diff := differentiator.NewDiff(val)
+	diff := differentiator.NewDifferentiator(val, differentiator.DifferentiatorOptions{
+		Loose:               c.Bool(LooseFlag.Name),
+		IncludeFilePath:     c.Bool(IncludeFilePathFlag.Name),
+		ExcludeDescriptions: c.Bool(ExcludeDescriptionsFlag.Name),
+	})
 
 	changelog, err := diff.Diff(jsonFile, jsonFile2)
 	if err != nil {
 		return err
 	}
 
-	output, err := json.MarshalIndent(changelog, "", "\t")
-	if err != nil {
-		panic(err)
-	}
-
-	outputPath := "changelog.json"
-	err = ioutil.WriteFile(outputPath, output, 0644)
+	outputPath := fmt.Sprintf("%s_%s", "changelog", time.Now().Format("15:04:05.000"))
+	rep := reporter.NewJSONReporter(changelog)
+	outputData, err := rep.Build()
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(Green(fmt.Sprintf("report saved: %s", outputPath)))
+	jsonOutput := fmt.Sprintf("%s%s", outputPath, ".json")
+	err = saveDiffOutputFile(jsonOutput, outputData)
+	if err != nil {
+		return err
+	}
+
+	if isHtmlOutput {
+		rep = reporter.NewHTMLReporter(changelog)
+		outputData, err := rep.Build()
+		if err != nil {
+			return err
+		}
+
+		htmlOutput := fmt.Sprintf("%s%s", outputPath, ".html")
+		err = saveDiffOutputFile(htmlOutput, outputData)
+		if err != nil {
+			return err
+		}
+
+		return openBrowser(htmlOutput)
+	}
 
 	return nil
+}
+
+func saveDiffOutputFile(path string, data []byte) error {
+	err := ioutil.WriteFile(path, data, 0644)
+	if err != nil {
+		return err
+	}
+
+	dirPath, err := filepath.Abs("./")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(Green(fmt.Sprintf("report saved: %s", fmt.Sprintf("%s/%s", dirPath, path))))
+
+	return nil
+}
+
+func openBrowser(path string) error {
+	var err error
+
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", path).Start()
+	case "windows":
+		//err = exec.Command("rundll32", "url.dll,FileProtocolHandler", path).Start()
+		err = exec.Command("cmd", "/C", "start", path).Start()
+	case "darwin":
+		err = exec.Command("open", path).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+
+	return err
 }

@@ -17,14 +17,14 @@ func RegisterValidateCmd() *cli.Command {
 		Aliases: []string{"v"},
 		Usage:   "Validate file to OAS 3.1 schema",
 		Action:  validateCmd,
-		Flags:   []cli.Flag{FileFlag},
+		Flags:   []cli.Flag{BaseFileFlag},
 	}
 }
 
 func validateCmd(c *cli.Context) error {
-	filePath := c.String(FileFlag.Name)
+	baseFilePath := c.String(BaseFileFlag.Name)
 
-	jsonFile := file.NewJsonFile(filePath)
+	jsonFile := file.NewJsonFile(baseFilePath)
 	_, err := jsonFile.Read()
 	if err != nil {
 		return err
@@ -46,6 +46,8 @@ func validateCmd(c *cli.Context) error {
 			for _, e := range output.Errors {
 				if len(e.InstanceLocation) > 0 {
 					sb.WriteString(fmt.Sprintf("'%s' %s\n", e.InstanceLocation, e.Error))
+				} else {
+					sb.WriteString(e.Error)
 				}
 			}
 

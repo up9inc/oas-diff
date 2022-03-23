@@ -23,3 +23,5 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 )
+
+replace github.com/r3labs/diff/v2 v2.14.8 => ./lib

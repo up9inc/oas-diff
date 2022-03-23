@@ -1,0 +1,26 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "headers",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/example": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "A simple string response",
+            "headers": {
+              "X-Rate-Limit": {
+                "description": "The number of allowed requests in the current period",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

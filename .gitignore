@@ -15,4 +15,7 @@
 # vendor/
 
 build/
-changelog.json
+lib/
+test/
+changelog*.json
+changelog*.html

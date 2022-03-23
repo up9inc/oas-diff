@@ -1,0 +1,37 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "responses",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/example": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "A simple string response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/x-binary": {
+                "encoding": {
+                  "base64": {
+                    "contentType": "base64"
+                  }
+                }
+              }
+            },
+            "links": {
+              "address": {
+                "operationId": "some-id"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

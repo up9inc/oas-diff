@@ -1,17 +1,17 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Simple example",
+    "title": "Simple ExAmPlE",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://test.com",
-      "description": "some description"
+      "url": "SOME URL",
+      "description": "SOME DESC"
     },
     {
-      "url": "http://refael.shipping.sock-shop",
-      "description": "refael salt bae"
+      "url": "new server url",
+      "description": "new server url"
     }
   ],
   "paths": {
@@ -20,7 +20,7 @@
         "parameters": [
           {
             "in": "header",
-            "name": "accept",
+            "name": "ACCEPT",
             "required": false,
             "schema": {
               "type": "string"
@@ -32,13 +32,16 @@
             "required": true,
             "style": "simple",
             "schema": {
-              "type": "string",
-              "pattern": ".+(_|-|\\.).+"
+              "type": "STRING",
+              "pattern": ".+(_|-abc-|\\.).+"
             },
-            "example": "some-uuid-maybe"
+            "example": "some-uuid"
           }
         ]
       }
+    },
+    "/AdMiN": {
+      "get": {}
     }
   }
 }

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+
+<body>
+
+    {{$status := .Status}}
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            <b></b>
+            <h5 class="text-center" style="color:#393085"><b> </b></h5>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Report generated on: {{.Status.StartTime}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Base File</td>
+                        <td>{{.Status.BaseFilePath}}</td>
+
+                    </tr>
+                    <tr>
+                        <td>Second File</td>
+                        <td>{{.Status.SecondFilePath}}</td>
+
+                    </tr>
+                    <tr>
+                        <td>Execution Time</td>
+                        <td>{{.Status.ExecutionTime}}</td>
+
+                    </tr>
+                    <tr>
+                        <td>Flags</td>
+                        <td>
+                            {{if .Status.ExecutionFlags.Loose}}
+                            --loose
+                            {{end}}
+                            {{if .Status.ExecutionFlags.IncludeFilePath}}
+                            --include-file-path
+                            {{end}}
+                            {{if .Status.ExecutionFlags.ExcludeDescriptions}}
+                            --exclude-descriptions
+                            {{end}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </li>
+    </ul>
+
+    {{range $key, $val := .PathChangelogMap}}
+    <div class="card text-left bg-light border-secondary mb-3" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
+        <div class="card-header">
+            <h3>{{$key}}</h3>
+           <h6>Changes: {{$val | PathLen}}</h6>
+        </div>
+
+            <!-- []pathChangelog -->
+            {{range $val}}
+        
+            <!-- Type (create/update/delete) -->
+            {{$type := .Changelog.Type}}
+            {{$color := $type | GetTypeColor}}
+
+            <div class="text-{{$color}}">
+                <div class="card-body">
+                    <div class="card-title card-header">
+                        <h6> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
+                        <span>{{GetTypeInfo $type $status}}</span>
+                    </div>
+                    <div class="row">
+                        {{if .Changelog.From | IsNotNil }}
+                        <div class="col">
+                            <pre class="card-text text-{{$type | GetFromTypeColor}}">{{.Changelog.From | ToPrettyJSON}}</pre>
+                        </div>
+                        {{end}}
+                        
+                        {{if .Changelog.To | IsNotNil }}
+                        <div class="col">
+                            <pre class="card-text text-{{$type | GetToTypeColor}}">{{.Changelog.To | ToPrettyJSON}}</pre>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        {{end}}
+    </div>
+    {{end}}
+
+</body>
+
+</html>

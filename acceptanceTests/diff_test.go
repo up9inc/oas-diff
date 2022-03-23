@@ -25,6 +25,8 @@ const (
 	FILE_RESPONSES2  = "data/responses2.json"
 	FILE_OPERATIONS  = "data/operations.json"
 	FILE_OPERATIONS2 = "data/operations2.json"
+	FILE_SERVERS     = "data/servers.json"
+	FILE_SERVERS2    = "data/servers2.json"
 )
 
 type DiffSuite struct {
@@ -77,6 +79,29 @@ func validateDependencies(d *DiffSuite) {
 	}
 }
 
+func validateExecutionStatus(d *DiffSuite, output *differentiator.ChangelogOutput) {
+	d.Assert().NotNil(d, "d is nil")
+	d.Assert().NotNil(output, "output is nil")
+
+	d.Assert().NotNil(output.ExecutionStatus, "executionStatus is nil")
+	d.Assert().Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
+	d.Assert().Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
+	d.Assert().Greater(len(output.ExecutionStatus.StartTime), 1)
+	d.Assert().Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+}
+
+func validateChangeMapOutput(d *DiffSuite, output *differentiator.ChangelogOutput) {
+	d.Assert().NotNil(d, "d is nil")
+	d.Assert().NotNil(output, "output is nil")
+
+	d.Assert().NotNil(output.Changelog, "changeMap is nil")
+	d.Assert().Len(output.Changelog, 4, "changeMap len should be 4")
+	d.Assert().NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
+	d.Assert().NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
+	d.Assert().NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	d.Assert().NotNil(output.Changelog[model.OAS_WEBHOOKS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_WEBHOOKS_KEY))
+}
+
 func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	validateDependencies(d)
 
@@ -91,17 +116,9 @@ func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
 	// ExecutionStatus
-	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
-	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
-	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
-	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
-	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	validateExecutionStatus(d, output)
 	// changeMap
-	assert.NotNil(output.Changelog, "changeMap is nil")
-	assert.Len(output.Changelog, 3, "changeMap len should be 3")
-	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
-	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
-	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	validateChangeMapOutput(d, output)
 
 	// aux vars
 	index := -1
@@ -291,17 +308,9 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
 	// ExecutionStatus
-	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
-	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
-	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
-	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
-	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	validateExecutionStatus(d, output)
 	// changeMap
-	assert.NotNil(output.Changelog, "changeMap is nil")
-	assert.Len(output.Changelog, 3, "changeMap len should be 3")
-	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
-	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
-	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	validateChangeMapOutput(d, output)
 
 	// aux vars
 	index := -1
@@ -403,17 +412,9 @@ func HeadersDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
 	// ExecutionStatus
-	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
-	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
-	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
-	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
-	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	validateExecutionStatus(d, output)
 	// changeMap
-	assert.NotNil(output.Changelog, "changeMap is nil")
-	assert.Len(output.Changelog, 3, "changeMap len should be 3")
-	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
-	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
-	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	validateChangeMapOutput(d, output)
 
 	// aux vars
 	index := -1
@@ -500,17 +501,9 @@ func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
 	// ExecutionStatus
-	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
-	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
-	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
-	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
-	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	validateExecutionStatus(d, output)
 	// changeMap
-	assert.NotNil(output.Changelog, "changeMap is nil")
-	assert.Len(output.Changelog, 3, "changeMap len should be 3")
-	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
-	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
-	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	validateChangeMapOutput(d, output)
 
 	// aux vars
 	index := -1
@@ -678,17 +671,9 @@ func OperationsDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
 	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
 	// ExecutionStatus
-	assert.NotNil(output.ExecutionStatus, "executionStatus is nil")
-	assert.Equal(output.ExecutionStatus.BaseFilePath, d.jsonFile1.GetPath())
-	assert.Equal(output.ExecutionStatus.SecondFilePath, d.jsonFile2.GetPath())
-	assert.Greater(len(output.ExecutionStatus.StartTime), 1)
-	assert.Greater(len(output.ExecutionStatus.ExecutionTime), 1)
+	validateExecutionStatus(d, output)
 	// changeMap
-	assert.NotNil(output.Changelog, "changeMap is nil")
-	assert.Len(output.Changelog, 3, "changeMap len should be 3")
-	assert.NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
-	assert.NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
-	assert.NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
+	validateChangeMapOutput(d, output)
 
 	// aux vars
 	index := -1

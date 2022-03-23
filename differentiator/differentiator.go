@@ -24,9 +24,10 @@ type differentiator struct {
 	opts      DifferentiatorOptions
 	differ    *lib.Differ
 
-	info    *infoDiff
-	servers *serversDiffer
-	paths   *pathsDiffer
+	info     *infoDiff
+	servers  *serversDiffer
+	paths    *pathsDiffer
+	webhooks *webhooksDiffer
 }
 
 func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Differentiator {
@@ -39,6 +40,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 
 	// maps
 	pathsDiffer := NewPathsDiffer()
+	webhooksDiffer := NewWebhooksDiffer()
 	headersDiffer := NewHeadersDiffer(opts)
 	responsesDiffer := NewResponsesDiffer(opts)
 	contentMapDiffer := NewContentMapDiffer(opts)
@@ -53,6 +55,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
 		lib.CustomValueDiffers(pathsDiffer),
+		lib.CustomValueDiffers(webhooksDiffer),
 		lib.CustomValueDiffers(headersDiffer),
 		lib.CustomValueDiffers(responsesDiffer),
 		lib.CustomValueDiffers(contentMapDiffer),
@@ -72,6 +75,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	serversDiffer.differ = differ
 	parametersDiffer.differ = differ
 	pathsDiffer.differ = differ
+	webhooksDiffer.differ = differ
 	headersDiffer.differ = differ
 	responsesDiffer.differ = differ
 	contentMapDiffer.differ = differ
@@ -88,6 +92,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		info:      NewInfoDiff(),
 		servers:   serversDiffer,
 		paths:     pathsDiffer,
+		webhooks:  webhooksDiffer,
 	}
 
 	return v
@@ -106,8 +111,6 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile2.GetPath())
 	}
 
-	// output
-	//changeMap := NewChangeMap(d.opts)
 	output := NewChangelogOutput(start, jsonFile.GetPath(), jsonFile2.GetPath(), d.opts)
 
 	// info
@@ -130,6 +133,13 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, err
 	}
 	output.Changelog[d.paths.key] = d.paths.changelog
+
+	// webhooks
+	err = d.webhooks.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
+	if err != nil {
+		return nil, err
+	}
+	output.Changelog[d.webhooks.key] = d.webhooks.changelog
 
 	return output, nil
 }

@@ -1,0 +1,23 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "headers",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/example": {
+      "put": {},
+      "patch": {},
+      "options": {}
+    },
+    "/login": {
+      "post": {
+        "callbacks": {
+          "/logincallback": {
+            "post": {}
+          }
+        }
+      }
+    }
+  }
+}

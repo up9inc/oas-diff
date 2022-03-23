@@ -3,10 +3,12 @@ name: acceptance tests
 on:
   pull_request:
     branches:
+      - 'develop'
       - 'main'
   push:
     branches:
       - 'develop'
+      - 'main'
 
 jobs:
   run-acceptance-tests:

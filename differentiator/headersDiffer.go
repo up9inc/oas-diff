@@ -23,13 +23,13 @@ func NewHeadersDiffer(opts DifferentiatorOptions) *headersDiffer {
 }
 
 func (h *headersDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Headers{}))
+	return lib.AreType(a, b, reflect.TypeOf(model.HeadersMap{}))
 }
 
 func (h *headersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if h.opts.Loose {
-		aValue, aOk := a.Interface().(model.Headers)
-		bValue, bOk := b.Interface().(model.Headers)
+		aValue, aOk := a.Interface().(model.HeadersMap)
+		bValue, bOk := b.Interface().(model.HeadersMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {

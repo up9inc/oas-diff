@@ -1,6 +1,6 @@
 package model
 
-type Headers map[string]*Header
+type HeadersMap map[string]*Header
 
 // https://spec.openapis.org/oas/v3.1.0#header-object
 type Header struct {

@@ -23,13 +23,13 @@ func NewLinksDiffer(opts DifferentiatorOptions) *linksDiffer {
 }
 
 func (l *linksDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Links{}))
+	return lib.AreType(a, b, reflect.TypeOf(model.LinksMap{}))
 }
 
 func (l *linksDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if l.opts.Loose {
-		aValue, aOk := a.Interface().(model.Links)
-		bValue, bOk := b.Interface().(model.Links)
+		aValue, aOk := a.Interface().(model.LinksMap)
+		bValue, bOk := b.Interface().(model.LinksMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {

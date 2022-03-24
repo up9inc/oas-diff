@@ -23,13 +23,13 @@ func NewExamplesDiffer(opts DifferentiatorOptions) *examplesDiffer {
 }
 
 func (e *examplesDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Examples{}))
+	return lib.AreType(a, b, reflect.TypeOf(model.ExamplesMap{}))
 }
 
 func (e *examplesDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if e.opts.Loose {
-		aValue, aOk := a.Interface().(model.Examples)
-		bValue, bOk := b.Interface().(model.Examples)
+		aValue, aOk := a.Interface().(model.ExamplesMap)
+		bValue, bOk := b.Interface().(model.ExamplesMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {

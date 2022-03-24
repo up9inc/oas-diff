@@ -9,8 +9,8 @@ type Operation struct {
 	OperationID  string               `json:"operationId,omitempty" diff:"operationId"`
 	Parameters   Parameters           `json:"parameters,omitempty" diff:"parameters"`
 	RequestBody  *RequestBody         `json:"requestBody,omitempty" diff:"requestBody"`
-	Responses    Responses            `json:"responses,omitempty" diff:"responses"`
-	Callbacks    Callbacks            `json:"callbacks,omitempty" diff:"callbacks"`
+	Responses    ResponsesMap         `json:"responses,omitempty" diff:"responses"`
+	Callbacks    CallbacksMap         `json:"callbacks,omitempty" diff:"callbacks"`
 	Deprecated   bool                 `json:"deprecated,omitempty" diff:"deprecated"`
 	Consumes     []string             `json:"consumes,omitempty" diff:"consumes"`
 	Security     SecurityRequirements `json:"security,omitempty" diff:"security"`

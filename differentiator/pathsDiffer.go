@@ -15,8 +15,8 @@ var _ InternalDiff = (*pathsDiffer)(nil)
 
 type pathsDiffer struct {
 	*internalDiff
-	data  model.Paths
-	data2 model.Paths
+	data  model.PathsMap
+	data2 model.PathsMap
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
@@ -24,8 +24,8 @@ type pathsDiffer struct {
 func NewPathsDiffer() *pathsDiffer {
 	return &pathsDiffer{
 		internalDiff: NewInternalDiff(model.OAS_PATHS_KEY),
-		data:         model.Paths{},
-		data2:        model.Paths{},
+		data:         model.PathsMap{},
+		data2:        model.PathsMap{},
 	}
 }
 
@@ -158,13 +158,13 @@ func (p *pathsDiffer) handleChanges(changes lib.Changelog) (err error) {
 }
 
 func (p *pathsDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Paths{}))
+	return lib.AreType(a, b, reflect.TypeOf(model.PathsMap{}))
 }
 
 func (p *pathsDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if p.opts.Loose {
-		aValue, aOk := a.Interface().(model.Paths)
-		bValue, bOk := b.Interface().(model.Paths)
+		aValue, aOk := a.Interface().(model.PathsMap)
+		bValue, bOk := b.Interface().(model.PathsMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {

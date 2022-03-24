@@ -23,13 +23,13 @@ func NewResponsesDiffer(opts DifferentiatorOptions) *responsesDiffer {
 }
 
 func (r *responsesDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Responses{}))
+	return lib.AreType(a, b, reflect.TypeOf(model.ResponsesMap{}))
 }
 
 func (r *responsesDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if r.opts.Loose {
-		aValue, aOk := a.Interface().(model.Responses)
-		bValue, bOk := b.Interface().(model.Responses)
+		aValue, aOk := a.Interface().(model.ResponsesMap)
+		bValue, bOk := b.Interface().(model.ResponsesMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {

@@ -23,13 +23,13 @@ func NewCallbacksDiffer(opts DifferentiatorOptions) *callbacksDiffer {
 }
 
 func (c *callbacksDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Callbacks{}))
+	return lib.AreType(a, b, reflect.TypeOf(model.CallbacksMap{}))
 }
 
 func (c *callbacksDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if c.opts.Loose {
-		aValue, aOk := a.Interface().(model.Callbacks)
-		bValue, bOk := b.Interface().(model.Callbacks)
+		aValue, aOk := a.Interface().(model.CallbacksMap)
+		bValue, bOk := b.Interface().(model.CallbacksMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {

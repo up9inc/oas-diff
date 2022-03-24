@@ -56,6 +56,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	callbacksMapDiffer := NewCallbacksMapDiffer(opts)
 	examplesMapDiffer := NewExamplesMapDiffer(opts)
 	serverVariablesMapDiffer := NewServerVariablesMapDiffer(opts)
+	requestBodiesMapDiffer := NewRequestBodiesMapDiffer(opts)
 
 	differ, err := lib.NewDiffer(
 		// strings
@@ -78,6 +79,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(callbacksMapDiffer),
 		lib.CustomValueDiffers(examplesMapDiffer),
 		lib.CustomValueDiffers(serverVariablesMapDiffer),
+		lib.CustomValueDiffers(requestBodiesMapDiffer),
 		// options
 		lib.StructMapKeySupport(),
 		lib.DisableStructValues(),
@@ -107,6 +109,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	callbacksMapDiffer.differ = differ
 	examplesMapDiffer.differ = differ
 	serverVariablesMapDiffer.differ = differ
+	requestBodiesMapDiffer.differ = differ
 
 	v := &differentiator{
 		validator:  val,

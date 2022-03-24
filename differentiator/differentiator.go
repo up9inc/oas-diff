@@ -44,6 +44,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	parametersDiffer := NewParameterDiffer(opts)
 
 	// maps
+	anyMapDiffer := NewAnyMapDiffer(opts)
 	stringsMapDiffer := NewStringsMapDiffer(opts)
 	schemasMapDiffer := NewSchemasMapDiffer(opts)
 	pathsMapDiffer := NewPathsMapDiffer()
@@ -68,6 +69,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
 		// maps
+		lib.CustomValueDiffers(anyMapDiffer),
 		lib.CustomValueDiffers(stringsMapDiffer),
 		lib.CustomValueDiffers(schemasMapDiffer),
 		lib.CustomValueDiffers(pathsMapDiffer),
@@ -99,6 +101,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	serversDiffer.differ = differ
 	parametersDiffer.differ = differ
 	// maps
+	anyMapDiffer.differ = differ
 	stringsMapDiffer.differ = differ
 	schemasMapDiffer.differ = differ
 	pathsMapDiffer.differ = differ

@@ -1,5 +1,7 @@
 package model
 
+type SchemaMap map[string]*Schema
+
 // TODO: []*Schema should be handled as an array like servers/parameters? If we do, what will be the identifier?
 // TODO: Support Extensions
 // TODO: Numbers should be uint64 or int/uint32?
@@ -7,26 +9,26 @@ package model
 // https://json-schema.org/draft/2020-12/release-notes.html
 type Schema struct {
 	// Schema
-	Defs                 map[string]*Schema            `json:"$defs,omitempty" diff:"$defs"`
-	OneOf                []*Schema                     `json:"oneOf,omitempty" diff:"oneOf"`
-	AnyOf                []*Schema                     `json:"anyOf,omitempty" diff:"anyOf"`
-	AllOf                []*Schema                     `json:"allOf,omitempty" diff:"allOf"`
-	Not                  *Schema                       `json:"not,omitempty" diff:"not"`
-	If                   *Schema                       `json:"if,omitempty" diff:"if"`
-	Then                 *Schema                       `json:"then,omitempty" diff:"then"`
-	Else                 *Schema                       `json:"else,omitempty" diff:"else"`
-	Properties           map[string]*Schema            `json:"properties,omitempty" diff:"properties"`
-	PropertyNames        *Schema                       `json:"propertyNames,omitempty" diff:"propertyNames"`
-	PrefixItems          []*Schema                     `json:"prefixItems,omitempty" diff:"prefixItems"`
-	Items                interface{}                   `json:"items,omitempty" diff:"items"`
-	Enum                 []interface{}                 `json:"enum,omitempty" diff:"enum"`
-	Default              interface{}                   `json:"default,omitempty" diff:"default"`
-	AdditionalProperties interface{}                   `json:"additionalProperties,omitempty" diff:"additionalProperties"`
-	Components           map[string]map[string]*Schema `json:"components,omitempty" diff:"components"`
-	Contains             *Schema                       `json:"contains,omitempty" diff:"contains"`
-	UnevaluatedItems     *Schema                       `json:"unevaluatedItems,omitempty" diff:"unevaluatedItems"`
-	PatternProperties    map[string]*Schema            `json:"patternProperties,omitempty" diff:"patternProperties"`
-	DependentSchemas     map[string]*Schema            `json:"dependentSchemas,omitempty" diff:"dependentSchemas"`
+	Defs                 SchemaMap            `json:"$defs,omitempty" diff:"$defs"`
+	OneOf                []*Schema            `json:"oneOf,omitempty" diff:"oneOf"`
+	AnyOf                []*Schema            `json:"anyOf,omitempty" diff:"anyOf"`
+	AllOf                []*Schema            `json:"allOf,omitempty" diff:"allOf"`
+	Not                  *Schema              `json:"not,omitempty" diff:"not"`
+	If                   *Schema              `json:"if,omitempty" diff:"if"`
+	Then                 *Schema              `json:"then,omitempty" diff:"then"`
+	Else                 *Schema              `json:"else,omitempty" diff:"else"`
+	Properties           SchemaMap            `json:"properties,omitempty" diff:"properties"`
+	PropertyNames        *Schema              `json:"propertyNames,omitempty" diff:"propertyNames"`
+	PrefixItems          []*Schema            `json:"prefixItems,omitempty" diff:"prefixItems"`
+	Items                interface{}          `json:"items,omitempty" diff:"items"`
+	Enum                 []interface{}        `json:"enum,omitempty" diff:"enum"`
+	Default              interface{}          `json:"default,omitempty" diff:"default"`
+	AdditionalProperties interface{}          `json:"additionalProperties,omitempty" diff:"additionalProperties"`
+	Components           map[string]SchemaMap `json:"components,omitempty" diff:"components"`
+	Contains             *Schema              `json:"contains,omitempty" diff:"contains"`
+	UnevaluatedItems     *Schema              `json:"unevaluatedItems,omitempty" diff:"unevaluatedItems"`
+	PatternProperties    SchemaMap            `json:"patternProperties,omitempty" diff:"patternProperties"`
+	DependentSchemas     SchemaMap            `json:"dependentSchemas,omitempty" diff:"dependentSchemas"`
 
 	// Bool
 	AllowEmptyValue       bool `json:"allowEmptyValue,omitempty" diff:"allowEmptyValue"`

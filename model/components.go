@@ -16,7 +16,7 @@ type RequestBodiesMap map[string]*RequestBody
 // TODO: Implement the generic Reference Object
 // https://spec.openapis.org/oas/v3.1.0#components-object
 type Components struct {
-	Schemas         SchemaMap        `json:"schemas,omitempty" diff:"schemas"`
+	Schemas         SchemasMap       `json:"schemas,omitempty" diff:"schemas"`
 	Responses       ResponsesMap     `json:"responses,omitempty" diff:"responses"`
 	Parameters      ParametersMap    `json:"parameters,omitempty" diff:"parameters"`
 	Examples        ExamplesMap      `json:"examples,omitempty" diff:"examples"`

@@ -67,6 +67,6 @@ type Schema struct {
 }
 
 type Discriminator struct {
-	PropertyName string            `json:"propertyName,omitempty" diff:"propertyName"`
-	Mapping      map[string]string `json:"mapping,omitempty" diff:"mapping"`
+	PropertyName string     `json:"propertyName,omitempty" diff:"propertyName"`
+	Mapping      StringsMap `json:"mapping,omitempty" diff:"mapping"`
 }

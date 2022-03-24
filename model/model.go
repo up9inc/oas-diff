@@ -9,6 +9,8 @@ type Model interface {
 	Parse(file file.JsonFile) error
 }
 
+type StringsMap map[string]string
+
 // https://spec.openapis.org/oas/v3.1.0#security-requirement-object
 type SecurityRequirements []map[string][]string
 

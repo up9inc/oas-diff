@@ -14,10 +14,10 @@ type SecurityScheme struct {
 
 // https://spec.openapis.org/oas/v3.1.0#oauth-flow-object
 type OAuthFlow struct {
-	AuthorizationUrl string            `json:"authorizationUrl,omitempty" diff:"name,authorizationUrl"`
-	TokenUrl         string            `json:"tokenUrl,omitempty" diff:"name,tokenUrl"`
-	RefreshUrl       string            `json:"refreshUrl,omitempty" diff:"refreshUrl"`
-	Scopes           map[string]string `json:"scopes,omitempty" diff:"scopes"`
+	AuthorizationUrl string     `json:"authorizationUrl,omitempty" diff:"name,authorizationUrl"`
+	TokenUrl         string     `json:"tokenUrl,omitempty" diff:"name,tokenUrl"`
+	RefreshUrl       string     `json:"refreshUrl,omitempty" diff:"refreshUrl"`
+	Scopes           StringsMap `json:"scopes,omitempty" diff:"scopes"`
 }
 
 // https://spec.openapis.org/oas/v3.1.0#oauth-flows-object

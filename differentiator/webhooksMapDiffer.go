@@ -11,9 +11,9 @@ import (
 )
 
 // make sure we implement the InternalDiff interface
-var _ InternalDiff = (*webhooksDiffer)(nil)
+var _ InternalDiff = (*webhooksMapDiffer)(nil)
 
-type webhooksDiffer struct {
+type webhooksMapDiffer struct {
 	*internalDiff
 	data  model.Webhooks
 	data2 model.Webhooks
@@ -21,15 +21,15 @@ type webhooksDiffer struct {
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewWebhooksDiffer() *webhooksDiffer {
-	return &webhooksDiffer{
+func NewWebhooksMapDiffer() *webhooksMapDiffer {
+	return &webhooksMapDiffer{
 		internalDiff: NewInternalDiff(model.OAS_WEBHOOKS_KEY),
 		data:         model.Webhooks{},
 		data2:        model.Webhooks{},
 	}
 }
 
-func (w *webhooksDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
+func (w *webhooksMapDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
 	var err error
 
 	// opts
@@ -68,7 +68,7 @@ func (w *webhooksDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.Jso
 	return w.handleChanges(changes)
 }
 
-func (w *webhooksDiffer) handleChanges(changes lib.Changelog) (err error) {
+func (w *webhooksMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 	for _, c := range changes {
 		key := c.Path[0]
 
@@ -157,11 +157,11 @@ func (w *webhooksDiffer) handleChanges(changes lib.Changelog) (err error) {
 	return nil
 }
 
-func (w *webhooksDiffer) Match(a, b reflect.Value) bool {
+func (w *webhooksMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.Webhooks{}))
 }
 
-func (w *webhooksDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (w *webhooksMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if w.opts.Loose {
 		aValue, aOk := a.Interface().(model.Webhooks)
 		bValue, bOk := b.Interface().(model.Webhooks)
@@ -185,6 +185,6 @@ func (w *webhooksDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Val
 	return w.differ.DiffMap(path, a, b)
 }
 
-func (w *webhooksDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+func (w *webhooksMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	w.DiffFunc = dfunc
 }

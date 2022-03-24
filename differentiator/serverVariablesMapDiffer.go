@@ -8,28 +8,28 @@ import (
 	"github.com/up9inc/oas-diff/model"
 )
 
-type serverVariablesDiffer struct {
+type serverVariablesMapDiffer struct {
 	opts   DifferentiatorOptions
 	differ *lib.Differ
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewServerVariablesDiffer(opts DifferentiatorOptions) *serverVariablesDiffer {
-	return &serverVariablesDiffer{
+func NewServerVariablesMapDiffer(opts DifferentiatorOptions) *serverVariablesMapDiffer {
+	return &serverVariablesMapDiffer{
 		opts:   opts,
 		differ: nil,
 	}
 }
 
-func (s *serverVariablesDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.ServerVariables{}))
+func (s *serverVariablesMapDiffer) Match(a, b reflect.Value) bool {
+	return lib.AreType(a, b, reflect.TypeOf(model.ServerVariablesMap{}))
 }
 
-func (s *serverVariablesDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (s *serverVariablesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if s.opts.Loose {
-		aValue, aOk := a.Interface().(model.ServerVariables)
-		bValue, bOk := b.Interface().(model.ServerVariables)
+		aValue, aOk := a.Interface().(model.ServerVariablesMap)
+		bValue, bOk := b.Interface().(model.ServerVariablesMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {
@@ -50,6 +50,6 @@ func (s *serverVariablesDiffer) Diff(cl *lib.Changelog, path []string, a, b refl
 	return s.differ.DiffMap(path, a, b)
 }
 
-func (s *serverVariablesDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+func (s *serverVariablesMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	s.DiffFunc = dfunc
 }

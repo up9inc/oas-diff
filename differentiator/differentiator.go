@@ -26,8 +26,8 @@ type differentiator struct {
 
 	info       *infoDiff
 	servers    *serversDiffer
-	paths      *pathsDiffer
-	webhooks   *webhooksDiffer
+	paths      *pathsMapDiffer
+	webhooks   *webhooksMapDiffer
 	components *componentsDiffer
 }
 
@@ -45,17 +45,17 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 
 	// maps
 	schemasMapDiffer := NewSchemasMapDiffer(opts)
-	pathsDiffer := NewPathsDiffer()
-	webhooksDiffer := NewWebhooksDiffer()
-	headersDiffer := NewHeadersDiffer(opts)
+	pathsMapDiffer := NewPathsMapDiffer()
+	webhooksMapDiffer := NewWebhooksMapDiffer()
+	headersMapDiffer := NewHeadersMapDiffer(opts)
 	parametersMapDiffer := NewParametersMapDiffer(opts)
-	responsesDiffer := NewResponsesMapDiffer(opts)
+	responsesMapDiffer := NewResponsesMapDiffer(opts)
 	contentMapDiffer := NewContentMapDiffer(opts)
 	encodingMapDiffer := NewEncodingMapDiffer(opts)
-	linksDiffer := NewLinksMapDiffer(opts)
-	callbacksDiffer := NewCallbacksDiffer(opts)
-	examplesDiffer := NewExamplesDiffer(opts)
-	serverVariablesDiffer := NewServerVariablesDiffer(opts)
+	linksMapDiffer := NewLinksMapDiffer(opts)
+	callbacksMapDiffer := NewCallbacksMapDiffer(opts)
+	examplesMapDiffer := NewExamplesMapDiffer(opts)
+	serverVariablesMapDiffer := NewServerVariablesMapDiffer(opts)
 
 	differ, err := lib.NewDiffer(
 		// strings
@@ -67,17 +67,17 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(parametersDiffer),
 		// maps
 		lib.CustomValueDiffers(schemasMapDiffer),
-		lib.CustomValueDiffers(pathsDiffer),
-		lib.CustomValueDiffers(webhooksDiffer),
-		lib.CustomValueDiffers(headersDiffer),
+		lib.CustomValueDiffers(pathsMapDiffer),
+		lib.CustomValueDiffers(webhooksMapDiffer),
+		lib.CustomValueDiffers(headersMapDiffer),
 		lib.CustomValueDiffers(parametersMapDiffer),
-		lib.CustomValueDiffers(responsesDiffer),
+		lib.CustomValueDiffers(responsesMapDiffer),
 		lib.CustomValueDiffers(contentMapDiffer),
 		lib.CustomValueDiffers(encodingMapDiffer),
-		lib.CustomValueDiffers(linksDiffer),
-		lib.CustomValueDiffers(callbacksDiffer),
-		lib.CustomValueDiffers(examplesDiffer),
-		lib.CustomValueDiffers(serverVariablesDiffer),
+		lib.CustomValueDiffers(linksMapDiffer),
+		lib.CustomValueDiffers(callbacksMapDiffer),
+		lib.CustomValueDiffers(examplesMapDiffer),
+		lib.CustomValueDiffers(serverVariablesMapDiffer),
 		// options
 		lib.StructMapKeySupport(),
 		lib.DisableStructValues(),
@@ -96,17 +96,17 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	parametersDiffer.differ = differ
 	// maps
 	schemasMapDiffer.differ = differ
-	pathsDiffer.differ = differ
-	webhooksDiffer.differ = differ
-	headersDiffer.differ = differ
+	pathsMapDiffer.differ = differ
+	webhooksMapDiffer.differ = differ
+	headersMapDiffer.differ = differ
 	parametersMapDiffer.differ = differ
-	responsesDiffer.differ = differ
+	responsesMapDiffer.differ = differ
 	contentMapDiffer.differ = differ
 	encodingMapDiffer.differ = differ
-	linksDiffer.differ = differ
-	callbacksDiffer.differ = differ
-	examplesDiffer.differ = differ
-	serverVariablesDiffer.differ = differ
+	linksMapDiffer.differ = differ
+	callbacksMapDiffer.differ = differ
+	examplesMapDiffer.differ = differ
+	serverVariablesMapDiffer.differ = differ
 
 	v := &differentiator{
 		validator:  val,
@@ -114,8 +114,8 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		differ:     differ,
 		info:       infoDiff,
 		servers:    serversDiffer,
-		paths:      pathsDiffer,
-		webhooks:   webhooksDiffer,
+		paths:      pathsMapDiffer,
+		webhooks:   webhooksMapDiffer,
 		components: componentsDiffer,
 	}
 

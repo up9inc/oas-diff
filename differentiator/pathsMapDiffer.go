@@ -11,9 +11,9 @@ import (
 )
 
 // make sure we implement the InternalDiff interface
-var _ InternalDiff = (*pathsDiffer)(nil)
+var _ InternalDiff = (*pathsMapDiffer)(nil)
 
-type pathsDiffer struct {
+type pathsMapDiffer struct {
 	*internalDiff
 	data  model.PathsMap
 	data2 model.PathsMap
@@ -21,15 +21,15 @@ type pathsDiffer struct {
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewPathsDiffer() *pathsDiffer {
-	return &pathsDiffer{
+func NewPathsMapDiffer() *pathsMapDiffer {
+	return &pathsMapDiffer{
 		internalDiff: NewInternalDiff(model.OAS_PATHS_KEY),
 		data:         model.PathsMap{},
 		data2:        model.PathsMap{},
 	}
 }
 
-func (p *pathsDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
+func (p *pathsMapDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
 	var err error
 
 	// opts
@@ -68,7 +68,7 @@ func (p *pathsDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFi
 	return p.handleChanges(changes)
 }
 
-func (p *pathsDiffer) handleChanges(changes lib.Changelog) (err error) {
+func (p *pathsMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 	for _, c := range changes {
 		key := c.Path[0]
 
@@ -157,11 +157,11 @@ func (p *pathsDiffer) handleChanges(changes lib.Changelog) (err error) {
 	return nil
 }
 
-func (p *pathsDiffer) Match(a, b reflect.Value) bool {
+func (p *pathsMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.PathsMap{}))
 }
 
-func (p *pathsDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (p *pathsMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if p.opts.Loose {
 		aValue, aOk := a.Interface().(model.PathsMap)
 		bValue, bOk := b.Interface().(model.PathsMap)
@@ -185,6 +185,6 @@ func (p *pathsDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value,
 	return p.differ.DiffMap(path, a, b)
 }
 
-func (p *pathsDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+func (p *pathsMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	p.DiffFunc = dfunc
 }

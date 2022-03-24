@@ -8,25 +8,25 @@ import (
 	"github.com/up9inc/oas-diff/model"
 )
 
-type examplesDiffer struct {
+type examplesMapDiffer struct {
 	opts   DifferentiatorOptions
 	differ *lib.Differ
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewExamplesDiffer(opts DifferentiatorOptions) *examplesDiffer {
-	return &examplesDiffer{
+func NewExamplesMapDiffer(opts DifferentiatorOptions) *examplesMapDiffer {
+	return &examplesMapDiffer{
 		opts:   opts,
 		differ: nil,
 	}
 }
 
-func (e *examplesDiffer) Match(a, b reflect.Value) bool {
+func (e *examplesMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.ExamplesMap{}))
 }
 
-func (e *examplesDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (e *examplesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if e.opts.Loose {
 		aValue, aOk := a.Interface().(model.ExamplesMap)
 		bValue, bOk := b.Interface().(model.ExamplesMap)
@@ -50,6 +50,6 @@ func (e *examplesDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Val
 	return e.differ.DiffMap(path, a, b)
 }
 
-func (e *examplesDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+func (e *examplesMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	e.DiffFunc = dfunc
 }

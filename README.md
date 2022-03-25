@@ -80,3 +80,9 @@ OAS 3.1 Validation and Diff Tool
     CREATE/DELETE -> Always the entire element
     UPDATE -> Only the property, exception if the property is the identifier
     ````
+
+## Limitations
+- `Specification Extensions` are not suppoerted (TODO)
+- `webhooks` field is only supoporting the `Path Item Object`, but it could also be a `Reference Object` (TODO)
+- `openapi` field is not a part of the changelog, we only support OAS version 3.1, so any changes will cause a validation failure
+- `jsonSchemaDialect` field is not a part of the changelog, we only support OAS version 3.1 and it uses `JSON Schema Validation Draft 2020-12`

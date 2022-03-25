@@ -16,17 +16,17 @@
         {
             "label": "run-loose",
             "type": "shell",
-            "command": "go run -race main.go diff --base-file test/simple.json --second-file test/simple2.json --loose"
+            "command": "go run -race oasdiff.go diff --base-file test/simple.json --second-file test/simple2.json --loose"
         },    
         {
             "label": "run",
             "type": "shell",
-            "command": "go run -race main.go diff --base-file test/simple.json --second-file test/simple2.json"
+            "command": "go run -race oasdiff.go diff --base-file test/simple.json --second-file test/simple2.json"
         },
         {
             "label": "run-html",
             "type": "shell",
-            "command": "go run -race main.go diff --base-file test/simple.json --second-file test/simple2.json --html"
+            "command": "go run -race oasdiff.go diff --base-file test/simple.json --second-file test/simple2.json --html"
         },
         {
             "label": "clean-changelog",

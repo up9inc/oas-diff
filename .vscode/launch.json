@@ -11,7 +11,7 @@
             "mode": "debug",
             "debugAdapter": "dlv-dap",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/main.go",
+            "program": "${workspaceFolder}/oasdiff.go",
             "args": [
                 "diff",
                 "--base-file",
@@ -28,13 +28,13 @@
             "mode": "debug",
             "debugAdapter": "dlv-dap",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/main.go",
+            "program": "${workspaceFolder}/oasdiff.go",
             "args": [
                 "diff",
                 "--base-file",
-                "test/simple.json",
+                "acceptanceTests/data/responses.json",
                 "--second-file",
-                "test/simple2.json",
+                "acceptanceTests/data/responses2.json",
                 "--loose",
                 "--html"
             ]

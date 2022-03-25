@@ -14,13 +14,13 @@ var _ Model = (*Servers)(nil)
 var _ Array = (*Servers)(nil)
 
 type Servers []*Server
-type Variables map[string]*ServerVariable
+type ServerVariablesMap map[string]*ServerVariable
 
 // https://spec.openapis.org/oas/v3.1.0#server-object
 type Server struct {
-	URL         string    `json:"url,omitempty" diff:"url,identifier"`
-	Description string    `json:"description,omitempty" diff:"description"`
-	Variables   Variables `json:"variables,omitempty" diff:"variables"`
+	URL         string             `json:"url,omitempty" diff:"url,identifier"`
+	Description string             `json:"description,omitempty" diff:"description"`
+	Variables   ServerVariablesMap `json:"variables,omitempty" diff:"variables"`
 }
 
 // https://spec.openapis.org/oas/v3.1.0#server-variable-object
@@ -43,7 +43,7 @@ func (s *Servers) Parse(file file.JsonFile) error {
 }
 
 func (s Servers) GetName() string {
-	return "servers"
+	return OAS_SERVERS_KEY
 }
 
 func (s Servers) GetIdentifierName() string {

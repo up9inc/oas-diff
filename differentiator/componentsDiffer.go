@@ -1,0 +1,70 @@
+package differentiator
+
+import (
+	"reflect"
+
+	lib "github.com/r3labs/diff/v2"
+	file "github.com/up9inc/oas-diff/json"
+	"github.com/up9inc/oas-diff/model"
+	"github.com/up9inc/oas-diff/validator"
+)
+
+// make sure we implement the InternalDiff interface
+var _ InternalDiff = (*componentsDiffer)(nil)
+
+type componentsDiffer struct {
+	*internalDiff
+	data  *model.Components
+	data2 *model.Components
+
+	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
+}
+
+func NewComponentsDiffer() *componentsDiffer {
+	return &componentsDiffer{
+		internalDiff: NewInternalDiff(model.OAS_COMPONENTS_KEY),
+		data:         &model.Components{},
+		data2:        &model.Components{},
+	}
+}
+
+func (c *componentsDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.JsonFile, validator validator.Validator, opts DifferentiatorOptions, differ *lib.Differ) error {
+	var err error
+
+	// opts
+	c.opts = opts
+
+	// differ
+	c.differ = differ
+
+	// schema
+	err = c.schema.Build(validator)
+	if err != nil {
+		return err
+	}
+
+	// components1
+	c.filePath = jsonFile.GetPath()
+	err = c.data.Parse(jsonFile)
+	if err != nil {
+		return err
+	}
+
+	// components2
+	c.filePath2 = jsonFile2.GetPath()
+	err = c.data2.Parse(jsonFile2)
+	if err != nil {
+		return err
+	}
+
+	// components changelog
+	changes, err := c.differ.Diff(c.data, c.data2)
+	if err != nil {
+		return err
+	}
+
+	// changelogs
+	c.internalDiff.handleChanges(changes)
+
+	return nil
+}

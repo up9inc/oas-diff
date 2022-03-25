@@ -8,9 +8,9 @@ import (
 )
 
 // make sure we implement the Model interface
-var _ Model = (*Paths)(nil)
+var _ Model = (*PathsMap)(nil)
 
-type Paths map[string]*PathItem
+type PathsMap map[string]*PathItem
 
 // https://spec.openapis.org/oas/v3.1.0#path-item-object
 type PathItem struct {
@@ -30,12 +30,12 @@ type PathItem struct {
 	Parameters  Parameters `json:"parameters,omitempty" diff:"parameters"`
 }
 
-func (p *Paths) Parse(file file.JsonFile) error {
+func (p *PathsMap) Parse(file file.JsonFile) error {
 	node := file.GetNodeData(OAS_PATHS_KEY)
 	if node != nil {
 		err := json.Unmarshal(*node, p)
 		if err != nil {
-			return fmt.Errorf("failed to Unmarshal Paths struct: %v", err)
+			return fmt.Errorf("failed to Unmarshal PathsMap struct: %v", err)
 		}
 	}
 

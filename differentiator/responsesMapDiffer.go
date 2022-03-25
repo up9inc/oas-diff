@@ -8,28 +8,28 @@ import (
 	"github.com/up9inc/oas-diff/model"
 )
 
-type responsesDiffer struct {
+type responsesMapDiffer struct {
 	opts   DifferentiatorOptions
 	differ *lib.Differ
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewResponsesDiffer(opts DifferentiatorOptions) *responsesDiffer {
-	return &responsesDiffer{
+func NewResponsesMapDiffer(opts DifferentiatorOptions) *responsesMapDiffer {
+	return &responsesMapDiffer{
 		opts:   opts,
 		differ: nil,
 	}
 }
 
-func (r *responsesDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Responses{}))
+func (r *responsesMapDiffer) Match(a, b reflect.Value) bool {
+	return lib.AreType(a, b, reflect.TypeOf(model.ResponsesMap{}))
 }
 
-func (r *responsesDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (r *responsesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if r.opts.Loose {
-		aValue, aOk := a.Interface().(model.Responses)
-		bValue, bOk := b.Interface().(model.Responses)
+		aValue, aOk := a.Interface().(model.ResponsesMap)
+		bValue, bOk := b.Interface().(model.ResponsesMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {
@@ -50,6 +50,6 @@ func (r *responsesDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Va
 	return r.differ.DiffMap(path, a, b)
 }
 
-func (r *responsesDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+func (r *responsesMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
 	r.DiffFunc = dfunc
 }

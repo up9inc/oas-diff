@@ -8,28 +8,28 @@ import (
 	"github.com/up9inc/oas-diff/model"
 )
 
-type headersDiffer struct {
+type linksMapDiffer struct {
 	opts   DifferentiatorOptions
 	differ *lib.Differ
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewHeadersDiffer(opts DifferentiatorOptions) *headersDiffer {
-	return &headersDiffer{
+func NewLinksMapDiffer(opts DifferentiatorOptions) *linksMapDiffer {
+	return &linksMapDiffer{
 		opts:   opts,
 		differ: nil,
 	}
 }
 
-func (h *headersDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Headers{}))
+func (l *linksMapDiffer) Match(a, b reflect.Value) bool {
+	return lib.AreType(a, b, reflect.TypeOf(model.LinksMap{}))
 }
 
-func (h *headersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
-	if h.opts.Loose {
-		aValue, aOk := a.Interface().(model.Headers)
-		bValue, bOk := b.Interface().(model.Headers)
+func (l *linksMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if l.opts.Loose {
+		aValue, aOk := a.Interface().(model.LinksMap)
+		bValue, bOk := b.Interface().(model.LinksMap)
 
 		if aOk && bOk {
 			for ak, av := range aValue {
@@ -47,9 +47,9 @@ func (h *headersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Valu
 		}
 	}
 
-	return h.differ.DiffMap(path, a, b)
+	return l.differ.DiffMap(path, a, b)
 }
 
-func (h *headersDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
-	h.DiffFunc = dfunc
+func (l *linksMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+	l.DiffFunc = dfunc
 }

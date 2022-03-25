@@ -24,41 +24,72 @@ type differentiator struct {
 	opts      DifferentiatorOptions
 	differ    *lib.Differ
 
-	info    *infoDiff
-	servers *serversDiffer
-	paths   *pathsDiffer
+	info         *infoDiff
+	servers      *serversDiffer
+	paths        *pathsMapDiffer
+	webhooks     *webhooksMapDiffer
+	components   *componentsDiffer
+	security     *securityRequirementsDiffer
+	tags         *tagsDiffer
+	externalDocs *externalDocsDiffer
 }
 
 func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Differentiator {
-	// custom differs
+	// strings
 	stringDiffer := NewStringDiffer(opts)
+
+	// structs
+	infoDiff := NewInfoDiff()
+	componentsDiffer := NewComponentsDiffer()
+	externalDocsDiffer := NewExternalDocsDiffer()
 
 	// slices
 	serversDiffer := NewServersDiffer()
 	parametersDiffer := NewParameterDiffer(opts)
+	tagsDiffer := NewTagsDiffer()
+	securityRequirementsDiffer := NewSecurityRequirementsDiffer()
 
 	// maps
-	pathsDiffer := NewPathsDiffer()
-	headersDiffer := NewHeadersDiffer(opts)
-	responsesDiffer := NewResponsesDiffer(opts)
+	anyMapDiffer := NewAnyMapDiffer(opts)
+	stringsMapDiffer := NewStringsMapDiffer(opts)
+	schemasMapDiffer := NewSchemasMapDiffer(opts)
+	pathsMapDiffer := NewPathsMapDiffer()
+	webhooksMapDiffer := NewWebhooksMapDiffer()
+	headersMapDiffer := NewHeadersMapDiffer(opts)
+	parametersMapDiffer := NewParametersMapDiffer(opts)
+	responsesMapDiffer := NewResponsesMapDiffer(opts)
 	contentMapDiffer := NewContentMapDiffer(opts)
 	encodingMapDiffer := NewEncodingMapDiffer(opts)
-	linksDiffer := NewLinksDiffer(opts)
-	callbacksDiffer := NewCallbacksDiffer(opts)
-	examplesDiffer := NewExamplesDiffer(opts)
+	linksMapDiffer := NewLinksMapDiffer(opts)
+	callbacksMapDiffer := NewCallbacksMapDiffer(opts)
+	examplesMapDiffer := NewExamplesMapDiffer(opts)
+	serverVariablesMapDiffer := NewServerVariablesMapDiffer(opts)
+	requestBodiesMapDiffer := NewRequestBodiesMapDiffer(opts)
 
 	differ, err := lib.NewDiffer(
+		// strings
 		lib.CustomValueDiffers(stringDiffer),
+		// slices
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
-		lib.CustomValueDiffers(pathsDiffer),
-		lib.CustomValueDiffers(headersDiffer),
-		lib.CustomValueDiffers(responsesDiffer),
+		lib.CustomValueDiffers(tagsDiffer),
+		// maps
+		lib.CustomValueDiffers(anyMapDiffer),
+		lib.CustomValueDiffers(stringsMapDiffer),
+		lib.CustomValueDiffers(schemasMapDiffer),
+		lib.CustomValueDiffers(pathsMapDiffer),
+		lib.CustomValueDiffers(webhooksMapDiffer),
+		lib.CustomValueDiffers(headersMapDiffer),
+		lib.CustomValueDiffers(parametersMapDiffer),
+		lib.CustomValueDiffers(responsesMapDiffer),
 		lib.CustomValueDiffers(contentMapDiffer),
 		lib.CustomValueDiffers(encodingMapDiffer),
-		lib.CustomValueDiffers(linksDiffer),
-		lib.CustomValueDiffers(callbacksDiffer),
-		lib.CustomValueDiffers(examplesDiffer),
+		lib.CustomValueDiffers(linksMapDiffer),
+		lib.CustomValueDiffers(callbacksMapDiffer),
+		lib.CustomValueDiffers(examplesMapDiffer),
+		lib.CustomValueDiffers(serverVariablesMapDiffer),
+		lib.CustomValueDiffers(requestBodiesMapDiffer),
+		// options
 		lib.StructMapKeySupport(),
 		lib.DisableStructValues(),
 		lib.SliceOrdering(false))
@@ -66,25 +97,46 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		panic(err)
 	}
 
+	// strings
 	stringDiffer.differ = differ
+	// structs
+	infoDiff.differ = differ
+	componentsDiffer.differ = differ
+	externalDocsDiffer.differ = differ
+	// slices
 	serversDiffer.differ = differ
 	parametersDiffer.differ = differ
-	pathsDiffer.differ = differ
-	headersDiffer.differ = differ
-	responsesDiffer.differ = differ
+	tagsDiffer.differ = differ
+	securityRequirementsDiffer.differ = differ
+	// maps
+	anyMapDiffer.differ = differ
+	stringsMapDiffer.differ = differ
+	schemasMapDiffer.differ = differ
+	pathsMapDiffer.differ = differ
+	webhooksMapDiffer.differ = differ
+	headersMapDiffer.differ = differ
+	parametersMapDiffer.differ = differ
+	responsesMapDiffer.differ = differ
 	contentMapDiffer.differ = differ
 	encodingMapDiffer.differ = differ
-	linksDiffer.differ = differ
-	callbacksDiffer.differ = differ
-	examplesDiffer.differ = differ
+	linksMapDiffer.differ = differ
+	callbacksMapDiffer.differ = differ
+	examplesMapDiffer.differ = differ
+	serverVariablesMapDiffer.differ = differ
+	requestBodiesMapDiffer.differ = differ
 
 	v := &differentiator{
-		validator: val,
-		opts:      opts,
-		differ:    differ,
-		info:      NewInfoDiff(),
-		servers:   serversDiffer,
-		paths:     pathsDiffer,
+		validator:    val,
+		opts:         opts,
+		differ:       differ,
+		info:         infoDiff,
+		servers:      serversDiffer,
+		paths:        pathsMapDiffer,
+		webhooks:     webhooksMapDiffer,
+		components:   componentsDiffer,
+		security:     securityRequirementsDiffer,
+		tags:         tagsDiffer,
+		externalDocs: externalDocsDiffer,
 	}
 
 	return v
@@ -103,8 +155,6 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile2.GetPath())
 	}
 
-	// output
-	//changeMap := NewChangeMap(d.opts)
 	output := NewChangelogOutput(start, jsonFile.GetPath(), jsonFile2.GetPath(), d.opts)
 
 	// info
@@ -127,6 +177,41 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, err
 	}
 	output.Changelog[d.paths.key] = d.paths.changelog
+
+	// webhooks
+	err = d.webhooks.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
+	if err != nil {
+		return nil, err
+	}
+	output.Changelog[d.webhooks.key] = d.webhooks.changelog
+
+	// components
+	err = d.components.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
+	if err != nil {
+		return nil, err
+	}
+	output.Changelog[d.components.key] = d.components.changelog
+
+	// security
+	err = d.security.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
+	if err != nil {
+		return nil, err
+	}
+	output.Changelog[d.security.key] = d.security.changelog
+
+	// tags
+	err = d.tags.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
+	if err != nil {
+		return nil, err
+	}
+	output.Changelog[d.tags.key] = d.tags.changelog
+
+	// externalDocs
+	err = d.externalDocs.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
+	if err != nil {
+		return nil, err
+	}
+	output.Changelog[d.externalDocs.key] = d.externalDocs.changelog
 
 	return output, nil
 }

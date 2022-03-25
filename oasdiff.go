@@ -14,7 +14,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name:     "oas-diff",
-		Version:  "1.0.0-pre-alpha",
+		Version:  "0.1.0-alpha",
 		Usage:    "Validate/Diff OAS 3.1 files",
 		HideHelp: true,
 		Commands: []*cli.Command{

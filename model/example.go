@@ -1,6 +1,6 @@
 package model
 
-type Examples map[string]*Example
+type ExamplesMap map[string]*Example
 
 // https://spec.openapis.org/oas/v3.1.0#example-object
 type Example struct {

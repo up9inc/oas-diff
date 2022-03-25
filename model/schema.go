@@ -60,7 +60,7 @@ type Schema struct {
 	// fixed fields
 	Discriminator *Discriminator `json:"discriminator,omitempty" diff:"discriminator"`
 	XML           interface{}    `json:"xml,omitempty" diff:"xml"`
-	ExternalDocs  *ExternalDocs  `json:"externalDocs,omitempty" diff:"externalDocs"`
+	ExternalDocs  *ExternalDoc   `json:"externalDocs,omitempty" diff:"externalDocs"`
 	Example       interface{}    `json:"example,omitempty" diff:"example"`
 
 	Examples []interface{} `json:"examples,omitempty" diff:"examples"`

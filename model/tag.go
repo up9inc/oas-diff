@@ -17,9 +17,9 @@ type Tags []*Tag
 
 // https://spec.openapis.org/oas/v3.1.0#tag-object
 type Tag struct {
-	Name         string        `json:"name,omitempty" diff:"name,identifier"`
-	Description  string        `json:"description,omitempty" diff:"description"`
-	ExternalDocs *ExternalDocs `json:"externalDocs,omitempty" diff:"externalDocs"`
+	Name         string       `json:"name,omitempty" diff:"name,identifier"`
+	Description  string       `json:"description,omitempty" diff:"description"`
+	ExternalDocs *ExternalDoc `json:"externalDocs,omitempty" diff:"externalDocs"`
 }
 
 func (t *Tags) Parse(file file.JsonFile) error {

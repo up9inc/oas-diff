@@ -57,6 +57,23 @@ OAS 3.1 Validation and Diff Tool
     ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --loose --exclude-descriptions
     ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --html
     ````
+
+## Array Identifiers
+ Array identifiers are used only for arrays to compare arrays by a matching identifier and not based on order. If an identifiable element is found in both the from and to structures, they will be directly compared
+
+- Servers
+    ````
+    URL         string             `json:"url,omitempty" diff:"url,identifier"`
+    ````
+- Tags
+    ````
+    Name         string        `json:"name,omitempty" diff:"name,identifier"`
+    ````
+- Parameters
+    ````
+    Name         string        `json:"name,omitempty" diff:"name,identifier"`
+    ````
+
 ## Changelog Rules
 - Arrays
     ````

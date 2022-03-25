@@ -43,7 +43,7 @@ func (s *Servers) Parse(file file.JsonFile) error {
 }
 
 func (s Servers) GetName() string {
-	return "servers"
+	return OAS_SERVERS_KEY
 }
 
 func (s Servers) GetIdentifierName() string {

@@ -29,6 +29,7 @@ type differentiator struct {
 	paths      *pathsMapDiffer
 	webhooks   *webhooksMapDiffer
 	components *componentsDiffer
+	tags       *tagsDiffer
 }
 
 func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Differentiator {
@@ -42,6 +43,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	// slices
 	serversDiffer := NewServersDiffer()
 	parametersDiffer := NewParameterDiffer(opts)
+	tagsDiffer := NewTagsDiffer()
 
 	// maps
 	anyMapDiffer := NewAnyMapDiffer(opts)
@@ -68,6 +70,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		// slices
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
+		lib.CustomValueDiffers(tagsDiffer),
 		// maps
 		lib.CustomValueDiffers(anyMapDiffer),
 		lib.CustomValueDiffers(stringsMapDiffer),
@@ -100,6 +103,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	// slices
 	serversDiffer.differ = differ
 	parametersDiffer.differ = differ
+	tagsDiffer.differ = differ
 	// maps
 	anyMapDiffer.differ = differ
 	stringsMapDiffer.differ = differ
@@ -126,6 +130,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		paths:      pathsMapDiffer,
 		webhooks:   webhooksMapDiffer,
 		components: componentsDiffer,
+		tags:       tagsDiffer,
 	}
 
 	return v
@@ -180,6 +185,13 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, err
 	}
 	output.Changelog[d.components.key] = d.components.changelog
+
+	// tags
+	err = d.tags.InternalDiff(jsonFile, jsonFile2, d.validator, d.opts, d.differ)
+	if err != nil {
+		return nil, err
+	}
+	output.Changelog[d.tags.key] = d.tags.changelog
 
 	return output, nil
 }

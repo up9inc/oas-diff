@@ -95,7 +95,7 @@ func validateChangeMapOutput(d *DiffSuite, output *differentiator.ChangelogOutpu
 	d.Assert().NotNil(output, "output is nil")
 
 	d.Assert().NotNil(output.Changelog, "changeMap is nil")
-	d.Assert().Len(output.Changelog, 7, "changeMap len should be 7")
+	d.Assert().Len(output.Changelog, 8, "changeMap len should be 8")
 	d.Assert().NotNil(output.Changelog[model.OAS_INFO_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_INFO_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_SERVERS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SERVERS_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_PATHS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_PATHS_KEY))
@@ -103,6 +103,7 @@ func validateChangeMapOutput(d *DiffSuite, output *differentiator.ChangelogOutpu
 	d.Assert().NotNil(output.Changelog[model.OAS_COMPONENTS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_COMPONENTS_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_TAGS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_TAGS_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_EXTERNAL_DOCS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_EXTERNAL_DOCS_KEY))
+	d.Assert().NotNil(output.Changelog[model.OAS_SECURITY_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SECURITY_KEY))
 }
 
 func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {

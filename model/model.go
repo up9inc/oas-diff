@@ -11,6 +11,3 @@ type Model interface {
 
 type AnyMap map[string]interface{}
 type StringsMap map[string]string
-
-// https://spec.openapis.org/oas/v3.1.0#security-requirement-object
-type SecurityRequirements []map[string][]string

@@ -7,6 +7,7 @@ const (
 	OAS_PATHS_KEY         = "paths"
 	OAS_WEBHOOKS_KEY      = "webhooks"
 	OAS_COMPONENTS_KEY    = "components"
+	OAS_SECURITY_KEY      = "security"
 	OAS_TAGS_KEY          = "tags"
 	OAS_EXTERNAL_DOCS_KEY = "externalDocs"
 )

@@ -1,6 +1,6 @@
 module github.com/up9inc/oas-diff
 
-go 1.17
+go 1.18
 
 require (
 	github.com/santhosh-tekuri/jsonschema/v5 v5.0.0

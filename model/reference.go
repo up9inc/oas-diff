@@ -1,5 +1,7 @@
 package model
 
+type ReferencesMap map[string]*Reference
+
 // https://spec.openapis.org/oas/v3.1.0#reference-object
 type Reference struct {
 	Ref         string `json:"$ref,omitempty" diff:"$ref"`

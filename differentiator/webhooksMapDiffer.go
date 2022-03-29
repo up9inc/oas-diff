@@ -2,7 +2,6 @@ package differentiator
 
 import (
 	"reflect"
-	"strings"
 
 	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
@@ -15,8 +14,8 @@ var _ InternalDiff = (*webhooksMapDiffer)(nil)
 
 type webhooksMapDiffer struct {
 	*internalDiff
-	data  model.Webhooks
-	data2 model.Webhooks
+	data  model.WebhooksMap
+	data2 model.WebhooksMap
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
@@ -24,8 +23,8 @@ type webhooksMapDiffer struct {
 func NewWebhooksMapDiffer() *webhooksMapDiffer {
 	return &webhooksMapDiffer{
 		internalDiff: NewInternalDiff(model.OAS_WEBHOOKS_KEY),
-		data:         model.Webhooks{},
-		data2:        model.Webhooks{},
+		data:         model.WebhooksMap{},
+		data2:        model.WebhooksMap{},
 	}
 }
 
@@ -158,28 +157,12 @@ func (w *webhooksMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 }
 
 func (w *webhooksMapDiffer) Match(a, b reflect.Value) bool {
-	return lib.AreType(a, b, reflect.TypeOf(model.Webhooks{}))
+	return lib.AreType(a, b, reflect.TypeOf(model.WebhooksMap{}))
 }
 
 func (w *webhooksMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if w.opts.Loose {
-		aValue, aOk := a.Interface().(model.Webhooks)
-		bValue, bOk := b.Interface().(model.Webhooks)
-
-		if aOk && bOk {
-			for ak, av := range aValue {
-				for bk, bv := range bValue {
-					// Ignore map key case sensitive
-					if len(ak) > 0 && len(bk) > 0 && ak != bk && strings.EqualFold(ak, bk) {
-						delete(aValue, ak)
-						aValue[strings.ToLower(ak)] = av
-
-						delete(bValue, bk)
-						bValue[strings.ToLower(bk)] = bv
-					}
-				}
-			}
-		}
+		handleLooseMap[model.WebhooksMap](a, b)
 	}
 
 	return w.differ.DiffMap(path, a, b)

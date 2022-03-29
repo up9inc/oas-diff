@@ -2,7 +2,6 @@ package differentiator
 
 import (
 	"reflect"
-	"strings"
 
 	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
@@ -163,23 +162,7 @@ func (p *pathsMapDiffer) Match(a, b reflect.Value) bool {
 
 func (p *pathsMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if p.opts.Loose {
-		aValue, aOk := a.Interface().(model.PathsMap)
-		bValue, bOk := b.Interface().(model.PathsMap)
-
-		if aOk && bOk {
-			for ak, av := range aValue {
-				for bk, bv := range bValue {
-					// Ignore map key case sensitive
-					if len(ak) > 0 && len(bk) > 0 && ak != bk && strings.EqualFold(ak, bk) {
-						delete(aValue, ak)
-						aValue[strings.ToLower(ak)] = av
-
-						delete(bValue, bk)
-						bValue[strings.ToLower(bk)] = bv
-					}
-				}
-			}
-		}
+		handleLooseMap[model.PathsMap](a, b)
 	}
 
 	return p.differ.DiffMap(path, a, b)

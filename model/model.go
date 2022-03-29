@@ -11,3 +11,7 @@ type Model interface {
 
 type AnyMap map[string]interface{}
 type StringsMap map[string]string
+
+type ModelMaps[V any] interface {
+	~map[string]V
+}

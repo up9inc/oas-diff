@@ -5,11 +5,13 @@ import "github.com/urfave/cli/v2"
 var (
 	BaseFileFlag = &cli.StringFlag{
 		Name:     "base-file",
+		Aliases:  []string{"f1"},
 		Usage:    "path of the base OAS 3.1 file",
 		Required: true,
 	}
 	SecondFileFlag = &cli.StringFlag{
 		Name:     "second-file",
+		Aliases:  []string{"f2"},
 		Usage:    "path of the second OAS 3.1 file",
 		Required: true,
 	}

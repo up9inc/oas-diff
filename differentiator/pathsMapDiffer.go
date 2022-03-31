@@ -78,12 +78,16 @@ func (p *pathsMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 		serversName := model.Servers{}.GetName()
 		parametersName := model.Parameters{}.GetName()
 
-		for _, path := range c.Path {
-			switch path {
+		// get the latest identifier only, if multiple provided
+		for i := len(c.Path) - 1; i >= 0; i-- {
+			switch c.Path[i] {
 			case serversName:
 				isServersArray = true
 			case parametersName:
 				isParametersArray = true
+			}
+			if isServersArray || isParametersArray {
+				break
 			}
 		}
 
@@ -99,7 +103,7 @@ func (p *pathsMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 		// paths.parameters || paths.operation.parameters
 		if isParametersArray {
 			// paths.parameters
-			if len(c.Path) == 3 {
+			if len(c.Path) > 1 && c.Path[1] == parametersName {
 				err = p.handleArrayChange(p.data[key].Parameters, p.data2[key].Parameters, c)
 				if err != nil {
 					return err

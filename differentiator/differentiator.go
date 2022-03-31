@@ -14,9 +14,10 @@ type Differentiator interface {
 }
 
 type DifferentiatorOptions struct {
-	Loose               bool `json:"loose"`
-	IncludeFilePath     bool `json:"include-file-path"`
-	ExcludeDescriptions bool `json:"exclude-descriptions"`
+	Loose              bool `json:"loose"`
+	IncludeFilePath    bool `json:"include-file-path"`
+	IgnoreDescriptions bool `json:"ignore-descriptions"`
+	IgnoreExamples     bool `json:"ignore-examples"`
 }
 
 type differentiator struct {

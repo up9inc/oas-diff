@@ -27,9 +27,15 @@ var (
 		Required: false,
 		Value:    false,
 	}
-	ExcludeDescriptionsFlag = &cli.BoolFlag{
-		Name:     "exclude-descriptions",
-		Usage:    "whether or not to exclude descriptions from the diff changelog",
+	IgnoreDescriptionsFlag = &cli.BoolFlag{
+		Name:     "ignore-descriptions",
+		Usage:    "whether or not to ignore descriptions when performing the diff",
+		Required: false,
+		Value:    false,
+	}
+	IgnoreExamplesFlag = &cli.BoolFlag{
+		Name:     "ignore-examples",
+		Usage:    "whether or not to ignore examples when performing the diff",
 		Required: false,
 		Value:    false,
 	}

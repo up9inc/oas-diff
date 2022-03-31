@@ -26,7 +26,7 @@ func (s *StringDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
-	if s.opts.ExcludeDescriptions && s.IsDescription(path) {
+	if s.opts.IgnoreDescriptions && s.IsDescription(path) {
 		return nil
 	}
 

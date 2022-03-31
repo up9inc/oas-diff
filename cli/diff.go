@@ -27,7 +27,8 @@ func RegisterDiffCmd() *cli.Command {
 			HtmlOutputFlag,
 			LooseFlag,
 			IncludeFilePathFlag,
-			ExcludeDescriptionsFlag,
+			IgnoreDescriptionsFlag,
+			IgnoreExamplesFlag,
 		},
 	}
 }
@@ -51,9 +52,10 @@ func diffCmd(c *cli.Context) error {
 
 	val := validator.NewValidator()
 	diff := differentiator.NewDifferentiator(val, differentiator.DifferentiatorOptions{
-		Loose:               c.Bool(LooseFlag.Name),
-		IncludeFilePath:     c.Bool(IncludeFilePathFlag.Name),
-		ExcludeDescriptions: c.Bool(ExcludeDescriptionsFlag.Name),
+		Loose:              c.Bool(LooseFlag.Name),
+		IncludeFilePath:    c.Bool(IncludeFilePathFlag.Name),
+		IgnoreDescriptions: c.Bool(IgnoreDescriptionsFlag.Name),
+		IgnoreExamples:     c.Bool(IgnoreExamplesFlag.Name),
 	})
 
 	changelog, err := diff.Diff(jsonFile, jsonFile2)

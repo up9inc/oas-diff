@@ -70,6 +70,8 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	differ, err := lib.NewDiffer(
 		// strings
 		lib.CustomValueDiffers(stringDiffer),
+		// structs
+		lib.CustomValueDiffers(componentsDiffer),
 		// slices
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),

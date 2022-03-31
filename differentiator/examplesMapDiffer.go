@@ -26,6 +26,10 @@ func (e *examplesMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (e *examplesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if e.opts.IgnoreExamples {
+		return nil
+	}
+
 	if e.opts.Loose {
 		handleLooseMap[model.ExamplesMap](a, b)
 	}

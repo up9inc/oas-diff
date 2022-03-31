@@ -26,6 +26,10 @@ func (c *contentMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (c *contentMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if c.opts.IgnoreExamples {
+		ignoreExamplesFromMaps[model.ContentMap](a, b)
+	}
+
 	if c.opts.Loose {
 		handleLooseMap[model.ContentMap](a, b)
 	}

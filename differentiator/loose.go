@@ -9,7 +9,7 @@ import (
 
 // TODO: HandleLooseArrays/Slices
 
-func handleLooseMap[T model.ModelMaps[V], V any](a, b reflect.Value) {
+func handleLooseMap[T model.MapsConstraint[V], V any](a, b reflect.Value) {
 	aValue, aOk := a.Interface().(T)
 	bValue, bOk := b.Interface().(T)
 
@@ -25,6 +25,40 @@ func handleLooseMap[T model.ModelMaps[V], V any](a, b reflect.Value) {
 					bValue[strings.ToLower(bk)] = bv
 				}
 			}
+		}
+	}
+}
+
+func ignoreExamplesFromMaps[T model.MapsConstraint[V], V model.ExamplesInterface](a, b reflect.Value) {
+	aValue, aOk := a.Interface().(T)
+	bValue, bOk := b.Interface().(T)
+
+	if aOk {
+		for _, av := range aValue {
+			av.IgnoreExamples()
+		}
+	}
+
+	if bOk {
+		for _, bv := range bValue {
+			bv.IgnoreExamples()
+		}
+	}
+}
+
+func ignoreExamplesFromSlices[T model.SlicesConstraint[V], V model.ExamplesInterface](a, b reflect.Value) {
+	aValue, aOk := a.Interface().(T)
+	bValue, bOk := b.Interface().(T)
+
+	if aOk {
+		for _, av := range aValue {
+			av.IgnoreExamples()
+		}
+	}
+
+	if bOk {
+		for _, bv := range bValue {
+			bv.IgnoreExamples()
 		}
 	}
 }

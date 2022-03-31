@@ -2,6 +2,9 @@ package model
 
 type SchemasMap map[string]*Schema
 
+// make sure we implement the Examples interface
+var _ ExamplesInterface = (*Schema)(nil)
+
 // TODO: []*Schema should be handled as an array like servers/parameters? If we do, what will be the identifier?
 // TODO: Support Extensions
 // TODO: Numbers should be uint64 or int/uint32?
@@ -62,11 +65,19 @@ type Schema struct {
 	XML           interface{}    `json:"xml,omitempty" diff:"xml"`
 	ExternalDocs  *ExternalDoc   `json:"externalDocs,omitempty" diff:"externalDocs"`
 	Example       interface{}    `json:"example,omitempty" diff:"example"`
-
-	Examples []interface{} `json:"examples,omitempty" diff:"examples"`
+	Examples      []interface{}  `json:"examples,omitempty" diff:"examples"`
 }
 
 type Discriminator struct {
 	PropertyName string     `json:"propertyName,omitempty" diff:"propertyName"`
 	Mapping      StringsMap `json:"mapping,omitempty" diff:"mapping"`
+}
+
+func (s *Schema) IgnoreExamples() {
+	if s.Example != nil {
+		s.Example = nil
+	}
+	if s.Examples != nil {
+		s.Examples = nil
+	}
 }

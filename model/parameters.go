@@ -10,21 +10,24 @@ var _ Array = (*Parameters)(nil)
 
 type Parameters []*Parameter
 
+// make sure we implement the Examples interface
+var _ ExamplesInterface = (*Parameter)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#parameter-object
 type Parameter struct {
-	Name            string                 `json:"name,omitempty" diff:"name,identifier"`
-	In              string                 `json:"in,omitempty" diff:"in"`
-	Description     string                 `json:"description,omitempty" diff:"description"`
-	Required        bool                   `json:"required,omitempty" diff:"required"`
-	Deprecated      bool                   `json:"deprecated,omitempty" diff:"deprecated"`
-	AllowEmptyValue bool                   `json:"allowEmptyValue,omitempty" diff:"allowEmptyValue"`
-	Style           string                 `json:"style,omitempty" diff:"style"`
-	Explode         bool                   `json:"explode,omitempty" diff:"explode"`
-	AllowReserved   bool                   `json:"allowReserved,omitempty" diff:"allowReserved"`
-	Schema          *Schema                `json:"schema,omitempty" diff:"schema"`
-	Example         interface{}            `json:"example,omitempty" diff:"example"`
-	Examples        map[string]interface{} `json:"examples,omitempty" diff:"examples"`
-	Content         ContentMap             `json:"content,omitempty" diff:"content"`
+	Name            string      `json:"name,omitempty" diff:"name,identifier"`
+	In              string      `json:"in,omitempty" diff:"in"`
+	Description     string      `json:"description,omitempty" diff:"description"`
+	Required        bool        `json:"required,omitempty" diff:"required"`
+	Deprecated      bool        `json:"deprecated,omitempty" diff:"deprecated"`
+	AllowEmptyValue bool        `json:"allowEmptyValue,omitempty" diff:"allowEmptyValue"`
+	Style           string      `json:"style,omitempty" diff:"style"`
+	Explode         bool        `json:"explode,omitempty" diff:"explode"`
+	AllowReserved   bool        `json:"allowReserved,omitempty" diff:"allowReserved"`
+	Schema          *Schema     `json:"schema,omitempty" diff:"schema"`
+	Example         interface{} `json:"example,omitempty" diff:"example"`
+	Examples        AnyMap      `json:"examples,omitempty" diff:"examples"`
+	Content         ContentMap  `json:"content,omitempty" diff:"content"`
 }
 
 func (p Parameters) GetName() string {
@@ -70,4 +73,13 @@ func (p Parameter) IsHeader() bool {
 func (p Parameter) IsIgnoredWhenLoose() bool {
 	name := strings.ToLower(p.Name)
 	return strings.HasPrefix(name, "x-") || name == "user-agent"
+}
+
+func (p *Parameter) IgnoreExamples() {
+	if p.Example != nil {
+		p.Example = nil
+	}
+	if p.Examples != nil {
+		p.Examples = nil
+	}
 }

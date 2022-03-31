@@ -12,6 +12,10 @@ type Model interface {
 type AnyMap map[string]interface{}
 type StringsMap map[string]string
 
-type ModelMaps[V any] interface {
+type MapsConstraint[V any] interface {
 	~map[string]V
+}
+
+type SlicesConstraint[V any] interface {
+	~[]V
 }

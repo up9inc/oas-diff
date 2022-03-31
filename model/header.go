@@ -2,6 +2,9 @@ package model
 
 type HeadersMap map[string]*Header
 
+// make sure we implement the Examples interface
+var _ ExamplesInterface = (*Header)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#header-object
 type Header struct {
 	Description     string      `json:"description,omitempty" diff:"description"`
@@ -15,4 +18,13 @@ type Header struct {
 	Example         interface{} `json:"example,omitempty" diff:"example"`
 	Examples        AnyMap      `json:"examples,omitempty" diff:"examples"`
 	Content         ContentMap  `json:"content,omitempty" diff:"content"`
+}
+
+func (h *Header) IgnoreExamples() {
+	if h.Example != nil {
+		h.Example = nil
+	}
+	if h.Examples != nil {
+		h.Examples = nil
+	}
 }

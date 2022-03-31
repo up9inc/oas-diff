@@ -28,6 +28,10 @@ func (p *ParametersDiffer) Match(a, b reflect.Value) bool {
 
 // TODO: Test if response Header is catched here
 func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if p.opts.IgnoreExamples {
+		ignoreExamplesFromSlices[model.Parameters](a, b)
+	}
+
 	if p.opts.Loose {
 		if a.Kind() == reflect.Invalid {
 			cl.Add(lib.CREATE, path, nil, lib.ExportInterface(b))

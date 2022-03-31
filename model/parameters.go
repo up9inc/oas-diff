@@ -67,7 +67,7 @@ func (p Parameters) FilterIdentifiers() []*ArrayIdentifierFilter {
 }
 
 func (p Parameter) IsHeader() bool {
-	return p.In == "header" || p.In == "Header" || p.In == "HEADER"
+	return strings.ToLower(p.In) == "header"
 }
 
 func (p Parameter) IsIgnoredWhenLoose() bool {

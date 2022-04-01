@@ -51,6 +51,9 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		bValue, bOk := b.Interface().(model.Parameters)
 
 		if aOk && bOk {
+			//var aToRemove []int
+			//var bToRemove []int
+
 			for ai, a := range aValue {
 				for bi, b := range bValue {
 					if a != nil && b != nil {
@@ -64,20 +67,36 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 
 						// Headers filter
 						// TODO: Support reggex value
+						// TODO: do not set nil, remove later to avoid issues
 						if a.IsHeader() {
 							// starts with x-
 							if a.IsIgnoredWhenLoose() {
+								//aToRemove = append(aToRemove, ai)
 								aValue[ai] = nil
 							}
 						}
 						if b.IsHeader() {
 							if b.IsIgnoredWhenLoose() {
+								//bToRemove = append(bToRemove, bi)
 								bValue[bi] = nil
 							}
 						}
 					}
 				}
 			}
+
+			/* 			for _, ai := range aToRemove {
+			   				aValue[ai] = aValue[len(aValue)-1] // Copy last element to index i.
+			   				aValue[len(aValue)-1] = nil        // Erase last element (write zero value).
+			   				aValue = aValue[:len(aValue)-1]    // Truncate slice.
+			   			}
+
+			   			for _, bi := range bToRemove {
+			   				bValue[bi] = bValue[len(bValue)-1] // Copy last element to index i.
+			   				bValue[len(bValue)-1] = nil        // Erase last element (write zero value).
+			   				bValue = bValue[:len(bValue)-1]    // Truncate slice.
+			   			} */
+
 		}
 	}
 

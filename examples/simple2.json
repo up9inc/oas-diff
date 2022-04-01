@@ -20,19 +20,21 @@
   ],
   "paths": {
     "/users": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "style": "simple",
+          "schema": {
+            "type": "string",
+            "pattern": ".+(_|-ABC-|\\.).+"
+          },
+          "example": "some example"
+        }
+      ],
       "get": {
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "pattern": ".+(_|-ABC-|\\.).+"
-            },
-            "example": "custom uuid"
-          },
           {
             "in": "header",
             "name": "x-custom",

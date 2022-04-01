@@ -18,6 +18,17 @@
     "/users": {
       "parameters": [
         {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "style": "simple",
+          "schema": {
+            "type": "string",
+            "pattern": ".+(_|-ABC-|\\.).+"
+          },
+          "example": "custom uuid"
+        },
+        {
           "in": "header",
           "name": "accept",
           "required": false,

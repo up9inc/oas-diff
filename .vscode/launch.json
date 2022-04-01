@@ -32,11 +32,9 @@
             "args": [
                 "diff",
                 "--base-file",
-                "acceptanceTests/data/responses.json",
+                "test/travis.json",
                 "--second-file",
-                "acceptanceTests/data/responses2.json",
-                "--loose",
-                "--html"
+                "test/travis2.json",
             ]
         }
     ]        

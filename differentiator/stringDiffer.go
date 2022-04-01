@@ -61,5 +61,8 @@ func (s *StringDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect
 }
 
 func (s *StringDiffer) IsDescription(path []string) bool {
+	if len(path) == 0 {
+		return false
+	}
 	return path[len(path)-1] == "description"
 }

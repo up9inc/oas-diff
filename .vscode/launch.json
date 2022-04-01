@@ -32,9 +32,10 @@
             "args": [
                 "diff",
                 "--base-file",
-                "test/travis.json",
+                "examples/simple.json",
                 "--second-file",
-                "test/travis2.json",
+                "examples/simple2.json",
+                "--loose"
             ]
         }
     ]        

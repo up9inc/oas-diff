@@ -43,10 +43,11 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	infoDiff := NewInfoDiff()
 	componentsDiffer := NewComponentsDiffer()
 	externalDocsDiffer := NewExternalDocsDiffer()
+	parameterDiffer := NewParameterDiffer(opts)
 
 	// slices
 	serversDiffer := NewServersDiffer()
-	parametersDiffer := NewParameterDiffer(opts)
+	parametersDiffer := NewParametersDiffer(opts)
 	tagsDiffer := NewTagsDiffer()
 	securityRequirementsDiffer := NewSecurityRequirementsDiffer()
 
@@ -72,6 +73,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(stringDiffer),
 		// structs
 		lib.CustomValueDiffers(componentsDiffer),
+		lib.CustomValueDiffers(parameterDiffer),
 		// slices
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
@@ -106,6 +108,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	infoDiff.differ = differ
 	componentsDiffer.differ = differ
 	externalDocsDiffer.differ = differ
+	parameterDiffer.differ = differ
 	// slices
 	serversDiffer.differ = differ
 	parametersDiffer.differ = differ

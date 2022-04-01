@@ -15,7 +15,7 @@ type ParametersDiffer struct {
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewParameterDiffer(opts DifferentiatorOptions) *ParametersDiffer {
+func NewParametersDiffer(opts DifferentiatorOptions) *ParametersDiffer {
 	return &ParametersDiffer{
 		opts:   opts,
 		differ: nil,
@@ -51,8 +51,8 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		bValue, bOk := b.Interface().(model.Parameters)
 
 		if aOk && bOk {
-			//var aToRemove []int
-			//var bToRemove []int
+			var aToRemove []int
+			var bToRemove []int
 
 			for ai, a := range aValue {
 				for bi, b := range bValue {
@@ -64,39 +64,49 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 							aValue[ai].Name = strings.ToLower(aValue[ai].Name)
 							bValue[bi].Name = strings.ToLower(bValue[bi].Name)
 						}
+					}
 
-						// Headers filter
-						// TODO: Support reggex value
-						// TODO: do not set nil, remove later to avoid issues
-						if a.IsHeader() {
-							// starts with x-
-							if a.IsIgnoredWhenLoose() {
-								//aToRemove = append(aToRemove, ai)
-								aValue[ai] = nil
+					// Headers filter
+					// ignore parameters header that starts with x- or is an user-agent
+					if a != nil && a.IsHeader() && a.IsIgnoredWhenLoose() {
+						var exists bool
+						for _, v := range aToRemove {
+							if v == ai {
+								exists = true
+								break
 							}
 						}
-						if b.IsHeader() {
-							if b.IsIgnoredWhenLoose() {
-								//bToRemove = append(bToRemove, bi)
-								bValue[bi] = nil
-							}
+						if !exists {
+							aToRemove = append(aToRemove, ai)
 						}
 					}
+					if b != nil && b.IsHeader() && b.IsIgnoredWhenLoose() {
+						var exists bool
+						for _, v := range bToRemove {
+							if v == bi {
+								exists = true
+								break
+							}
+						}
+						if !exists {
+							bToRemove = append(bToRemove, bi)
+						}
+					}
+
 				}
 			}
 
-			/* 			for _, ai := range aToRemove {
-			   				aValue[ai] = aValue[len(aValue)-1] // Copy last element to index i.
-			   				aValue[len(aValue)-1] = nil        // Erase last element (write zero value).
-			   				aValue = aValue[:len(aValue)-1]    // Truncate slice.
-			   			}
+			for _, ai := range aToRemove {
+				aValue[ai] = aValue[len(aValue)-1] // Copy last element to index i.
+				aValue[len(aValue)-1] = nil        // Erase last element (write zero value).
+				aValue = aValue[:len(aValue)-1]    // Truncate slice.
+			}
 
-			   			for _, bi := range bToRemove {
-			   				bValue[bi] = bValue[len(bValue)-1] // Copy last element to index i.
-			   				bValue[len(bValue)-1] = nil        // Erase last element (write zero value).
-			   				bValue = bValue[:len(bValue)-1]    // Truncate slice.
-			   			} */
-
+			for _, bi := range bToRemove {
+				bValue[bi] = bValue[len(bValue)-1] // Copy last element to index i.
+				bValue[len(bValue)-1] = nil        // Erase last element (write zero value).
+				bValue = bValue[:len(bValue)-1]    // Truncate slice.
+			}
 		}
 	}
 

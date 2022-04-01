@@ -69,6 +69,11 @@ func (p *pathsMapDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.Jso
 
 func (p *pathsMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 	for _, c := range changes {
+		if len(c.Path) == 0 {
+			p.internalDiff.handleChange(c)
+			continue
+		}
+
 		key := c.Path[0]
 
 		var isServersArray bool

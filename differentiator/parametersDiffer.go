@@ -6,6 +6,7 @@ import (
 
 	lib "github.com/r3labs/diff/v2"
 	"github.com/up9inc/oas-diff/model"
+	"github.com/up9inc/oas-diff/util"
 )
 
 type ParametersDiffer struct {
@@ -69,43 +70,29 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 					// Headers filter
 					// ignore parameters header that starts with x- or is an user-agent
 					if a != nil && a.IsHeader() && a.IsIgnoredWhenLoose() {
-						var exists bool
-						for _, v := range aToRemove {
-							if v == ai {
-								exists = true
-								break
-							}
-						}
-						if !exists {
-							aToRemove = append(aToRemove, ai)
-						}
+						aToRemove = util.SliceElementAddUnique(aToRemove, ai)
 					}
 					if b != nil && b.IsHeader() && b.IsIgnoredWhenLoose() {
-						var exists bool
-						for _, v := range bToRemove {
-							if v == bi {
-								exists = true
-								break
-							}
-						}
-						if !exists {
-							bToRemove = append(bToRemove, bi)
-						}
+						bToRemove = util.SliceElementAddUnique(bToRemove, bi)
 					}
 
 				}
 			}
 
-			for _, ai := range aToRemove {
-				aValue[ai] = aValue[len(aValue)-1] // Copy last element to index i.
-				aValue[len(aValue)-1] = nil        // Erase last element (write zero value).
-				aValue = aValue[:len(aValue)-1]    // Truncate slice.
+			if len(aToRemove) > 0 {
+				for _, ai := range aToRemove {
+					aValue = util.SliceElementRemoveAtIndex(aValue, ai)
+				}
+				// we need to update the reflect ref since we allocated a new slice after the removing elements
+				a = reflect.ValueOf(aValue)
 			}
 
-			for _, bi := range bToRemove {
-				bValue[bi] = bValue[len(bValue)-1] // Copy last element to index i.
-				bValue[len(bValue)-1] = nil        // Erase last element (write zero value).
-				bValue = bValue[:len(bValue)-1]    // Truncate slice.
+			if len(bToRemove) > 0 {
+				for _, bi := range bToRemove {
+					bValue = util.SliceElementRemoveAtIndex(bValue, bi)
+				}
+				// we need to update the reflect ref since we allocated a new slice after the removing elements
+				b = reflect.ValueOf(bValue)
 			}
 		}
 	}

@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: up9inc/diff
-          ref: feature/public_diff_functions
+          ref: feature/custom_differ_interceptor
           path: lib
 
       - name: Diff Lib Tests

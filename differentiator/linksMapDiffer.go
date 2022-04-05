@@ -25,12 +25,12 @@ func (l *linksMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.LinksMap{}))
 }
 
-func (l *linksMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (l *linksMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if l.opts.Loose {
 		handleLooseMap[model.LinksMap](a, b)
 	}
 
-	return l.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (l *linksMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

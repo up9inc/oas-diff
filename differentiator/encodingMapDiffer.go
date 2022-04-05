@@ -25,12 +25,12 @@ func (e *encodingMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.EncodingMap{}))
 }
 
-func (e *encodingMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (e *encodingMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if e.opts.Loose {
 		handleLooseMap[model.EncodingMap](a, b)
 	}
 
-	return e.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (e *encodingMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

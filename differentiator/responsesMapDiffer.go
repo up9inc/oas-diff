@@ -25,12 +25,12 @@ func (r *responsesMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.ResponsesMap{}))
 }
 
-func (r *responsesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (r *responsesMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if r.opts.Loose {
 		handleLooseMap[model.ResponsesMap](a, b)
 	}
 
-	return r.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (r *responsesMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

@@ -169,12 +169,12 @@ func (w *webhooksMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.WebhooksMap{}))
 }
 
-func (w *webhooksMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (w *webhooksMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if w.opts.Loose {
 		handleLooseMap[model.WebhooksMap](a, b)
 	}
 
-	return w.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (w *webhooksMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

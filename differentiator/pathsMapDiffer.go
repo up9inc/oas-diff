@@ -169,12 +169,12 @@ func (p *pathsMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.PathsMap{}))
 }
 
-func (p *pathsMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (p *pathsMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if p.opts.Loose {
 		handleLooseMap[model.PathsMap](a, b)
 	}
 
-	return p.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (p *pathsMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

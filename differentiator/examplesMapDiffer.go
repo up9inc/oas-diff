@@ -25,7 +25,7 @@ func (e *examplesMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.ExamplesMap{}))
 }
 
-func (e *examplesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (e *examplesMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if e.opts.IgnoreExamples {
 		return nil
 	}
@@ -34,7 +34,7 @@ func (e *examplesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.
 		handleLooseMap[model.ExamplesMap](a, b)
 	}
 
-	return e.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (e *examplesMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

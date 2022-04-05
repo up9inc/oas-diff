@@ -10,6 +10,7 @@ type Model interface {
 }
 
 type AnyMap map[string]interface{}
+type AnySlice []interface{}
 type StringsMap map[string]string
 
 type MapsConstraint[V any] interface {
@@ -18,4 +19,8 @@ type MapsConstraint[V any] interface {
 
 type SlicesConstraint[V any] interface {
 	~[]V
+}
+
+type ExtensionProps struct {
+	Extensions map[string]interface{} `json:"-" diff:"-"`
 }

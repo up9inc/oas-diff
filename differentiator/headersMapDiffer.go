@@ -25,7 +25,7 @@ func (h *headersMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.HeadersMap{}))
 }
 
-func (h *headersMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (h *headersMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if h.opts.IgnoreExamples {
 		ignoreExamplesFromMaps[model.HeadersMap](a, b)
 	}
@@ -34,7 +34,7 @@ func (h *headersMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		handleLooseMap[model.HeadersMap](a, b)
 	}
 
-	return h.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (h *headersMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

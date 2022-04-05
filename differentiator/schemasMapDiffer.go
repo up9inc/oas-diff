@@ -25,7 +25,7 @@ func (s *schemasMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.SchemasMap{}))
 }
 
-func (s *schemasMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (s *schemasMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if s.opts.IgnoreExamples {
 		ignoreExamplesFromMaps[model.SchemasMap](a, b)
 	}
@@ -34,7 +34,7 @@ func (s *schemasMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		handleLooseMap[model.SchemasMap](a, b)
 	}
 
-	return s.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (s *schemasMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

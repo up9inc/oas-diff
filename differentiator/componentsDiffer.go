@@ -73,7 +73,7 @@ func (c *componentsDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.Components{}))
 }
 
-func (c *componentsDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (c *componentsDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if c.opts.IgnoreExamples {
 		aValue, aOk := a.Interface().(model.Components)
 		bValue, bOk := b.Interface().(model.Components)
@@ -87,7 +87,7 @@ func (c *componentsDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		}
 	}
 
-	return c.differ.DiffStruct(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (c *componentsDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

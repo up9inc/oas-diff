@@ -25,12 +25,12 @@ func (p *parametersMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.ParametersMap{}))
 }
 
-func (p *parametersMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (p *parametersMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if p.opts.Loose {
 		handleLooseMap[model.ParametersMap](a, b)
 	}
 
-	return p.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (p *parametersMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

@@ -25,7 +25,7 @@ func (c *contentMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.ContentMap{}))
 }
 
-func (c *contentMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (c *contentMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if c.opts.IgnoreExamples {
 		ignoreExamplesFromMaps[model.ContentMap](a, b)
 	}
@@ -34,7 +34,7 @@ func (c *contentMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 		handleLooseMap[model.ContentMap](a, b)
 	}
 
-	return c.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (c *contentMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

@@ -25,12 +25,12 @@ func (c *callbacksMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.CallbacksMap{}))
 }
 
-func (c *callbacksMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (c *callbacksMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if c.opts.Loose {
 		handleLooseMap[model.CallbacksMap](a, b)
 	}
 
-	return c.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (c *callbacksMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

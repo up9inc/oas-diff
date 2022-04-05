@@ -44,12 +44,14 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	componentsDiffer := NewComponentsDiffer()
 	externalDocsDiffer := NewExternalDocsDiffer()
 	parameterDiffer := NewParameterDiffer(opts)
+	schemaDiffer := NewSchemaDiffer(opts)
 
 	// slices
 	serversDiffer := NewServersDiffer()
 	parametersDiffer := NewParametersDiffer(opts)
 	tagsDiffer := NewTagsDiffer()
 	securityRequirementsDiffer := NewSecurityRequirementsDiffer()
+	schemasSlicesDiffer := NewSchemasSliceDiffer(opts)
 
 	// maps
 	anyMapDiffer := NewAnyMapDiffer(opts)
@@ -74,10 +76,12 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		// structs
 		lib.CustomValueDiffers(componentsDiffer),
 		lib.CustomValueDiffers(parameterDiffer),
+		lib.CustomValueDiffers(schemaDiffer),
 		// slices
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
 		lib.CustomValueDiffers(tagsDiffer),
+		lib.CustomValueDiffers(schemasSlicesDiffer),
 		// maps
 		lib.CustomValueDiffers(anyMapDiffer),
 		lib.CustomValueDiffers(stringsMapDiffer),
@@ -109,11 +113,13 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	componentsDiffer.differ = differ
 	externalDocsDiffer.differ = differ
 	parameterDiffer.differ = differ
+	schemaDiffer.differ = differ
 	// slices
 	serversDiffer.differ = differ
 	parametersDiffer.differ = differ
 	tagsDiffer.differ = differ
 	securityRequirementsDiffer.differ = differ
+	schemasSlicesDiffer.differ = differ
 	// maps
 	anyMapDiffer.differ = differ
 	stringsMapDiffer.differ = differ

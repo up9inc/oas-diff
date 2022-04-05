@@ -74,22 +74,8 @@ func (s *serversDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.Servers{}))
 }
 
-func (s *serversDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (s *serversDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if s.opts.Loose {
-		if a.Kind() == reflect.Invalid {
-			cl.Add(lib.CREATE, path, nil, lib.ExportInterface(b))
-			return nil
-		}
-
-		if b.Kind() == reflect.Invalid {
-			cl.Add(lib.DELETE, path, lib.ExportInterface(a), nil)
-			return nil
-		}
-
-		if a.Kind() != b.Kind() {
-			return lib.ErrTypeMismatch
-		}
-
 		aValue, aOk := a.Interface().(model.Servers)
 		bValue, bOk := b.Interface().(model.Servers)
 
@@ -112,7 +98,7 @@ func (s *serversDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Valu
 		}
 	}
 
-	return s.differ.DiffSlice(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (s *serversDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

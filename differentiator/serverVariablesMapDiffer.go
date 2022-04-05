@@ -8,16 +8,14 @@ import (
 )
 
 type serverVariablesMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewServerVariablesMapDiffer(opts DifferentiatorOptions) *serverVariablesMapDiffer {
 	return &serverVariablesMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

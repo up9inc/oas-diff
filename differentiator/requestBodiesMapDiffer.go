@@ -9,16 +9,14 @@ import (
 )
 
 type requestBodiesMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewRequestBodiesMapDiffer(opts DifferentiatorOptions) *requestBodiesMapDiffer {
 	return &requestBodiesMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

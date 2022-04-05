@@ -8,16 +8,14 @@ import (
 )
 
 type examplesMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewExamplesMapDiffer(opts DifferentiatorOptions) *examplesMapDiffer {
 	return &examplesMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

@@ -106,37 +106,6 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		panic(err)
 	}
 
-	// strings
-	stringDiffer.differ = differ
-	// structs
-	infoDiff.differ = differ
-	componentsDiffer.differ = differ
-	externalDocsDiffer.differ = differ
-	parameterDiffer.differ = differ
-	schemaDiffer.differ = differ
-	// slices
-	serversDiffer.differ = differ
-	parametersDiffer.differ = differ
-	tagsDiffer.differ = differ
-	securityRequirementsDiffer.differ = differ
-	schemasSlicesDiffer.differ = differ
-	// maps
-	anyMapDiffer.differ = differ
-	stringsMapDiffer.differ = differ
-	schemasMapDiffer.differ = differ
-	pathsMapDiffer.differ = differ
-	webhooksMapDiffer.differ = differ
-	headersMapDiffer.differ = differ
-	parametersMapDiffer.differ = differ
-	responsesMapDiffer.differ = differ
-	contentMapDiffer.differ = differ
-	encodingMapDiffer.differ = differ
-	linksMapDiffer.differ = differ
-	callbacksMapDiffer.differ = differ
-	examplesMapDiffer.differ = differ
-	serverVariablesMapDiffer.differ = differ
-	requestBodiesMapDiffer.differ = differ
-
 	v := &differentiator{
 		validator:    val,
 		opts:         opts,

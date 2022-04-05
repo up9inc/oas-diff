@@ -8,16 +8,14 @@ import (
 )
 
 type schemasSliceDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewSchemasSliceDiffer(opts DifferentiatorOptions) *schemasSliceDiffer {
 	return &schemasSliceDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

@@ -8,16 +8,14 @@ import (
 )
 
 type StringDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewStringDiffer(opts DifferentiatorOptions) *StringDiffer {
 	return &StringDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

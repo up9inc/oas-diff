@@ -8,16 +8,14 @@ import (
 )
 
 type callbacksMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewCallbacksMapDiffer(opts DifferentiatorOptions) *callbacksMapDiffer {
 	return &callbacksMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

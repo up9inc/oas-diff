@@ -8,16 +8,14 @@ import (
 )
 
 type contentMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewContentMapDiffer(opts DifferentiatorOptions) *contentMapDiffer {
 	return &contentMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

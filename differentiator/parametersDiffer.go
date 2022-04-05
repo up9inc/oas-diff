@@ -10,16 +10,14 @@ import (
 )
 
 type ParametersDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewParametersDiffer(opts DifferentiatorOptions) *ParametersDiffer {
 	return &ParametersDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

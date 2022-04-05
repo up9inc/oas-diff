@@ -8,16 +8,14 @@ import (
 )
 
 type linksMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewLinksMapDiffer(opts DifferentiatorOptions) *linksMapDiffer {
 	return &linksMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

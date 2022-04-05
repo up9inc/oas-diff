@@ -8,16 +8,14 @@ import (
 )
 
 type headersMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewHeadersMapDiffer(opts DifferentiatorOptions) *headersMapDiffer {
 	return &headersMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 

@@ -13,6 +13,9 @@ var _ Model = (*Components)(nil)
 type ParametersMap map[string]*Parameter
 type RequestBodiesMap map[string]*RequestBody
 
+// make sure we implement the Examples interface
+var _ ExamplesInterface = (*Components)(nil)
+
 // TODO: Implement the generic Reference Object
 // https://spec.openapis.org/oas/v3.1.0#components-object
 type Components struct {
@@ -38,4 +41,10 @@ func (c *Components) Parse(file file.JsonFile) error {
 	}
 
 	return nil
+}
+
+func (c *Components) IgnoreExamples() {
+	if c.Examples != nil {
+		c.Examples = nil
+	}
 }

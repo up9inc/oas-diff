@@ -136,13 +136,18 @@ func (h *htmlReporter) buildPathChangelogList() []pathChangelog {
 
 	for k, v := range h.output.Changelog {
 		for _, c := range v {
+
 			// ignore others non-paths keys
 			if k != model.OAS_PATHS_KEY && k != model.OAS_WEBHOOKS_KEY {
 				continue
 			}
 
 			var op string
-			endpoint := c.Path[0]
+			var endpoint string
+
+			if len(c.Path) > 0 {
+				endpoint = c.Path[0]
+			}
 			if len(c.Path) > 1 && c.Path[1] != "parameters" {
 				op = c.Path[1]
 			}
@@ -173,8 +178,11 @@ func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
 			}
 
 			var op string
-			endpoint := c.Path[0]
-			//if len(c.Path) > 1 && c.Path[1] != "parameters" {
+			var endpoint string
+
+			if len(c.Path) > 0 {
+				endpoint = c.Path[0]
+			}
 			if len(c.Path) > 1 {
 				op = c.Path[1]
 			}

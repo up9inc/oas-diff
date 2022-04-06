@@ -14,9 +14,10 @@ type Differentiator interface {
 }
 
 type DifferentiatorOptions struct {
-	Loose               bool `json:"loose"`
-	IncludeFilePath     bool `json:"include-file-path"`
-	ExcludeDescriptions bool `json:"exclude-descriptions"`
+	Loose              bool `json:"loose"`
+	IncludeFilePath    bool `json:"include-file-path"`
+	IgnoreDescriptions bool `json:"ignore-descriptions"`
+	IgnoreExamples     bool `json:"ignore-examples"`
 }
 
 type differentiator struct {
@@ -42,12 +43,15 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	infoDiff := NewInfoDiff()
 	componentsDiffer := NewComponentsDiffer()
 	externalDocsDiffer := NewExternalDocsDiffer()
+	parameterDiffer := NewParameterDiffer(opts)
+	schemaDiffer := NewSchemaDiffer(opts)
 
 	// slices
 	serversDiffer := NewServersDiffer()
-	parametersDiffer := NewParameterDiffer(opts)
+	parametersDiffer := NewParametersDiffer(opts)
 	tagsDiffer := NewTagsDiffer()
 	securityRequirementsDiffer := NewSecurityRequirementsDiffer()
+	schemasSlicesDiffer := NewSchemasSliceDiffer(opts)
 
 	// maps
 	anyMapDiffer := NewAnyMapDiffer(opts)
@@ -69,10 +73,15 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	differ, err := lib.NewDiffer(
 		// strings
 		lib.CustomValueDiffers(stringDiffer),
+		// structs
+		lib.CustomValueDiffers(componentsDiffer),
+		lib.CustomValueDiffers(parameterDiffer),
+		lib.CustomValueDiffers(schemaDiffer),
 		// slices
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
 		lib.CustomValueDiffers(tagsDiffer),
+		lib.CustomValueDiffers(schemasSlicesDiffer),
 		// maps
 		lib.CustomValueDiffers(anyMapDiffer),
 		lib.CustomValueDiffers(stringsMapDiffer),
@@ -96,34 +105,6 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	if err != nil {
 		panic(err)
 	}
-
-	// strings
-	stringDiffer.differ = differ
-	// structs
-	infoDiff.differ = differ
-	componentsDiffer.differ = differ
-	externalDocsDiffer.differ = differ
-	// slices
-	serversDiffer.differ = differ
-	parametersDiffer.differ = differ
-	tagsDiffer.differ = differ
-	securityRequirementsDiffer.differ = differ
-	// maps
-	anyMapDiffer.differ = differ
-	stringsMapDiffer.differ = differ
-	schemasMapDiffer.differ = differ
-	pathsMapDiffer.differ = differ
-	webhooksMapDiffer.differ = differ
-	headersMapDiffer.differ = differ
-	parametersMapDiffer.differ = differ
-	responsesMapDiffer.differ = differ
-	contentMapDiffer.differ = differ
-	encodingMapDiffer.differ = differ
-	linksMapDiffer.differ = differ
-	callbacksMapDiffer.differ = differ
-	examplesMapDiffer.differ = differ
-	serverVariablesMapDiffer.differ = differ
-	requestBodiesMapDiffer.differ = differ
 
 	v := &differentiator{
 		validator:    val,

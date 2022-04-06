@@ -9,16 +9,14 @@ import (
 )
 
 type requestBodiesMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewRequestBodiesMapDiffer(opts DifferentiatorOptions) *requestBodiesMapDiffer {
 	return &requestBodiesMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 
@@ -26,7 +24,7 @@ func (r *requestBodiesMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.RequestBodiesMap{}))
 }
 
-func (r *requestBodiesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (r *requestBodiesMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if r.opts.Loose {
 		aValue, aOk := a.Interface().(model.RequestBodiesMap)
 		bValue, bOk := b.Interface().(model.RequestBodiesMap)
@@ -47,7 +45,7 @@ func (r *requestBodiesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b ref
 		}
 	}
 
-	return r.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (r *requestBodiesMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

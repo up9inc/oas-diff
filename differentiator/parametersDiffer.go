@@ -6,19 +6,18 @@ import (
 
 	lib "github.com/r3labs/diff/v2"
 	"github.com/up9inc/oas-diff/model"
+	"github.com/up9inc/oas-diff/util"
 )
 
 type ParametersDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
-func NewParameterDiffer(opts DifferentiatorOptions) *ParametersDiffer {
+func NewParametersDiffer(opts DifferentiatorOptions) *ParametersDiffer {
 	return &ParametersDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 
@@ -27,26 +26,19 @@ func (p *ParametersDiffer) Match(a, b reflect.Value) bool {
 }
 
 // TODO: Test if response Header is catched here
-func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (p *ParametersDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if p.opts.IgnoreExamples {
+		ignoreExamplesFromSlices[model.Parameters](a, b)
+	}
+
 	if p.opts.Loose {
-		if a.Kind() == reflect.Invalid {
-			cl.Add(lib.CREATE, path, nil, lib.ExportInterface(b))
-			return nil
-		}
-
-		if b.Kind() == reflect.Invalid {
-			cl.Add(lib.DELETE, path, lib.ExportInterface(a), nil)
-			return nil
-		}
-
-		if a.Kind() != b.Kind() {
-			return lib.ErrTypeMismatch
-		}
-
 		aValue, aOk := a.Interface().(model.Parameters)
 		bValue, bOk := b.Interface().(model.Parameters)
 
 		if aOk && bOk {
+			var aToRemove []int
+			var bToRemove []int
+
 			for ai, a := range aValue {
 				for bi, b := range bValue {
 					if a != nil && b != nil {
@@ -57,27 +49,39 @@ func (p *ParametersDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.V
 							aValue[ai].Name = strings.ToLower(aValue[ai].Name)
 							bValue[bi].Name = strings.ToLower(bValue[bi].Name)
 						}
-
-						// Headers filter
-						// TODO: Support reggex value
-						if a.IsHeader() {
-							// starts with x-
-							if a.IsIgnoredWhenLoose() {
-								aValue[ai] = nil
-							}
-						}
-						if b.IsHeader() {
-							if b.IsIgnoredWhenLoose() {
-								bValue[bi] = nil
-							}
-						}
 					}
+
+					// Headers filter
+					// ignore parameters header that starts with x- or is an user-agent
+					if a != nil && a.IsHeader() && a.IsIgnoredWhenLoose() {
+						aToRemove = util.SliceElementAddUnique(aToRemove, ai)
+					}
+					if b != nil && b.IsHeader() && b.IsIgnoredWhenLoose() {
+						bToRemove = util.SliceElementAddUnique(bToRemove, bi)
+					}
+
 				}
+			}
+
+			if len(aToRemove) > 0 {
+				for _, ai := range aToRemove {
+					aValue = util.SliceElementRemoveAtIndex(aValue, ai)
+				}
+				// we need to update the reflect ref since we allocated a new slice after removing elements
+				a = reflect.ValueOf(aValue)
+			}
+
+			if len(bToRemove) > 0 {
+				for _, bi := range bToRemove {
+					bValue = util.SliceElementRemoveAtIndex(bValue, bi)
+				}
+				// we need to update the reflect ref since we allocated a new slice after removing elements
+				b = reflect.ValueOf(bValue)
 			}
 		}
 	}
 
-	return p.differ.DiffSlice(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (p *ParametersDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

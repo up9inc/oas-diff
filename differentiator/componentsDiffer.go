@@ -68,3 +68,28 @@ func (c *componentsDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.J
 
 	return nil
 }
+
+func (c *componentsDiffer) Match(a, b reflect.Value) bool {
+	return lib.AreType(a, b, reflect.TypeOf(model.Components{}))
+}
+
+func (c *componentsDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if c.opts.IgnoreExamples {
+		aValue, aOk := a.Interface().(model.Components)
+		bValue, bOk := b.Interface().(model.Components)
+
+		if aOk {
+			aValue.IgnoreExamples()
+		}
+
+		if bOk {
+			bValue.IgnoreExamples()
+		}
+	}
+
+	return df(path, a, b, parent)
+}
+
+func (c *componentsDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+	c.DiffFunc = dfunc
+}

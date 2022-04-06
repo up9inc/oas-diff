@@ -46,8 +46,11 @@
                             {{if .Status.ExecutionFlags.IncludeFilePath}}
                             --include-file-path
                             {{end}}
-                            {{if .Status.ExecutionFlags.ExcludeDescriptions}}
-                            --exclude-descriptions
+                            {{if .Status.ExecutionFlags.IgnoreDescriptions}}
+                            --ignore-descriptions
+                            {{end}}
+                            {{if .Status.ExecutionFlags.IgnoreExamples}}
+                            --ignore-examples
                             {{end}}
                         </td>
                     </tr>

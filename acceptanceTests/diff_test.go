@@ -324,7 +324,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	// info
 	info := output.Changelog[model.OAS_INFO_KEY]
 
-	if opts.ExcludeDescriptions {
+	if opts.IgnoreDescriptions {
 		assert.Len(info, 1, "info should have 1 change")
 
 		// info[0]
@@ -355,7 +355,7 @@ func SimpleDiffLoose(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	}
 
 	// servers
-	if !opts.ExcludeDescriptions {
+	if !opts.IgnoreDescriptions {
 		servers := output.Changelog[model.OAS_SERVERS_KEY]
 		assert.Len(servers, 1, "servers should have 1 change")
 
@@ -869,8 +869,8 @@ func (d *DiffSuite) TestSimpleLooseDiffWithExcludeDescriptions() {
 	}
 
 	opts := differentiator.DifferentiatorOptions{
-		Loose:               true,
-		ExcludeDescriptions: true,
+		Loose:              true,
+		IgnoreDescriptions: true,
 	}
 	d.diff = differentiator.NewDifferentiator(d.vall, opts)
 	SimpleDiffLoose(d, opts)

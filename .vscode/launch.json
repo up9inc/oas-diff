@@ -32,11 +32,10 @@
             "args": [
                 "diff",
                 "--base-file",
-                "acceptanceTests/data/responses.json",
+                "examples/simple.json",
                 "--second-file",
-                "acceptanceTests/data/responses2.json",
-                "--loose",
-                "--html"
+                "examples/simple2.json",
+                "--loose"
             ]
         }
     ]        

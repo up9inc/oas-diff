@@ -1,6 +1,10 @@
 package model
 
 type SchemasMap map[string]*Schema
+type SchemasSlice []*Schema
+
+// make sure we implement the Examples interface
+var _ ExamplesInterface = (*Schema)(nil)
 
 // TODO: []*Schema should be handled as an array like servers/parameters? If we do, what will be the identifier?
 // TODO: Support Extensions
@@ -10,9 +14,9 @@ type SchemasMap map[string]*Schema
 type Schema struct {
 	// Schema
 	Defs                 SchemasMap            `json:"$defs,omitempty" diff:"$defs"`
-	OneOf                []*Schema             `json:"oneOf,omitempty" diff:"oneOf"`
-	AnyOf                []*Schema             `json:"anyOf,omitempty" diff:"anyOf"`
-	AllOf                []*Schema             `json:"allOf,omitempty" diff:"allOf"`
+	OneOf                SchemasSlice          `json:"oneOf,omitempty" diff:"oneOf"`
+	AnyOf                SchemasSlice          `json:"anyOf,omitempty" diff:"anyOf"`
+	AllOf                SchemasSlice          `json:"allOf,omitempty" diff:"allOf"`
 	Not                  *Schema               `json:"not,omitempty" diff:"not"`
 	If                   *Schema               `json:"if,omitempty" diff:"if"`
 	Then                 *Schema               `json:"then,omitempty" diff:"then"`
@@ -20,8 +24,8 @@ type Schema struct {
 	Properties           SchemasMap            `json:"properties,omitempty" diff:"properties"`
 	PropertyNames        *Schema               `json:"propertyNames,omitempty" diff:"propertyNames"`
 	PrefixItems          []*Schema             `json:"prefixItems,omitempty" diff:"prefixItems"`
-	Items                interface{}           `json:"items,omitempty" diff:"items"`
-	Enum                 []interface{}         `json:"enum,omitempty" diff:"enum"`
+	Items                *Schema               `json:"items,omitempty" diff:"items"`
+	Enum                 []string              `json:"enum,omitempty" diff:"enum"`
 	Default              interface{}           `json:"default,omitempty" diff:"default"`
 	AdditionalProperties interface{}           `json:"additionalProperties,omitempty" diff:"additionalProperties"`
 	Components           map[string]SchemasMap `json:"components,omitempty" diff:"components"`
@@ -62,11 +66,21 @@ type Schema struct {
 	XML           interface{}    `json:"xml,omitempty" diff:"xml"`
 	ExternalDocs  *ExternalDoc   `json:"externalDocs,omitempty" diff:"externalDocs"`
 	Example       interface{}    `json:"example,omitempty" diff:"example"`
+	Examples      []interface{}  `json:"examples,omitempty" diff:"examples"`
 
-	Examples []interface{} `json:"examples,omitempty" diff:"examples"`
+	//Extensions map[string]interface{} `json:"-" diff:"-"`
 }
 
 type Discriminator struct {
 	PropertyName string     `json:"propertyName,omitempty" diff:"propertyName"`
 	Mapping      StringsMap `json:"mapping,omitempty" diff:"mapping"`
+}
+
+func (s *Schema) IgnoreExamples() {
+	if s.Example != nil {
+		s.Example = nil
+	}
+	if s.Examples != nil {
+		s.Examples = nil
+	}
 }

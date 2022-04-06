@@ -2,7 +2,6 @@ package differentiator
 
 import (
 	"reflect"
-	"strings"
 
 	lib "github.com/r3labs/diff/v2"
 	file "github.com/up9inc/oas-diff/json"
@@ -70,6 +69,11 @@ func (p *pathsMapDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file.Jso
 
 func (p *pathsMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 	for _, c := range changes {
+		if len(c.Path) == 0 {
+			p.internalDiff.handleChange(c)
+			continue
+		}
+
 		key := c.Path[0]
 
 		var isServersArray bool
@@ -79,12 +83,16 @@ func (p *pathsMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 		serversName := model.Servers{}.GetName()
 		parametersName := model.Parameters{}.GetName()
 
-		for _, path := range c.Path {
-			switch path {
+		// get the latest identifier only, if multiple provided
+		for i := len(c.Path) - 1; i >= 0; i-- {
+			switch c.Path[i] {
 			case serversName:
 				isServersArray = true
 			case parametersName:
 				isParametersArray = true
+			}
+			if isServersArray || isParametersArray {
+				break
 			}
 		}
 
@@ -100,7 +108,7 @@ func (p *pathsMapDiffer) handleChanges(changes lib.Changelog) (err error) {
 		// paths.parameters || paths.operation.parameters
 		if isParametersArray {
 			// paths.parameters
-			if len(c.Path) == 3 {
+			if len(c.Path) > 1 && c.Path[1] == parametersName {
 				err = p.handleArrayChange(p.data[key].Parameters, p.data2[key].Parameters, c)
 				if err != nil {
 					return err
@@ -161,28 +169,12 @@ func (p *pathsMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.PathsMap{}))
 }
 
-func (p *pathsMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (p *pathsMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if p.opts.Loose {
-		aValue, aOk := a.Interface().(model.PathsMap)
-		bValue, bOk := b.Interface().(model.PathsMap)
-
-		if aOk && bOk {
-			for ak, av := range aValue {
-				for bk, bv := range bValue {
-					// Ignore map key case sensitive
-					if len(ak) > 0 && len(bk) > 0 && ak != bk && strings.EqualFold(ak, bk) {
-						delete(aValue, ak)
-						aValue[strings.ToLower(ak)] = av
-
-						delete(bValue, bk)
-						bValue[strings.ToLower(bk)] = bv
-					}
-				}
-			}
-		}
+		handleLooseMap[model.PathsMap](a, b)
 	}
 
-	return p.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (p *pathsMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

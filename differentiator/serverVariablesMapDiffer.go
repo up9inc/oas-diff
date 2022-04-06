@@ -2,23 +2,20 @@ package differentiator
 
 import (
 	"reflect"
-	"strings"
 
 	lib "github.com/r3labs/diff/v2"
 	"github.com/up9inc/oas-diff/model"
 )
 
 type serverVariablesMapDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewServerVariablesMapDiffer(opts DifferentiatorOptions) *serverVariablesMapDiffer {
 	return &serverVariablesMapDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 
@@ -26,28 +23,12 @@ func (s *serverVariablesMapDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.ServerVariablesMap{}))
 }
 
-func (s *serverVariablesMapDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+func (s *serverVariablesMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
 	if s.opts.Loose {
-		aValue, aOk := a.Interface().(model.ServerVariablesMap)
-		bValue, bOk := b.Interface().(model.ServerVariablesMap)
-
-		if aOk && bOk {
-			for ak, av := range aValue {
-				for bk, bv := range bValue {
-					// Ignore map key case sensitive
-					if len(ak) > 0 && len(bk) > 0 && ak != bk && strings.EqualFold(ak, bk) {
-						delete(aValue, ak)
-						aValue[strings.ToLower(ak)] = av
-
-						delete(bValue, bk)
-						bValue[strings.ToLower(bk)] = bv
-					}
-				}
-			}
-		}
+		handleLooseMap[model.ServerVariablesMap](a, b)
 	}
 
-	return s.differ.DiffMap(path, a, b)
+	return df(path, a, b, parent)
 }
 
 func (s *serverVariablesMapDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {

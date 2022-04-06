@@ -8,16 +8,14 @@ import (
 )
 
 type StringDiffer struct {
-	opts   DifferentiatorOptions
-	differ *lib.Differ
+	opts DifferentiatorOptions
 
 	DiffFunc (func(path []string, a, b reflect.Value, p interface{}) error)
 }
 
 func NewStringDiffer(opts DifferentiatorOptions) *StringDiffer {
 	return &StringDiffer{
-		opts:   opts,
-		differ: nil,
+		opts: opts,
 	}
 }
 
@@ -25,8 +23,8 @@ func (s *StringDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf((*string)(nil)).Elem())
 }
 
-func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
-	if s.opts.ExcludeDescriptions && s.IsDescription(path) {
+func (s *StringDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if s.opts.IgnoreDescriptions && s.IsDescription(path) {
 		return nil
 	}
 
@@ -53,7 +51,7 @@ func (s *StringDiffer) Diff(cl *lib.Changelog, path []string, a, b reflect.Value
 		return nil
 	}
 
-	return s.differ.DiffString(path, a, b, parent)
+	return df(path, a, b, parent)
 }
 
 func (s *StringDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
@@ -61,5 +59,8 @@ func (s *StringDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect
 }
 
 func (s *StringDiffer) IsDescription(path []string) bool {
+	if len(path) == 0 {
+		return false
+	}
 	return path[len(path)-1] == "description"
 }

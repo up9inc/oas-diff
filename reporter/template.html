@@ -10,6 +10,7 @@
 <body>
 
     {{$status := .Status}}
+    {{$hasTypeFilter := (gt (StringLen .Status.ExecutionFlags.TypeFilter) 0)}}
 
     <ul class="list-group">
         <li class="list-group-item">
@@ -42,9 +43,19 @@
                         <td>{{.PathChangelogMap | TotalPathsChanges}}</td>
 
                     </tr>
+                    {{if $hasTypeFilter}}
+                    <tr>
+                        <td>Type Filter</td>
+                        <td>{{.Status.ExecutionFlags.TypeFilter}}</td>
+
+                    </tr>
+                    {{end}}
                     <tr>
                         <td>Flags</td>
                         <td>
+                            {{if $hasTypeFilter}}
+                            --type {{.Status.ExecutionFlags.TypeFilter}}
+                            {{end}}
                             {{if .Status.ExecutionFlags.Loose}}
                             --loose
                             {{end}}

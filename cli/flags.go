@@ -15,6 +15,12 @@ var (
 		Usage:    "path of the second OAS 3.1 file",
 		Required: true,
 	}
+	TypeFilterFlag = &cli.StringFlag{
+		Name:     "type",
+		Aliases:  []string{"t"},
+		Usage:    "Changelog Type filter (create/update/delete)",
+		Required: false,
+	}
 	LooseFlag = &cli.BoolFlag{
 		Name:     "loose",
 		Usage:    "loosely diff, ignores global case sensitivity for strings comparisons and ignore headers that start with 'x-' and 'user-agent'",

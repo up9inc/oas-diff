@@ -24,6 +24,7 @@ func RegisterDiffCmd() *cli.Command {
 		Flags: []cli.Flag{
 			BaseFileFlag,
 			SecondFileFlag,
+			TypeFilterFlag,
 			HtmlOutputFlag,
 			LooseFlag,
 			IncludeFilePathFlag,
@@ -52,6 +53,7 @@ func diffCmd(c *cli.Context) error {
 
 	val := validator.NewValidator()
 	diff := differentiator.NewDifferentiator(val, differentiator.DifferentiatorOptions{
+		TypeFilter:         c.String(TypeFilterFlag.Name),
 		Loose:              c.Bool(LooseFlag.Name),
 		IncludeFilePath:    c.Bool(IncludeFilePathFlag.Name),
 		IgnoreDescriptions: c.Bool(IgnoreDescriptionsFlag.Name),

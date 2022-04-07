@@ -52,6 +52,7 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 
 func (h *htmlReporter) Build() ([]byte, error) {
 	funcMap := template.FuncMap{
+		"StringLen": func(s string) int { return len(s) },
 		"TotalPathsChanges": func(data pathChangelogMap) int {
 			var count int
 			for _, v := range data {

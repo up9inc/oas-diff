@@ -36,3 +36,17 @@ func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string
 		Changelog: make(ChangeMap, 0),
 	}
 }
+
+func (c ChangeMap) FilterByType(t string) ChangeMap {
+	filtered := make(ChangeMap, 0)
+
+	for k, m := range c {
+		for _, cc := range m {
+			if cc.Type == t {
+				filtered[k] = append(filtered[k], cc)
+			}
+		}
+	}
+
+	return filtered
+}

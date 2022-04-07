@@ -201,8 +201,25 @@ func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
 			if len(c.Path) > 0 {
 				endpoint = c.Path[0]
 			}
+
 			if len(c.Path) > 1 {
 				op = c.Path[1]
+			} else {
+				// the endpoint was created/deleted, we only have one operation
+				if c.Type != "update" {
+					data := c.To
+					if c.Type == "delete" {
+						data = c.From
+					}
+					pathItem, ok := data.(model.PathItem)
+					if ok {
+						operations := pathItem.GetOperationsName()
+						if len(operations) == 1 {
+							op = operations[0]
+							//c.Path = append(c.Path, op)
+						}
+					}
+				}
 			}
 
 			_, ok := result[endpoint]

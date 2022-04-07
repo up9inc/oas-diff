@@ -75,21 +75,28 @@
         </li>
     </ul>
 
-    {{range $key, $val := .PathChangelogMap}}
-    <div class="card text-left bg-light border-secondary mb-3" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
-        <div class="card-header">
-            <h3>{{$key}}</h3>
-           <h6>Changes: {{$val | PathChanges}}</h6>
-        </div>
+        <!-- map[string][]pathChangelog -->
+        {{range $key, $val := .PathChangelogMap}}
 
+        {{$header := CollapseHeaderId}}
+
+        <div class="card text-left bg-light border-secondary mb-3"
+            style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
+            <a data-toggle="collapse" href="#{{$header}}" role="button" aria-expanded="false" aria-controls="{{$header}}">
+                <div class="card-header">
+                    <h3>{{$key}}</h3>
+                    <h6>Changes: {{$val | PathChanges}}</h6>
+                </div>
+            </a>
+        
             <!-- []pathChangelog -->
             {{range $val}}
         
-            <!-- Type (create/update/delete) -->
+            {{$body := CollapseBodyId}}
             {{$type := .Changelog.Type}}
-            {{$color := $type | GetTypeColor}}
+            {{$color := $type | GetTypeColor}} 
 
-            <div class="text-{{$color}}">
+            <div id="{{$header}}" class="collapse text-{{$color}}">
                 <div class="card-body">
                     <div class="card-title card-header">
                         <h6> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
@@ -98,22 +105,32 @@
                     <div class="row">
                         {{if .Changelog.From | IsNotNil }}
                         <div class="col">
-                            <pre class="card-text text-{{$type | GetFromTypeColor}}" style="white-space: pre-wrap;">{{.Changelog.From | ToPrettyJSON}}</pre>
+                            <pre class="card-text text-{{$type | GetFromTypeColor}}"
+                                style="white-space: pre-wrap;">{{.Changelog.From | ToPrettyJSON}}</pre>
                         </div>
                         {{end}}
-                        
+        
                         {{if .Changelog.To | IsNotNil }}
                         <div class="col">
-                            <pre class="card-text text-{{$type | GetToTypeColor}}" style="white-space: pre-wrap;">{{.Changelog.To | ToPrettyJSON}}</pre>
+                            <pre class="card-text text-{{$type | GetToTypeColor}}"
+                                style="white-space: pre-wrap;">{{.Changelog.To | ToPrettyJSON}}</pre>
                         </div>
                         {{end}}
                     </div>
                 </div>
             </div>
+
+            {{end}}
+
+        </div>
+
         {{end}}
-    </div>
-    {{end}}
 
 </body>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
 
 </html>

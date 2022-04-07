@@ -50,8 +50,18 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 	}
 }
 
+var collapseHeaderIndex, collapseBodyIndex int
+
 func (h *htmlReporter) Build() ([]byte, error) {
 	funcMap := template.FuncMap{
+		"CollapseHeaderId": func() string {
+			collapseHeaderIndex++
+			return fmt.Sprintf("collapseHeader_%d", collapseHeaderIndex)
+		},
+		"CollapseBodyId": func() string {
+			collapseBodyIndex++
+			return fmt.Sprintf("collapse_%d", collapseBodyIndex)
+		},
 		"StringLen": func(s string) int { return len(s) },
 		"TotalPathsChanges": func(data pathChangelogMap) int {
 			var count int

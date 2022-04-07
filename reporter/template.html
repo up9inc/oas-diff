@@ -38,6 +38,11 @@
 
                     </tr>
                     <tr>
+                        <td>Total Paths Changes</td>
+                        <td>{{.PathChangelogMap | TotalPathsChanges}}</td>
+
+                    </tr>
+                    <tr>
                         <td>Flags</td>
                         <td>
                             {{if .Status.ExecutionFlags.Loose}}
@@ -63,7 +68,7 @@
     <div class="card text-left bg-light border-secondary mb-3" style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
         <div class="card-header">
             <h3>{{$key}}</h3>
-           <h6>Changes: {{$val | PathLen}}</h6>
+           <h6>Changes: {{$val | PathChanges}}</h6>
         </div>
 
             <!-- []pathChangelog -->

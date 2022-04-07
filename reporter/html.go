@@ -52,10 +52,17 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 
 func (h *htmlReporter) Build() ([]byte, error) {
 	funcMap := template.FuncMap{
-		"PathLen":  func(data []pathChangelog) int { return len(data) },
-		"IsNotNil": func(data interface{}) bool { return data != nil },
-		"ToUpper":  strings.ToUpper,
-		"ToLower":  strings.ToLower,
+		"TotalPathsChanges": func(data pathChangelogMap) int {
+			var count int
+			for _, v := range data {
+				count += len(v)
+			}
+			return count
+		},
+		"PathChanges": func(data []pathChangelog) int { return len(data) },
+		"IsNotNil":    func(data interface{}) bool { return data != nil },
+		"ToUpper":     strings.ToUpper,
+		"ToLower":     strings.ToLower,
 		"ToPrettyJSON": func(data interface{}) string {
 			j, _ := json.MarshalIndent(data, "", "\t")
 			return string(j)

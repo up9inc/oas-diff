@@ -202,7 +202,9 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 	output.Changelog[d.externalDocs.key] = d.externalDocs.changelog
 
 	// filter by type
-	output.Changelog = output.Changelog.FilterByType(d.opts.TypeFilter)
+	if len(d.opts.TypeFilter) > 0 {
+		output.Changelog = output.Changelog.FilterByType(d.opts.TypeFilter)
+	}
 
 	return output, nil
 }

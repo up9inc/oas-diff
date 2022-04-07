@@ -38,6 +38,10 @@ func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string
 }
 
 func (c ChangeMap) FilterByType(t string) ChangeMap {
+	if len(t) == 0 {
+		return c
+	}
+
 	filtered := make(ChangeMap, 0)
 
 	for k, m := range c {

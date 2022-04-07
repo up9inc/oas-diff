@@ -1,6 +1,9 @@
 package differentiator
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type ExecutionStatus struct {
 	BaseFilePath   string                `json:"base-file"`
@@ -42,11 +45,12 @@ func (c ChangeMap) FilterByType(t string) ChangeMap {
 		return c
 	}
 
+	filterType := strings.ToLower(t)
 	filtered := make(ChangeMap, 0)
 
 	for k, m := range c {
 		for _, cc := range m {
-			if cc.Type == t {
+			if cc.Type == filterType {
 				filtered[k] = append(filtered[k], cc)
 			}
 		}

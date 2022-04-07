@@ -46,7 +46,7 @@
                     {{if $hasTypeFilter}}
                     <tr>
                         <td>Type Filter</td>
-                        <td>{{.Status.ExecutionFlags.TypeFilter}}</td>
+                        <td class="text-{{.Status.ExecutionFlags.TypeFilter | GetTypeColor}}">{{.Status.ExecutionFlags.TypeFilter}}</td>
 
                     </tr>
                     {{end}}
@@ -88,7 +88,11 @@
             style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
                 <div class="card-header">
                     <a data-toggle="collapse" href="#{{$header}}" role="button" aria-expanded="false" aria-controls="{{$header}}">
-                        <h3 class="text-info">{{$key}}</h3>
+                        {{if $hasTypeFilter}}
+                            <h3 class="text-{{$status.ExecutionFlags.TypeFilter | GetTypeColor}}">{{$key}}</h3>
+                        {{else}}
+                            <h3 class="text-info">{{$key}}</h3>
+                        {{end}}
                     </a>
                     <h6>Changes: {{$val | PathChanges}}</h6>
                 </div>

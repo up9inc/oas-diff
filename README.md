@@ -56,7 +56,9 @@ OAS 3.1 Validation and Diff Tool
     ````
     ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json
     ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --loose
+    ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --type create
     ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --type update
+    ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --type delete
     ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --ignore-descriptions
     ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --ignore-examples
     ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --loose --ignore-descriptions --ignore-examples

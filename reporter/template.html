@@ -98,13 +98,13 @@
                     <div class="row">
                         {{if .Changelog.From | IsNotNil }}
                         <div class="col">
-                            <pre class="card-text text-{{$type | GetFromTypeColor}}">{{.Changelog.From | ToPrettyJSON}}</pre>
+                            <pre class="card-text text-{{$type | GetFromTypeColor}}" style="white-space: pre-wrap;">{{.Changelog.From | ToPrettyJSON}}</pre>
                         </div>
                         {{end}}
                         
                         {{if .Changelog.To | IsNotNil }}
                         <div class="col">
-                            <pre class="card-text text-{{$type | GetToTypeColor}}">{{.Changelog.To | ToPrettyJSON}}</pre>
+                            <pre class="card-text text-{{$type | GetToTypeColor}}" style="white-space: pre-wrap;">{{.Changelog.To | ToPrettyJSON}}</pre>
                         </div>
                         {{end}}
                     </div>

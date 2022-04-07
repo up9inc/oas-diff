@@ -75,6 +75,10 @@
         </li>
     </ul>
 
+    <div style="text-align: center; padding-top: 1em; padding-bottom: 1em;">
+        <h3 class="title">Endpoints Changelog</h3>
+        <input class="text-info" id="collapseAllButton" type="button" value="Collapse All" >
+    </div>
         <!-- map[string][]pathChangelog -->
         {{range $key, $val := .PathChangelogMap}}
 
@@ -82,12 +86,12 @@
 
         <div class="card text-left bg-light border-secondary mb-3"
             style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
-            <a data-toggle="collapse" href="#{{$header}}" role="button" aria-expanded="false" aria-controls="{{$header}}">
                 <div class="card-header">
-                    <h3>{{$key}}</h3>
+                    <a data-toggle="collapse" href="#{{$header}}" role="button" aria-expanded="false" aria-controls="{{$header}}">
+                        <h3 class="text-info">{{$key}}</h3>
+                    </a>
                     <h6>Changes: {{$val | PathChanges}}</h6>
                 </div>
-            </a>
         
             <!-- []pathChangelog -->
             {{range $val}}
@@ -96,13 +100,15 @@
             {{$type := .Changelog.Type}}
             {{$color := $type | GetTypeColor}} 
 
-            <div id="{{$header}}" class="collapse text-{{$color}}">
+            <div id="{{$header}}" class="collapse">
                 <div class="card-body">
-                    <div class="card-title card-header">
-                        <h6> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
-                        <span>{{GetTypeInfo $type $status}}</span>
-                    </div>
-                    <div class="row">
+                    <a data-toggle="collapse" href="#{{$body}}" role="button" aria-expanded="false" aria-controls="{{$body}}">
+                        <div class="card-title card-header text-{{$color}}">
+                            <h6> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
+                            <span>{{GetTypeInfo $type $status}}</span>
+                        </div>
+                    </a>
+                    <div id="{{$body}}" class="collapse row">
                         {{if .Changelog.From | IsNotNil }}
                         <div class="col">
                             <pre class="card-text text-{{$type | GetFromTypeColor}}"
@@ -132,5 +138,14 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+        $('#collapseAllButton').click(function () {
+            $('.collapse').collapse('hide');
+            //$('.collapse').collapse('show');
+        });
+    });
+</script>
+
 
 </html>

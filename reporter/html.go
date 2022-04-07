@@ -82,12 +82,12 @@ func (h *htmlReporter) Build() ([]byte, error) {
 		"GetTypeInfo": func(t string, s differentiator.ExecutionStatus) string {
 			switch t {
 			case "create":
-				return fmt.Sprintf("created from %s", s.SecondFilePath)
+				return fmt.Sprintf("CREATED from %s", s.SecondFilePath)
 			// TODO: Updated from source file info
 			case "update":
-				return "updated"
+				return "UPDATED"
 			case "delete":
-				return fmt.Sprintf("deleted from %s", s.BaseFilePath)
+				return fmt.Sprintf("DELETED from %s", s.BaseFilePath)
 			}
 
 			return ""

@@ -27,6 +27,12 @@ type Changelog struct {
 	To         interface{} `json:"to"`
 }
 
+type ByType []Changelog
+
+func (t ByType) Len() int           { return len(t) }
+func (t ByType) Less(i, j int) bool { return t[i].Type < t[j].Type }
+func (t ByType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+
 func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string, opts DifferentiatorOptions) *ChangelogOutput {
 	return &ChangelogOutput{
 		ExecutionStatus: ExecutionStatus{

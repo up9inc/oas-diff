@@ -77,7 +77,8 @@ func (h *htmlReporter) Build() ([]byte, error) {
 			j, _ := json.MarshalIndent(data, "", "\t")
 			return string(j)
 		},
-		"FormatPath": func(path []string) string { return strings.Join(path, " ") },
+		"FormatPath":  func(path []string) string { return strings.Join(path, " ") },
+		"PathPadding": func(index int) string { return fmt.Sprintf("padding-left: %.1fem", float32(index)*0.4) },
 		"GetTypeInfo": func(t string, s differentiator.ExecutionStatus) string {
 			switch t {
 			case "create":
@@ -203,7 +204,7 @@ func (h *htmlReporter) buildPathChangelogMap() []pathKeyValue {
 						operations := pathItem.GetOperationsName()
 						if len(operations) == 1 {
 							op = operations[0]
-							//c.Path = append(c.Path, op)
+							c.Path = append(c.Path, op)
 						}
 					}
 				}

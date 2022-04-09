@@ -40,7 +40,7 @@
                     </tr>
                     <tr>
                         <td>Total Paths Changes</td>
-                        <td>{{.PathChangelogMap | TotalPathsChanges}}</td>
+                        <td>{{.PathChangelogList | TotalPathsChanges}}</td>
 
                     </tr>
                     {{if $hasTypeFilter}}
@@ -79,16 +79,17 @@
         <h3 class="title">Endpoints Changelog</h3>
         <input class="text-info" id="collapseAllButton" type="button" value="Collapse All" >
     </div>
-        <!-- map[string][]pathChangelog -->
-        {{range $key, $val := .PathChangelogMap}}
-
-        {{$header := CollapseHeaderId}}
+        <!-- []pathKeyValue -->
+        {{range $index, $data := .PathChangelogList}}
+        {{$endpoint := $data.Key}}
+        {{$val := $data.Value}}
+        {{$header := CollapseHeaderId}}        
 
         <div class="card text-left bg-light border-secondary mb-3"
             style="padding-top: 1em; padding-left: 1em; padding-right: 1em;">
                 <div class="card-header">
                     <a data-toggle="collapse" href="#{{$header}}" role="button" aria-expanded="false" aria-controls="{{$header}}">
-                        <h4 class="text-info">{{$key}}</h4>
+                        <h4 class="text-info">[{{$val.Key | ToUpper}}] {{$endpoint}}</h4>
                     </a>
                     <span style="font-size: 14px;">
                         {{if (ne $hasTypeFilter true)}}
@@ -107,8 +108,7 @@
                 </div>
         
             <!-- []pathChangelog -->
-            {{range $val.Paths}}
-        
+            {{range $val.Paths}}        
             {{$body := CollapseBodyId}}
             {{$type := .Changelog.Type}}
             {{$color := $type | GetTypeColor}} 
@@ -117,7 +117,7 @@
                 <div class="card-body">
                     <a data-toggle="collapse" href="#{{$body}}" role="button" aria-expanded="false" aria-controls="{{$body}}">
                         <div class="card-title card-header text-{{$color}}">
-                            <h6> {{.Operation | ToUpper}} {{.Changelog.Path | FormatPath}}</h6>
+                            <h6>[{{.Operation | ToUpper}}] {{.Changelog.Path | FormatPath}}</h6>
                             <span>{{GetTypeInfo $type $status}}</span>
                         </div>
                     </a>

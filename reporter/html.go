@@ -17,32 +17,31 @@ type htmlReporter struct {
 }
 
 type pathChangelog struct {
-	Key       string                   `json:"key"`
-	Endpoint  string                   `json:"endpoint"`
-	Operation string                   `json:"operation"`
-	Changelog differentiator.Changelog `json:"changelog"`
+	Endpoint  string
+	Operation string
+	Changelog differentiator.Changelog
 }
 
-type pathData struct {
-	Paths         []pathChangelog `json:"paths"`
-	TotalChanges  int             `json:"totalChanges"`
-	CreateChanges int             `json:"createChanges"`
-	UpdateChanges int             `json:"updateChanges"`
-	DeleteChanges int             `json:"deleteChanges"`
+type pathsData struct {
+	Key           string
+	Paths         []pathChangelog
+	TotalChanges  int
+	CreateChanges int
+	UpdateChanges int
+	DeleteChanges int
 }
 
-type pathChangelogMap map[string]pathData
+type pathsMap map[string]pathsData
 
-type ByType []pathChangelog
+type byType []pathChangelog
 
-func (t ByType) Len() int           { return len(t) }
-func (t ByType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelog.Type }
-func (t ByType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t byType) Len() int           { return len(t) }
+func (t byType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelog.Type }
+func (t byType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 
-type templateData struct {
-	Status               differentiator.ExecutionStatus
-	NonPathChangelogList []differentiator.Changelog
-	PathChangelogMap     pathChangelogMap
+type pathKeyValue struct {
+	Key   string
+	Value pathsData
 }
 
 func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
@@ -64,10 +63,10 @@ func (h *htmlReporter) Build() ([]byte, error) {
 			return fmt.Sprintf("collapse_%d", collapseBodyIndex)
 		},
 		"StringLen": func(s string) int { return len(s) },
-		"TotalPathsChanges": func(data pathChangelogMap) int {
+		"TotalPathsChanges": func(data []pathKeyValue) int {
 			var count int
 			for _, v := range data {
-				count += v.TotalChanges
+				count += v.Value.TotalChanges
 			}
 			return count
 		},
@@ -130,10 +129,14 @@ func (h *htmlReporter) Build() ([]byte, error) {
 		},
 	}
 
-	data := templateData{
+	data := struct {
+		Status               differentiator.ExecutionStatus
+		NonPathChangelogList []differentiator.Changelog
+		PathChangelogList    []pathKeyValue
+	}{
 		Status:               h.output.ExecutionStatus,
 		NonPathChangelogList: h.buildNonPathChangelogList(),
-		PathChangelogMap:     h.buildPathChangelogMap(),
+		PathChangelogList:    h.buildPathChangelogMap(),
 	}
 
 	var buf bytes.Buffer
@@ -169,8 +172,8 @@ func (h *htmlReporter) buildNonPathChangelogList() []differentiator.Changelog {
 	return result
 }
 
-func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
-	result := make(pathChangelogMap, 0)
+func (h *htmlReporter) buildPathChangelogMap() []pathKeyValue {
+	pathsMap := make(pathsMap, 0)
 
 	for k, v := range h.output.Changelog {
 		for _, c := range v {
@@ -206,18 +209,19 @@ func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
 				}
 			}
 
-			_, ok := result[endpoint]
+			_, ok := pathsMap[endpoint]
 			if !ok {
-				result[endpoint] = pathData{
+				pathsMap[endpoint] = pathsData{
+					Key:           k,
+					Paths:         make([]pathChangelog, 0),
 					TotalChanges:  0,
 					CreateChanges: 0,
 					UpdateChanges: 0,
 					DeleteChanges: 0,
-					Paths:         make([]pathChangelog, 0),
 				}
 			}
 
-			aux := result[endpoint]
+			aux := pathsMap[endpoint]
 			aux.TotalChanges++
 			switch c.Type {
 			case "create":
@@ -227,20 +231,27 @@ func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
 			case "delete":
 				aux.DeleteChanges++
 			}
-			aux.Paths = append(result[endpoint].Paths, pathChangelog{
-				Key:       k,
+			aux.Paths = append(pathsMap[endpoint].Paths, pathChangelog{
 				Endpoint:  endpoint,
 				Operation: op,
 				Changelog: c,
 			})
-			result[endpoint] = aux
+			pathsMap[endpoint] = aux
 		}
 	}
 
+	var ss []pathKeyValue
+
 	// sort by type
-	for _, v := range result {
-		sort.Sort(ByType(v.Paths))
+	for k, v := range pathsMap {
+		sort.Sort(byType(v.Paths))
+		ss = append(ss, pathKeyValue{k, v})
 	}
 
-	return result
+	// sorty by TotalChanges
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value.TotalChanges > ss[j].Value.TotalChanges
+	})
+
+	return ss
 }

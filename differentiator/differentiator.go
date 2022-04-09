@@ -14,10 +14,11 @@ type Differentiator interface {
 }
 
 type DifferentiatorOptions struct {
-	Loose              bool `json:"loose"`
-	IncludeFilePath    bool `json:"include-file-path"`
-	IgnoreDescriptions bool `json:"ignore-descriptions"`
-	IgnoreExamples     bool `json:"ignore-examples"`
+	TypeFilter         string `json:"type"`
+	Loose              bool   `json:"loose"`
+	IncludeFilePath    bool   `json:"include-file-path"`
+	IgnoreDescriptions bool   `json:"ignore-descriptions"`
+	IgnoreExamples     bool   `json:"ignore-examples"`
 }
 
 type differentiator struct {
@@ -36,6 +37,12 @@ type differentiator struct {
 }
 
 func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Differentiator {
+	if len(opts.TypeFilter) > 0 {
+		if opts.TypeFilter != "create" && opts.TypeFilter != "update" && opts.TypeFilter != "delete" {
+			panic(fmt.Errorf(`Invalid type filter value "%s", must be %s/%s/%s`, opts.TypeFilter, lib.CREATE, lib.UPDATE, lib.DELETE))
+		}
+	}
+
 	// strings
 	stringDiffer := NewStringDiffer(opts)
 
@@ -193,6 +200,11 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 		return nil, err
 	}
 	output.Changelog[d.externalDocs.key] = d.externalDocs.changelog
+
+	// filter by type
+	if len(d.opts.TypeFilter) > 0 {
+		output.Changelog = output.Changelog.FilterByType(d.opts.TypeFilter)
+	}
 
 	return output, nil
 }

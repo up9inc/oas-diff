@@ -17,31 +17,31 @@ type htmlReporter struct {
 }
 
 type pathChangelog struct {
-	Key       string                   `json:"key"`
-	Endpoint  string                   `json:"endpoint"`
-	Operation string                   `json:"operation"`
-	Changelog differentiator.Changelog `json:"changelog"`
+	Endpoint  string
+	Operation string
+	Changelog differentiator.Changelog
 }
 
-type pathChangelogMap map[string][]pathChangelog
+type pathsData struct {
+	Key           string
+	Paths         []pathChangelog
+	TotalChanges  int
+	CreateChanges int
+	UpdateChanges int
+	DeleteChanges int
+}
 
-type ByType []pathChangelog
+type pathsMap map[string]pathsData
 
-func (t ByType) Len() int           { return len(t) }
-func (t ByType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelog.Type }
-func (t ByType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+type byType []pathChangelog
 
-type ByOperation []*pathChangelog
+func (t byType) Len() int           { return len(t) }
+func (t byType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelog.Type }
+func (t byType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 
-func (o ByOperation) Len() int           { return len(o) }
-func (o ByOperation) Less(i, j int) bool { return o[i].Operation < o[j].Operation }
-func (o ByOperation) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
-
-type templateData struct {
-	Status            differentiator.ExecutionStatus
-	Changelog         differentiator.ChangeMap
-	PathChangelogList []pathChangelog
-	PathChangelogMap  pathChangelogMap
+type pathKeyValue struct {
+	Key   string
+	Value pathsData
 }
 
 func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
@@ -50,9 +50,26 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 	}
 }
 
+var collapseHeaderIndex, collapseBodyIndex int
+
 func (h *htmlReporter) Build() ([]byte, error) {
 	funcMap := template.FuncMap{
-		"PathLen":  func(data []pathChangelog) int { return len(data) },
+		"CollapseHeaderId": func() string {
+			collapseHeaderIndex++
+			return fmt.Sprintf("collapseHeader_%d", collapseHeaderIndex)
+		},
+		"CollapseBodyId": func() string {
+			collapseBodyIndex++
+			return fmt.Sprintf("collapse_%d", collapseBodyIndex)
+		},
+		"StringLen": func(s string) int { return len(s) },
+		"TotalPathsChanges": func(data []pathKeyValue) int {
+			var count int
+			for _, v := range data {
+				count += v.Value.TotalChanges
+			}
+			return count
+		},
 		"IsNotNil": func(data interface{}) bool { return data != nil },
 		"ToUpper":  strings.ToUpper,
 		"ToLower":  strings.ToLower,
@@ -60,16 +77,17 @@ func (h *htmlReporter) Build() ([]byte, error) {
 			j, _ := json.MarshalIndent(data, "", "\t")
 			return string(j)
 		},
-		"FormatPath": func(path []string) string { return strings.Join(path, " ") },
+		"FormatPath":  func(path []string) string { return strings.Join(path, " ") },
+		"PathPadding": func(index int) string { return fmt.Sprintf("padding-left: %.1fem", float32(index)*0.4) },
 		"GetTypeInfo": func(t string, s differentiator.ExecutionStatus) string {
 			switch t {
 			case "create":
-				return fmt.Sprintf("created from %s", s.SecondFilePath)
+				return fmt.Sprintf("CREATED from %s", s.SecondFilePath)
 			// TODO: Updated from source file info
 			case "update":
-				return "updated"
+				return "UPDATED"
 			case "delete":
-				return fmt.Sprintf("deleted from %s", s.BaseFilePath)
+				return fmt.Sprintf("DELETED from %s", s.BaseFilePath)
 			}
 
 			return ""
@@ -112,11 +130,14 @@ func (h *htmlReporter) Build() ([]byte, error) {
 		},
 	}
 
-	data := templateData{
-		Status:            h.output.ExecutionStatus,
-		Changelog:         h.output.Changelog,
-		PathChangelogList: h.buildPathChangelogList(),
-		PathChangelogMap:  h.buildPathChangelogMap(),
+	data := struct {
+		Status               differentiator.ExecutionStatus
+		NonPathChangelogList []differentiator.Changelog
+		PathChangelogList    []pathKeyValue
+	}{
+		Status:               h.output.ExecutionStatus,
+		NonPathChangelogList: h.buildNonPathChangelogList(),
+		PathChangelogList:    h.buildPathChangelogMap(),
 	}
 
 	var buf bytes.Buffer
@@ -131,44 +152,29 @@ func (h *htmlReporter) Build() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (h *htmlReporter) buildPathChangelogList() []pathChangelog {
-	result := make([]pathChangelog, 0)
+func (h *htmlReporter) buildNonPathChangelogList() []differentiator.Changelog {
+	result := make([]differentiator.Changelog, 0)
 
 	for k, v := range h.output.Changelog {
 		for _, c := range v {
 
-			// ignore others non-paths keys
-			if k != model.OAS_PATHS_KEY && k != model.OAS_WEBHOOKS_KEY {
+			// ignore paths and webhooks
+			if k == model.OAS_PATHS_KEY || k == model.OAS_WEBHOOKS_KEY {
 				continue
 			}
 
-			var op string
-			var endpoint string
-
-			if len(c.Path) > 0 {
-				endpoint = c.Path[0]
-			}
-			if len(c.Path) > 1 && c.Path[1] != "parameters" {
-				op = c.Path[1]
-			}
-
-			result = append(result, pathChangelog{
-				Key:       k,
-				Endpoint:  endpoint,
-				Operation: op,
-				Changelog: c,
-			})
+			result = append(result, c)
 		}
 	}
 
 	// sort by type
-	sort.Sort(ByType(result))
+	sort.Sort(differentiator.ByType(result))
 
 	return result
 }
 
-func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
-	result := make(pathChangelogMap, 0)
+func (h *htmlReporter) buildPathChangelogMap() []pathKeyValue {
+	pathsMap := make(pathsMap, 0)
 
 	for k, v := range h.output.Changelog {
 		for _, c := range v {
@@ -183,27 +189,70 @@ func (h *htmlReporter) buildPathChangelogMap() pathChangelogMap {
 			if len(c.Path) > 0 {
 				endpoint = c.Path[0]
 			}
+
 			if len(c.Path) > 1 {
 				op = c.Path[1]
+			} else {
+				// the endpoint was created/deleted, we only have one operation
+				if c.Type != "update" {
+					data := c.To
+					if c.Type == "delete" {
+						data = c.From
+					}
+					pathItem, ok := data.(model.PathItem)
+					if ok {
+						operations := pathItem.GetOperationsName()
+						if len(operations) == 1 {
+							op = operations[0]
+							c.Path = append(c.Path, op)
+						}
+					}
+				}
 			}
 
-			_, ok := result[endpoint]
+			_, ok := pathsMap[endpoint]
 			if !ok {
-				result[endpoint] = make([]pathChangelog, 0)
+				pathsMap[endpoint] = pathsData{
+					Key:           k,
+					Paths:         make([]pathChangelog, 0),
+					TotalChanges:  0,
+					CreateChanges: 0,
+					UpdateChanges: 0,
+					DeleteChanges: 0,
+				}
 			}
-			result[endpoint] = append(result[endpoint], pathChangelog{
-				Key:       k,
+
+			aux := pathsMap[endpoint]
+			aux.TotalChanges++
+			switch c.Type {
+			case "create":
+				aux.CreateChanges++
+			case "update":
+				aux.UpdateChanges++
+			case "delete":
+				aux.DeleteChanges++
+			}
+			aux.Paths = append(pathsMap[endpoint].Paths, pathChangelog{
 				Endpoint:  endpoint,
 				Operation: op,
 				Changelog: c,
 			})
+			pathsMap[endpoint] = aux
 		}
 	}
 
+	var ss []pathKeyValue
+
 	// sort by type
-	for _, v := range result {
-		sort.Sort(ByType(v))
+	for k, v := range pathsMap {
+		sort.Sort(byType(v.Paths))
+		ss = append(ss, pathKeyValue{k, v})
 	}
 
-	return result
+	// sorty by TotalChanges
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value.TotalChanges > ss[j].Value.TotalChanges
+	})
+
+	return ss
 }

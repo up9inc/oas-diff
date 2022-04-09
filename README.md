@@ -30,6 +30,7 @@ OAS 3.1 Validation and Diff Tool
     ````
     --base-file value, --f1 value    path of the base OAS 3.1 file
     --second-file value, --f2 value  path of the second OAS 3.1 file
+    --type value, -t value           Changelog Type filter (create/update/delete)
     --html                           save an html report (default: false)
     --loose                          loosely diff, ignores global case sensitivity for strings comparisons and ignore headers that start with 'x-' and 'user-agent' (default: false)
     --include-file-path              whether or not to include the full file path from the diff changelog (default: false)
@@ -55,6 +56,9 @@ OAS 3.1 Validation and Diff Tool
     ````
     ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json
     ./build/oasdiff diff --base-file examples/simple.json --second-file examples/simple2.json --loose
+    ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --type create
+    ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --type update
+    ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --type delete
     ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --ignore-descriptions
     ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --ignore-examples
     ./build/oasdiff diff --f1 examples/simple.json --f2 examples/simple2.json --loose --ignore-descriptions --ignore-examples

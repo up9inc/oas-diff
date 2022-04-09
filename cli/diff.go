@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	differentiator "github.com/up9inc/oas-diff/differentiator"
@@ -24,6 +25,7 @@ func RegisterDiffCmd() *cli.Command {
 		Flags: []cli.Flag{
 			BaseFileFlag,
 			SecondFileFlag,
+			TypeFilterFlag,
 			HtmlOutputFlag,
 			LooseFlag,
 			IncludeFilePathFlag,
@@ -52,6 +54,7 @@ func diffCmd(c *cli.Context) error {
 
 	val := validator.NewValidator()
 	diff := differentiator.NewDifferentiator(val, differentiator.DifferentiatorOptions{
+		TypeFilter:         strings.ToLower(c.String(TypeFilterFlag.Name)),
 		Loose:              c.Bool(LooseFlag.Name),
 		IncludeFilePath:    c.Bool(IncludeFilePathFlag.Name),
 		IgnoreDescriptions: c.Bool(IgnoreDescriptionsFlag.Name),

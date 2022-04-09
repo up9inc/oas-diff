@@ -41,3 +41,29 @@ func (p *PathsMap) Parse(file file.JsonFile) error {
 
 	return nil
 }
+
+func (p PathItem) GetOperationsName() []string {
+	var operations []string
+
+	if p.Connect != nil {
+		operations = append(operations, "connect")
+	} else if p.Delete != nil {
+		operations = append(operations, "delete")
+	} else if p.Get != nil {
+		operations = append(operations, "get")
+	} else if p.Head != nil {
+		operations = append(operations, "head")
+	} else if p.Options != nil {
+		operations = append(operations, "options")
+	} else if p.Patch != nil {
+		operations = append(operations, "patch")
+	} else if p.Post != nil {
+		operations = append(operations, "post")
+	} else if p.Put != nil {
+		operations = append(operations, "put")
+	} else if p.Trace != nil {
+		operations = append(operations, "trace")
+	}
+
+	return operations
+}

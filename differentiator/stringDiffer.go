@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	lib "github.com/r3labs/diff/v2"
+	lib "github.com/r3labs/diff/v3"
 )
 
 type StringDiffer struct {

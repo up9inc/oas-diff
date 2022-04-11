@@ -23,15 +23,5 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Checkout lib fork repo
-        uses: actions/checkout@v3
-        with:
-          repository: up9inc/diff
-          ref: feature/custom_differ_interceptor
-          path: lib
-
-      - name: Diff Lib Tests
-        run: make -C lib test
-
       - name: Acceptance Tests
         run: make acceptance-test

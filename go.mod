@@ -3,6 +3,7 @@ module github.com/up9inc/oas-diff
 go 1.18
 
 require (
+	github.com/r3labs/diff/v3 v3.0.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.0.0
 	github.com/tidwall/gjson v1.14.0
 )
@@ -18,10 +19,7 @@ require (
 )
 
 require (
-	github.com/r3labs/diff/v2 v2.14.8
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 )
-
-replace github.com/r3labs/diff/v2 v2.14.8 => ./lib

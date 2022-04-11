@@ -3,7 +3,7 @@ package differentiator
 import (
 	"reflect"
 
-	lib "github.com/r3labs/diff/v2"
+	lib "github.com/r3labs/diff/v3"
 	"github.com/up9inc/oas-diff/model"
 )
 

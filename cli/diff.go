@@ -27,6 +27,7 @@ func RegisterDiffCmd() *cli.Command {
 			SecondFileFlag,
 			TypeFilterFlag,
 			HtmlOutputFlag,
+			EndpointsOutputFlag,
 			LooseFlag,
 			IncludeFilePathFlag,
 			IgnoreDescriptionsFlag,
@@ -39,6 +40,7 @@ func diffCmd(c *cli.Context) error {
 	baseFilePath := c.String(BaseFileFlag.Name)
 	secondFilePath := c.String(SecondFileFlag.Name)
 	isHtmlOutput := c.Bool(HtmlOutputFlag.Name)
+	isEndpointsOutput := c.Bool(EndpointsOutputFlag.Name)
 
 	jsonFile := file.NewJsonFile(baseFilePath)
 	_, err := jsonFile.Read()
@@ -81,6 +83,20 @@ func diffCmd(c *cli.Context) error {
 	err = saveDiffOutputFile(jsonOutput, outputData)
 	if err != nil {
 		return err
+	}
+
+	if isEndpointsOutput {
+		rep = reporter.NewEndpointReporter(changelog)
+		outputData, err := rep.Build()
+		if err != nil {
+			return err
+		}
+
+		endpointsOutput := fmt.Sprintf("%s_%s%s", "endpoint", outputPath, ".json")
+		err = saveDiffOutputFile(endpointsOutput, outputData)
+		if err != nil {
+			return err
+		}
 	}
 
 	if isHtmlOutput {

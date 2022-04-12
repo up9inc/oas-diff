@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	lib "github.com/r3labs/diff/v2"
+	lib "github.com/r3labs/diff/v3"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/validator"
 )

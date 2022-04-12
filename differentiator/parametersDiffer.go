@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	lib "github.com/r3labs/diff/v2"
+	lib "github.com/r3labs/diff/v3"
 	"github.com/up9inc/oas-diff/model"
 	"github.com/up9inc/oas-diff/util"
 )

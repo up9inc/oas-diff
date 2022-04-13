@@ -3,11 +3,12 @@ package reporter
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
+	"strings"
 
 	"github.com/up9inc/oas-diff/differentiator"
 	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
+	"github.com/up9inc/oas-diff/util"
 )
 
 type endpoinChangelog struct {
@@ -51,9 +52,53 @@ func (s *summaryReporter) Build() ([]byte, error) {
 	return json.MarshalIndent(data, "", "\t")
 }
 
-func (s *summaryReporter) buildEndpointChangelogMap() (endpointsMap, error) {
-	endpointsMap := make(endpointsMap, 0)
+type SummaryData struct {
+	Endpoints      map[string][]string
+	RequestHeaders map[string]map[string][]string
+	Parameters     map[string]map[string][]string
+}
+
+func (s *SummaryData) AddEndpoint(typeKey string, value string) {
+	_, ok := s.Endpoints[typeKey]
+	if !ok {
+		s.Endpoints[typeKey] = make([]string, 0)
+	}
+	s.Endpoints[typeKey] = util.SliceElementAddUnique(s.Endpoints[typeKey], value)
+}
+
+func (s *SummaryData) AddRequestHeader(typeKey string, endpointKey, value string) {
+	_, ok := s.RequestHeaders[typeKey]
+	if !ok {
+		s.RequestHeaders[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.RequestHeaders[typeKey][endpointKey]
+	if !ok {
+		s.RequestHeaders[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.RequestHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestHeaders[typeKey][endpointKey], value)
+}
+
+func (s *SummaryData) AddParameter(typeKey string, endpointKey, value string) {
+	_, ok := s.Parameters[typeKey]
+	if !ok {
+		s.Parameters[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.Parameters[typeKey][endpointKey]
+	if !ok {
+		s.Parameters[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.Parameters[typeKey][endpointKey] = util.SliceElementAddUnique(s.Parameters[typeKey][endpointKey], value)
+}
+
+func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 	params := model.Parameters{}
+	summaryData := SummaryData{
+		Endpoints:      make(map[string][]string, 0),
+		RequestHeaders: make(map[string]map[string][]string, 0),
+		Parameters:     make(map[string]map[string][]string, 0),
+	}
 
 	for k, v := range s.output.Changelog {
 		for _, c := range v {
@@ -62,12 +107,12 @@ func (s *summaryReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 				continue
 			}
 
-			pathItem := &model.PathItem{}
 			var operation *model.Operation
 			var op string
 			var endpoint string
-			var headers []string
-			var parameters []string
+			var typeKey string
+			var endpointKey string
+			pathItem := &model.PathItem{}
 
 			if len(c.Path) > 0 {
 				endpoint = c.Path[0]
@@ -82,12 +127,15 @@ func (s *summaryReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 
 			switch c.Type {
 			case "create":
+				typeKey = "New"
 				// file2
 				sourceFileRef = s.jsonFile2
 			case "delete":
+				typeKey = "Removed"
 				// file1
 				sourceFileRef = s.jsonFile
 			case "update":
+				typeKey = "Updated"
 				// both
 				// try file1 first
 				sourceFileRef = s.jsonFile
@@ -105,11 +153,17 @@ func (s *summaryReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 			}
 			err := pathItem.ParseFromNode(endpointNode)
 			if err != nil {
-				return nil, err
+				return summaryData, err
 			}
 
 			if len(c.Path) > 1 {
 				op = c.Path[1]
+				endpointKey = fmt.Sprintf("%s %s", strings.ToUpper(op), endpoint)
+
+				// updated endpoints only
+				if c.Type == "update" {
+					summaryData.AddEndpoint(typeKey, endpointKey)
+				}
 
 				// TODO: How to distinguish Parameters type: "query", "header", "path" or "cookie"
 				// TODO: Response Headers Map
@@ -158,11 +212,11 @@ func (s *summaryReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 							}
 
 							if paramType == "header" {
-								headers = append(headers, pv.Name)
-								//headers = append(headers, c.Identifier[params.GetIdentifierName()])
+								summaryData.AddRequestHeader(typeKey, endpointKey, pv.Name)
+								//summaryData.AddRequestHeader(typeKey, endpointKey, c.Identifier[params.GetIdentifierName()])
 							} else {
-								parameters = append(parameters, pv.Name)
-								//parameters = append(parameters, c.Identifier[params.GetIdentifierName()])
+								summaryData.AddParameter(typeKey, endpointKey, pv.Name)
+								//summaryData.AddParameter(typeKey, endpointKey, c.Identifier[params.GetIdentifierName()])
 							}
 							break
 						}
@@ -183,50 +237,16 @@ func (s *summaryReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 						if len(operations) == 1 {
 							op = operations[0]
 							c.Path = append(c.Path, op)
+							endpointKey = fmt.Sprintf("%s %s", strings.ToUpper(op), endpoint)
+
+							// created/deleted endpoints only
+							summaryData.AddEndpoint(typeKey, endpointKey)
 						}
 					}
 				}
 			}
-
-			_, ok := endpointsMap[endpoint]
-			if !ok {
-				endpointsMap[endpoint] = endpointData{
-					Changelogs:     make([]endpoinChangelog, 0),
-					TotalChanges:   0,
-					CreatedChanges: 0,
-					UpdatedChanges: 0,
-					DeletedChanges: 0,
-				}
-			}
-
-			aux := endpointsMap[endpoint]
-			aux.TotalChanges++
-			switch c.Type {
-			case "create":
-				aux.CreatedChanges++
-			case "update":
-				aux.UpdatedChanges++
-			case "delete":
-				aux.DeletedChanges++
-			}
-			aux.Changelogs = append(endpointsMap[endpoint].Changelogs, endpoinChangelog{
-				Type:       c.Type,
-				Endpoint:   endpoint,
-				Operation:  op,
-				Headers:    headers,
-				Parameters: parameters,
-				Changelog:  c,
-			})
-			endpointsMap[endpoint] = aux
 		}
 	}
 
-	// sort by type
-	for _, v := range endpointsMap {
-		sort.Slice(v.Changelogs, func(i, j int) bool {
-			return v.Changelogs[i].Changelog.Type < v.Changelogs[j].Changelog.Type
-		})
-	}
-
-	return endpointsMap, nil
+	return summaryData, nil
 }

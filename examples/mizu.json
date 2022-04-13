@@ -1,0 +1,545 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "https://httpbin.org",
+        "description": "Mizu observed 19 entries (0 failed), at 0.10 hits/s, average response time is 0.17 seconds",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "https://httpbin.org"
+        }
+    ],
+    "paths": {
+        "/appears-once": {
+            "get": {
+                "summary": "/appears-once",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.63 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "application/json": {
+                                "example": null
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/appears-twice": {
+            "get": {
+                "summary": "/appears-twice",
+                "description": "Mizu observed 2 entries (0 failed), at 0.50 hits/s, average response time is 0.63 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "application/json": {
+                                "example": null
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/body-optional": {
+            "post": {
+                "summary": "/body-optional",
+                "description": "Mizu observed 3 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                },
+                "requestBody": {
+                    "description": "Generic request body",
+                    "content": {
+                        "application/json": {
+                            "example": "{\"key\", \"val\"}"
+                        }
+                    }
+                }
+            }
+        },
+        "/body-required": {
+            "post": {
+                "summary": "/body-required",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                },
+                "requestBody": {
+                    "description": "Generic request body",
+                    "content": {
+                        "": {
+                            "example": "body exists"
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/form-multipart": {
+            "post": {
+                "summary": "/form-multipart",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {
+                                "example": {}
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "description": "Generic request body",
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "file",
+                                    "path"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "contentMediaType": "application/json",
+                                        "examples": [
+                                            "{\"functions\": 123}"
+                                        ]
+                                    },
+                                    "path": {
+                                        "type": "string",
+                                        "examples": [
+                                            "/content/components"
+                                        ]
+                                    }
+                                }
+                            },
+                            "example": "--BOUNDARY\r\nContent-Disposition: form-data; name=\"file\"; filename=\"metadata.json\"\r\nContent-Type: application/json\r\n\r\n{\"functions\": 123}\r\n--BOUNDARY\r\nContent-Disposition: form-data; name=\"path\"\r\n\r\n/content/components\r\n--BOUNDARY--\r\n"
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/form-urlencoded": {
+            "post": {
+                "summary": "/form-urlencoded",
+                "description": "Mizu observed 2 entries (0 failed), at 0.50 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                },
+                "requestBody": {
+                    "description": "Generic request body",
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "agent-id",
+                                    "callback-url",
+                                    "token"
+                                ],
+                                "properties": {
+                                    "agent-id": {
+                                        "type": "string",
+                                        "examples": [
+                                            "ade"
+                                        ]
+                                    },
+                                    "callback-url": {
+                                        "type": "string",
+                                        "examples": [
+                                            ""
+                                        ]
+                                    },
+                                    "optional": {
+                                        "type": "string",
+                                        "examples": [
+                                            "another"
+                                        ]
+                                    },
+                                    "token": {
+                                        "type": "string",
+                                        "examples": [
+                                            "sometoken",
+                                            "sometoken-second-val"
+                                        ]
+                                    }
+                                }
+                            },
+                            "example": "agent-id=ade\u0026callback-url=\u0026token=sometoken"
+                        }
+                    },
+                    "required": true
+                }
+            }
+        },
+        "/param-patterns/prefix-gibberish-fine/{prefixgibberishfineId}": {
+            "get": {
+                "tags": [
+                    "param-patterns"
+                ],
+                "summary": "/param-patterns/prefix-gibberish-fine/{prefixgibberishfineId}",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "prefixgibberishfineId",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "234324"
+                        }
+                    }
+                }
+            ]
+        },
+        "/param-patterns/{parampatternId}": {
+            "get": {
+                "tags": [
+                    "param-patterns"
+                ],
+                "summary": "/param-patterns/{parampatternId}",
+                "description": "Mizu observed 2 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "parampatternId",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string",
+                        "pattern": "^prefix-gibberish-.+"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "prefix-gibberish-sfdlasdfkadf87sd93284q24r"
+                        },
+                        "example #1": {
+                            "value": "prefix-gibberish-adslkfasdf89sa7dfasddafa8a98sd7kansdf"
+                        },
+                        "example #2": {
+                            "value": "prefix-gibberish-4jk5l2345h2452l4352435jlk45"
+                        },
+                        "example #3": {
+                            "value": "prefix-gibberish-84395h2j4k35hj243j5h2kl34h54k"
+                        },
+                        "example #4": {
+                            "value": "prefix-gibberish-afterwards"
+                        }
+                    }
+                }
+            ]
+        },
+        "/param-patterns/{parampatternId}/1": {
+            "get": {
+                "tags": [
+                    "param-patterns"
+                ],
+                "summary": "/param-patterns/{parampatternId}/1",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "parampatternId",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string",
+                        "pattern": "^prefix-gibberish-.+"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "prefix-gibberish-sfdlasdfkadf87sd93284q24r"
+                        },
+                        "example #1": {
+                            "value": "prefix-gibberish-adslkfasdf89sa7dfasddafa8a98sd7kansdf"
+                        },
+                        "example #2": {
+                            "value": "prefix-gibberish-4jk5l2345h2452l4352435jlk45"
+                        },
+                        "example #3": {
+                            "value": "prefix-gibberish-84395h2j4k35hj243j5h2kl34h54k"
+                        },
+                        "example #4": {
+                            "value": "prefix-gibberish-afterwards"
+                        }
+                    }
+                }
+            ]
+        },
+        "/param-patterns/{parampatternId}/static": {
+            "get": {
+                "tags": [
+                    "param-patterns"
+                ],
+                "summary": "/param-patterns/{parampatternId}/static",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "parampatternId",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string",
+                        "pattern": "^prefix-gibberish-.+"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "prefix-gibberish-sfdlasdfkadf87sd93284q24r"
+                        },
+                        "example #1": {
+                            "value": "prefix-gibberish-adslkfasdf89sa7dfasddafa8a98sd7kansdf"
+                        },
+                        "example #2": {
+                            "value": "prefix-gibberish-4jk5l2345h2452l4352435jlk45"
+                        },
+                        "example #3": {
+                            "value": "prefix-gibberish-84395h2j4k35hj243j5h2kl34h54k"
+                        },
+                        "example #4": {
+                            "value": "prefix-gibberish-afterwards"
+                        }
+                    }
+                }
+            ]
+        },
+        "/param-patterns/{parampatternId}/{param1}": {
+            "get": {
+                "tags": [
+                    "param-patterns"
+                ],
+                "summary": "/param-patterns/{parampatternId}/{param1}",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.00 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "": {}
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "param1",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "23421"
+                        }
+                    }
+                },
+                {
+                    "name": "parampatternId",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string",
+                        "pattern": "^prefix-gibberish-.+"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "prefix-gibberish-sfdlasdfkadf87sd93284q24r"
+                        },
+                        "example #1": {
+                            "value": "prefix-gibberish-adslkfasdf89sa7dfasddafa8a98sd7kansdf"
+                        },
+                        "example #2": {
+                            "value": "prefix-gibberish-4jk5l2345h2452l4352435jlk45"
+                        },
+                        "example #3": {
+                            "value": "prefix-gibberish-84395h2j4k35hj243j5h2kl34h54k"
+                        },
+                        "example #4": {
+                            "value": "prefix-gibberish-afterwards"
+                        }
+                    }
+                }
+            ]
+        },
+        "/{Id}": {
+            "get": {
+                "summary": "/{Id}",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.63 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "application/json": {
+                                "example": null
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "<UUID4>"
+                        },
+                        "example #1": {
+                            "value": "<UUID4>"
+                        }
+                    }
+                }
+            ]
+        },
+        "/{Id}/sub1": {
+            "get": {
+                "summary": "/{Id}/sub1",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.11 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "text/html": {}
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "<UUID4>"
+                        },
+                        "example #1": {
+                            "value": "<UUID4>"
+                        }
+                    }
+                }
+            ]
+        },
+        "/{Id}/sub2": {
+            "get": {
+                "summary": "/{Id}/sub2",
+                "description": "Mizu observed 1 entries (0 failed), at 0.00 hits/s, average response time is 0.63 seconds",
+                "operationId": "<UUID4>",
+                "responses": {
+                    "200": {
+                        "description": "Successful call with status 200",
+                        "content": {
+                            "application/json": {
+                                "example": null
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": [
+                {
+                    "name": "Id",
+                    "in": "path",
+                    "required": true,
+                    "style": "simple",
+                    "schema": {
+                        "type": "string"
+                    },
+                    "examples": {
+                        "example #0": {
+                            "value": "<UUID4>"
+                        },
+                        "example #1": {
+                            "value": "<UUID4>"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -86,7 +86,7 @@ func diffCmd(c *cli.Context) error {
 	}
 
 	if isEndpointsOutput {
-		rep = reporter.NewEndpointReporter(changelog)
+		rep = reporter.NewEndpointReporter(jsonFile, jsonFile2, changelog)
 		outputData, err := rep.Build()
 		if err != nil {
 			return err

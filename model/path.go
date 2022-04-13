@@ -35,7 +35,30 @@ func (p *PathsMap) Parse(file file.JsonFile) error {
 	if node != nil {
 		err := json.Unmarshal(*node, p)
 		if err != nil {
-			return fmt.Errorf("failed to Unmarshal PathsMap struct: %v", err)
+			return fmt.Errorf("failed to Unmarshal PathsMap: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (p *PathItem) Parse(file file.JsonFile, path string) error {
+	node := file.GetNodeData(fmt.Sprintf("%s.%s", OAS_PATHS_KEY, path))
+	if node != nil {
+		err := json.Unmarshal(*node, p)
+		if err != nil {
+			return fmt.Errorf("failed to Unmarshal PathItem struct: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (p *PathItem) ParseFromNode(node *[]byte) error {
+	if node != nil {
+		err := json.Unmarshal(*node, p)
+		if err != nil {
+			return fmt.Errorf("failed to Unmarshal PathItem struct: %v", err)
 		}
 	}
 

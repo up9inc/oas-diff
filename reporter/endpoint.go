@@ -2,16 +2,21 @@ package reporter
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 
 	"github.com/up9inc/oas-diff/differentiator"
+	file "github.com/up9inc/oas-diff/json"
 	"github.com/up9inc/oas-diff/model"
 )
 
 type endpoinChangelog struct {
-	//Endpoint  string
-	Operation string                   `json:"operation"`
-	Changelog differentiator.Changelog `json:"changelog"`
+	Type       string                   `json:"type"`
+	Endpoint   string                   `json:"endpoint"`
+	Operation  string                   `json:"operation"`
+	Headers    []string                 `json:"headers"`
+	Parameters []string                 `json:"parameters"`
+	Changelog  differentiator.Changelog `json:"changelog"`
 }
 
 type endpointData struct {
@@ -25,21 +30,30 @@ type endpointData struct {
 type endpointsMap map[string]endpointData
 
 type endpointReporter struct {
-	output *differentiator.ChangelogOutput
+	output    *differentiator.ChangelogOutput
+	jsonFile  file.JsonFile
+	jsonFile2 file.JsonFile
 }
 
-func NewEndpointReporter(output *differentiator.ChangelogOutput) Reporter {
+func NewEndpointReporter(jsonFile file.JsonFile, jsonFile2 file.JsonFile, output *differentiator.ChangelogOutput) Reporter {
 	return &endpointReporter{
-		output: output,
+		output:    output,
+		jsonFile:  jsonFile,
+		jsonFile2: jsonFile2,
 	}
 }
 
 func (e *endpointReporter) Build() ([]byte, error) {
-	return json.MarshalIndent(e.buildEndpointChangelogMap(), "", "\t")
+	data, err := e.buildEndpointChangelogMap()
+	if err != nil {
+		return nil, err
+	}
+	return json.MarshalIndent(data, "", "\t")
 }
 
-func (e *endpointReporter) buildEndpointChangelogMap() endpointsMap {
+func (e *endpointReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 	endpointsMap := make(endpointsMap, 0)
+	params := model.Parameters{}
 
 	for k, v := range e.output.Changelog {
 		for _, c := range v {
@@ -48,15 +62,107 @@ func (e *endpointReporter) buildEndpointChangelogMap() endpointsMap {
 				continue
 			}
 
+			pathItem := &model.PathItem{}
+			var operation *model.Operation
 			var op string
 			var endpoint string
+			var headers []string
+			var parameters []string
 
 			if len(c.Path) > 0 {
 				endpoint = c.Path[0]
 			}
 
+			if len(endpoint) == 0 {
+				panic("endpoint should not be nil")
+			}
+
+			var sourceFileRef file.JsonFile
+			var endpointNode *[]byte
+
+			switch c.Type {
+			case "create":
+				// file2
+				sourceFileRef = e.jsonFile2
+			case "delete":
+				// file1
+				sourceFileRef = e.jsonFile
+			case "update":
+				// both
+				// try file1 first
+				sourceFileRef = e.jsonFile
+				endpointNode = sourceFileRef.GetNodeData(fmt.Sprintf("%s.%s", model.OAS_PATHS_KEY, endpoint))
+				if endpointNode == nil {
+					sourceFileRef = e.jsonFile2
+				}
+			}
+
+			if endpointNode == nil {
+				endpointNode = sourceFileRef.GetNodeData(fmt.Sprintf("%s.%s", model.OAS_PATHS_KEY, endpoint))
+				if endpointNode == nil {
+					panic(fmt.Errorf(`failed to find endpoint "%s" node for "%s" operation in file "%s"`, endpoint, c.Type, sourceFileRef.GetPath()))
+				}
+			}
+			err := pathItem.ParseFromNode(endpointNode)
+			if err != nil {
+				return nil, err
+			}
+
 			if len(c.Path) > 1 {
 				op = c.Path[1]
+
+				// TODO: How to distinguish Parameters type: "query", "header", "path" or "cookie"
+				// TODO: Response Headers Map
+
+				// endpoint.parameters || endpoint.operation.parameters
+				if op == params.GetName() || (len(c.Path) > 2 && c.Path[2] == params.GetName()) {
+					paramsRef := pathItem.Parameters
+
+					// endpoint.operation.parameters
+					if op != params.GetName() {
+						switch op {
+						case "connect":
+							operation = pathItem.Connect
+						case "delete":
+							operation = pathItem.Delete
+						case "get":
+							operation = pathItem.Get
+						case "head":
+							operation = pathItem.Head
+						case "options":
+							operation = pathItem.Options
+						case "patch":
+							operation = pathItem.Patch
+						case "post":
+							operation = pathItem.Post
+						case "put":
+							operation = pathItem.Put
+						case "trace":
+							operation = pathItem.Trace
+						}
+
+						if operation == nil {
+							panic("operation should not be nil")
+						}
+
+						paramsRef = operation.Parameters
+					}
+
+					for _, pv := range paramsRef {
+						if pv.Name == c.Identifier[params.GetIdentifierName()] {
+							if pv.In == "header" {
+								headers = append(headers, pv.Name)
+								//headers = append(headers, c.Identifier[params.GetIdentifierName()])
+							} else {
+								parameters = append(parameters, pv.Name)
+								//parameters = append(parameters, c.Identifier[params.GetIdentifierName()])
+							}
+							break
+						}
+					}
+
+				}
+
 			} else {
 				// the endpoint was created/deleted, we only have one operation
 				if c.Type != "update" {
@@ -97,9 +203,12 @@ func (e *endpointReporter) buildEndpointChangelogMap() endpointsMap {
 				aux.DeletedChanges++
 			}
 			aux.Changelogs = append(endpointsMap[endpoint].Changelogs, endpoinChangelog{
-				//Endpoint:  endpoint,
-				Operation: op,
-				Changelog: c,
+				Type:       c.Type,
+				Endpoint:   endpoint,
+				Operation:  op,
+				Headers:    headers,
+				Parameters: parameters,
+				Changelog:  c,
 			})
 			endpointsMap[endpoint] = aux
 		}
@@ -112,5 +221,5 @@ func (e *endpointReporter) buildEndpointChangelogMap() endpointsMap {
 		})
 	}
 
-	return endpointsMap
+	return endpointsMap, nil
 }

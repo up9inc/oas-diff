@@ -46,6 +46,10 @@ func (f *jsonFile) ValidatePath() error {
 }
 
 func (f *jsonFile) Read() (*[]byte, error) {
+	if f.data != nil {
+		return f.data, nil
+	}
+
 	err := f.ValidatePath()
 	if err != nil {
 		return nil, err

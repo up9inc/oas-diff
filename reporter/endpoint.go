@@ -150,7 +150,14 @@ func (e *endpointReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 
 					for _, pv := range paramsRef {
 						if pv.Name == c.Identifier[params.GetIdentifierName()] {
-							if pv.In == "header" {
+							paramType := pv.In
+
+							// endpoint.operation.parameters.identifier.in || endpoint.parameters.identifier.in
+							if (len(c.Path) > 4 && c.Path[4] == "in") || (op == params.GetName() && len(c.Path) > 3 && c.Path[3] == "in") {
+								paramType = c.To.(string)
+							}
+
+							if paramType == "header" {
 								headers = append(headers, pv.Name)
 								//headers = append(headers, c.Identifier[params.GetIdentifierName()])
 							} else {

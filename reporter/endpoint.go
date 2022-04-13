@@ -29,33 +29,33 @@ type endpointData struct {
 
 type endpointsMap map[string]endpointData
 
-type endpointReporter struct {
+type summaryReporter struct {
 	output    *differentiator.ChangelogOutput
 	jsonFile  file.JsonFile
 	jsonFile2 file.JsonFile
 }
 
-func NewEndpointReporter(jsonFile file.JsonFile, jsonFile2 file.JsonFile, output *differentiator.ChangelogOutput) Reporter {
-	return &endpointReporter{
+func NewSummaryReporter(jsonFile file.JsonFile, jsonFile2 file.JsonFile, output *differentiator.ChangelogOutput) Reporter {
+	return &summaryReporter{
 		output:    output,
 		jsonFile:  jsonFile,
 		jsonFile2: jsonFile2,
 	}
 }
 
-func (e *endpointReporter) Build() ([]byte, error) {
-	data, err := e.buildEndpointChangelogMap()
+func (s *summaryReporter) Build() ([]byte, error) {
+	data, err := s.buildEndpointChangelogMap()
 	if err != nil {
 		return nil, err
 	}
 	return json.MarshalIndent(data, "", "\t")
 }
 
-func (e *endpointReporter) buildEndpointChangelogMap() (endpointsMap, error) {
+func (s *summaryReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 	endpointsMap := make(endpointsMap, 0)
 	params := model.Parameters{}
 
-	for k, v := range e.output.Changelog {
+	for k, v := range s.output.Changelog {
 		for _, c := range v {
 			// ignore others non-paths keys
 			if k != model.OAS_PATHS_KEY && k != model.OAS_WEBHOOKS_KEY {
@@ -83,17 +83,17 @@ func (e *endpointReporter) buildEndpointChangelogMap() (endpointsMap, error) {
 			switch c.Type {
 			case "create":
 				// file2
-				sourceFileRef = e.jsonFile2
+				sourceFileRef = s.jsonFile2
 			case "delete":
 				// file1
-				sourceFileRef = e.jsonFile
+				sourceFileRef = s.jsonFile
 			case "update":
 				// both
 				// try file1 first
-				sourceFileRef = e.jsonFile
+				sourceFileRef = s.jsonFile
 				endpointNode = sourceFileRef.GetNodeData(fmt.Sprintf("%s.%s", model.OAS_PATHS_KEY, endpoint))
 				if endpointNode == nil {
-					sourceFileRef = e.jsonFile2
+					sourceFileRef = s.jsonFile2
 				}
 			}
 

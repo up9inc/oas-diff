@@ -55,10 +55,10 @@ var (
 		Usage:    "save an html report",
 		Required: false,
 	}
-	EndpointsOutputFlag = &cli.BoolFlag{
-		Name:     "output-endpoint",
+	SummaryOutputFlag = &cli.BoolFlag{
+		Name:     "output-summary",
 		Aliases:  []string{"oe"},
-		Usage:    "endpoint based changelog output",
+		Usage:    "summary of endpoints based changelog output",
 		Required: false,
 	}
 )

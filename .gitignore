@@ -18,5 +18,5 @@ build/
 lib/
 test/
 changelog*.json
-endpoint*.json
+summary*.json
 changelog*.html

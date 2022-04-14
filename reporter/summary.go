@@ -233,6 +233,8 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 					}
 				}
 
+				// TODO: RequestBody
+
 				// Responses: endpoint.operation.responses
 				if len(c.Path) > 3 && c.Path[2] == "responses" {
 					responseName := c.Path[3]
@@ -264,6 +266,7 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 					pathItem, ok := data.(model.PathItem)
 					if ok {
 						operations := pathItem.GetOperationsName()
+						// TODO: Support multiple operations for created/deleted endpoints
 						if len(operations) == 1 {
 							op = operations[0]
 							c.Path = append(c.Path, op)

@@ -36,8 +36,9 @@ func (s *summaryReporter) Build() ([]byte, error) {
 type SummaryData struct {
 	Endpoints       map[string][]string
 	RequestHeaders  map[string]map[string][]string
-	ResponseHeaders map[string]map[string][]string
 	Parameters      map[string]map[string][]string
+	ResponseHeaders map[string]map[string][]string
+	Responses       map[string]map[string][]string
 }
 
 func (s *SummaryData) AddEndpoint(typeKey string, value string) {
@@ -87,13 +88,27 @@ func (s *SummaryData) AddParameter(typeKey string, endpointKey, value string) {
 	s.Parameters[typeKey][endpointKey] = util.SliceElementAddUnique(s.Parameters[typeKey][endpointKey], value)
 }
 
+func (s *SummaryData) AddResponse(typeKey string, endpointKey, value string) {
+	_, ok := s.Responses[typeKey]
+	if !ok {
+		s.Responses[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.Responses[typeKey][endpointKey]
+	if !ok {
+		s.Responses[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.Responses[typeKey][endpointKey] = util.SliceElementAddUnique(s.Responses[typeKey][endpointKey], value)
+}
+
 func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 	params := model.Parameters{}
 	summaryData := SummaryData{
 		Endpoints:       make(map[string][]string, 0),
 		RequestHeaders:  make(map[string]map[string][]string, 0),
-		ResponseHeaders: make(map[string]map[string][]string, 0),
 		Parameters:      make(map[string]map[string][]string, 0),
+		ResponseHeaders: make(map[string]map[string][]string, 0),
+		Responses:       make(map[string]map[string][]string, 0),
 	}
 
 	for k, v := range s.output.Changelog {
@@ -215,6 +230,18 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 							}
 							break
 						}
+					}
+				}
+
+				// Responses: endpoint.operation.responses
+				if len(c.Path) > 3 && c.Path[2] == "responses" {
+					responseName := c.Path[3]
+					if len(responseName) == 0 {
+						panic(fmt.Errorf("failed to get response name for path %s", strings.Join(c.Path, ".")))
+					}
+					// create/delete
+					if c.Type == "update" || (c.Type != "update" && len(c.Path) == 4) {
+						summaryData.AddResponse(typeKey, endpointKey, responseName)
 					}
 				}
 

@@ -11,25 +11,6 @@ import (
 	"github.com/up9inc/oas-diff/util"
 )
 
-type endpoinChangelog struct {
-	Type       string                   `json:"type"`
-	Endpoint   string                   `json:"endpoint"`
-	Operation  string                   `json:"operation"`
-	Headers    []string                 `json:"headers"`
-	Parameters []string                 `json:"parameters"`
-	Changelog  differentiator.Changelog `json:"changelog"`
-}
-
-type endpointData struct {
-	Changelogs     []endpoinChangelog `json:"changelogs"`
-	TotalChanges   int                `json:"total"`
-	CreatedChanges int                `json:"created"`
-	UpdatedChanges int                `json:"updated"`
-	DeletedChanges int                `json:"deleted"`
-}
-
-type endpointsMap map[string]endpointData
-
 type summaryReporter struct {
 	output    *differentiator.ChangelogOutput
 	jsonFile  file.JsonFile
@@ -53,9 +34,10 @@ func (s *summaryReporter) Build() ([]byte, error) {
 }
 
 type SummaryData struct {
-	Endpoints      map[string][]string
-	RequestHeaders map[string]map[string][]string
-	Parameters     map[string]map[string][]string
+	Endpoints       map[string][]string
+	RequestHeaders  map[string]map[string][]string
+	ResponseHeaders map[string]map[string][]string
+	Parameters      map[string]map[string][]string
 }
 
 func (s *SummaryData) AddEndpoint(typeKey string, value string) {
@@ -79,6 +61,19 @@ func (s *SummaryData) AddRequestHeader(typeKey string, endpointKey, value string
 	s.RequestHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestHeaders[typeKey][endpointKey], value)
 }
 
+func (s *SummaryData) AddResponseHeader(typeKey string, endpointKey, value string) {
+	_, ok := s.ResponseHeaders[typeKey]
+	if !ok {
+		s.ResponseHeaders[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.ResponseHeaders[typeKey][endpointKey]
+	if !ok {
+		s.ResponseHeaders[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.ResponseHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.ResponseHeaders[typeKey][endpointKey], value)
+}
+
 func (s *SummaryData) AddParameter(typeKey string, endpointKey, value string) {
 	_, ok := s.Parameters[typeKey]
 	if !ok {
@@ -95,9 +90,10 @@ func (s *SummaryData) AddParameter(typeKey string, endpointKey, value string) {
 func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 	params := model.Parameters{}
 	summaryData := SummaryData{
-		Endpoints:      make(map[string][]string, 0),
-		RequestHeaders: make(map[string]map[string][]string, 0),
-		Parameters:     make(map[string]map[string][]string, 0),
+		Endpoints:       make(map[string][]string, 0),
+		RequestHeaders:  make(map[string]map[string][]string, 0),
+		ResponseHeaders: make(map[string]map[string][]string, 0),
+		Parameters:      make(map[string]map[string][]string, 0),
 	}
 
 	for k, v := range s.output.Changelog {
@@ -168,7 +164,7 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 				// TODO: How to distinguish Parameters type: "query", "header", "path" or "cookie"
 				// TODO: Response Headers Map
 
-				// endpoint.parameters || endpoint.operation.parameters
+				// Request Headers: endpoint.parameters || endpoint.operation.parameters
 				if op == params.GetName() || (len(c.Path) > 2 && c.Path[2] == params.GetName()) {
 					paramsRef := pathItem.Parameters
 
@@ -221,8 +217,9 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 							break
 						}
 					}
-
 				}
+
+				// Response Headers: endpoint.operation.responses.key.headers
 
 			} else {
 				// the endpoint was created/deleted, we only have one operation

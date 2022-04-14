@@ -115,7 +115,7 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 			}
 
 			if len(endpoint) == 0 {
-				panic("endpoint should not be nil")
+				panic(fmt.Errorf("failed to get endpoint for path %s", strings.Join(c.Path, ".")))
 			}
 
 			var sourceFileRef file.JsonFile
@@ -162,7 +162,6 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 				}
 
 				// TODO: How to distinguish Parameters type: "query", "header", "path" or "cookie"
-				// TODO: Response Headers Map
 
 				// Request Headers: endpoint.parameters || endpoint.operation.parameters
 				if op == params.GetName() || (len(c.Path) > 2 && c.Path[2] == params.GetName()) {
@@ -192,7 +191,7 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 						}
 
 						if operation == nil {
-							panic("operation should not be nil")
+							panic(fmt.Errorf("failed to get request header operation data for path %s", strings.Join(c.Path, ".")))
 						}
 
 						paramsRef = operation.Parameters
@@ -220,6 +219,13 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 				}
 
 				// Response Headers: endpoint.operation.responses.key.headers
+				if len(c.Path) > 5 && c.Path[4] == "headers" {
+					headerName := c.Path[5]
+					if len(headerName) == 0 {
+						panic(fmt.Errorf("failed to get response header name for path %s", strings.Join(c.Path, ".")))
+					}
+					summaryData.AddResponseHeader(typeKey, endpointKey, headerName)
+				}
 
 			} else {
 				// the endpoint was created/deleted, we only have one operation

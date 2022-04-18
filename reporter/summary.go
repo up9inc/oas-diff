@@ -266,7 +266,7 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 					pathItem, ok := data.(model.PathItem)
 					if ok {
 						operations := pathItem.GetOperationsName()
-						// TODO: Support multiple operations for created/deleted endpoints
+
 						if len(operations) == 1 {
 							op = operations[0]
 							c.Path = append(c.Path, op)
@@ -274,6 +274,11 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 
 							// created/deleted endpoints only
 							summaryData.AddEndpoint(typeKey, endpointKey)
+						} else {
+							for _, o := range operations {
+								endpointKey = fmt.Sprintf("%s %s", strings.ToUpper(o), endpoint)
+								summaryData.AddEndpoint(typeKey, endpointKey)
+							}
 						}
 					}
 				}

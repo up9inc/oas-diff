@@ -70,21 +70,29 @@ func (p PathItem) GetOperationsName() []string {
 
 	if p.Connect != nil {
 		operations = append(operations, "connect")
-	} else if p.Delete != nil {
+	}
+	if p.Delete != nil {
 		operations = append(operations, "delete")
-	} else if p.Get != nil {
+	}
+	if p.Get != nil {
 		operations = append(operations, "get")
-	} else if p.Head != nil {
+	}
+	if p.Head != nil {
 		operations = append(operations, "head")
-	} else if p.Options != nil {
+	}
+	if p.Options != nil {
 		operations = append(operations, "options")
-	} else if p.Patch != nil {
+	}
+	if p.Patch != nil {
 		operations = append(operations, "patch")
-	} else if p.Post != nil {
+	}
+	if p.Post != nil {
 		operations = append(operations, "post")
-	} else if p.Put != nil {
+	}
+	if p.Put != nil {
 		operations = append(operations, "put")
-	} else if p.Trace != nil {
+	}
+	if p.Trace != nil {
 		operations = append(operations, "trace")
 	}
 

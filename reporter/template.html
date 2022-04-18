@@ -95,14 +95,14 @@
                         {{if (ne $hasTypeFilter true)}}
                         <span>Changes: {{$val.TotalChanges }}</span>
                         {{end}}
-                        {{if (gt $val.CreateChanges 0)}}
-                        <span class="text-success">Create: {{$val.CreateChanges }}</span>
+                        {{if (gt $val.CreatedChanges 0)}}
+                        <span class="text-success">Created: {{$val.CreatedChanges }}</span>
                         {{end}}
-                        {{if (gt $val.UpdateChanges 0)}}
-                        <span class="text-warning"> Update: {{$val.UpdateChanges }}</span>
+                        {{if (gt $val.UpdatedChanges 0)}}
+                        <span class="text-warning"> Updated: {{$val.UpdatedChanges }}</span>
                         {{end}}
-                        {{if (gt $val.DeleteChanges 0)}}
-                        <span class="text-danger"> Delete: {{$val.DeleteChanges }}</span>
+                        {{if (gt $val.DeletedChanges 0)}}
+                        <span class="text-danger"> Deleted: {{$val.DeletedChanges }}</span>
                         {{end}}
                     </span>
                 </div>

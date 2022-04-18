@@ -11,6 +11,12 @@ import (
 	"github.com/up9inc/oas-diff/util"
 )
 
+const (
+	SUMMARY_NEW     = "New"
+	SUMMARY_UPDATED = "Updated"
+	SUMMARY_REMOVED = "Removed"
+)
+
 type summaryReporter struct {
 	output    *differentiator.ChangelogOutput
 	jsonFile  file.JsonFile
@@ -36,6 +42,7 @@ func (s *summaryReporter) Build() ([]byte, error) {
 type SummaryData struct {
 	Endpoints       map[string][]string
 	RequestHeaders  map[string]map[string][]string
+	RequestBodies   map[string]map[string][]string
 	Parameters      map[string]map[string][]string
 	ResponseHeaders map[string]map[string][]string
 	Responses       map[string]map[string][]string
@@ -60,6 +67,19 @@ func (s *SummaryData) AddRequestHeader(typeKey string, endpointKey, value string
 	}
 
 	s.RequestHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestHeaders[typeKey][endpointKey], value)
+}
+
+func (s *SummaryData) AddRequestBody(typeKey string, endpointKey, value string) {
+	_, ok := s.RequestBodies[typeKey]
+	if !ok {
+		s.RequestBodies[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.RequestBodies[typeKey][endpointKey]
+	if !ok {
+		s.RequestBodies[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.RequestBodies[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestBodies[typeKey][endpointKey], value)
 }
 
 func (s *SummaryData) AddResponseHeader(typeKey string, endpointKey, value string) {
@@ -106,6 +126,7 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 	summaryData := SummaryData{
 		Endpoints:       make(map[string][]string, 0),
 		RequestHeaders:  make(map[string]map[string][]string, 0),
+		RequestBodies:   make(map[string]map[string][]string, 0),
 		Parameters:      make(map[string]map[string][]string, 0),
 		ResponseHeaders: make(map[string]map[string][]string, 0),
 		Responses:       make(map[string]map[string][]string, 0),
@@ -138,15 +159,15 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 
 			switch c.Type {
 			case "create":
-				typeKey = "New"
+				typeKey = SUMMARY_NEW
 				// file2
 				sourceFileRef = s.jsonFile2
 			case "delete":
-				typeKey = "Removed"
+				typeKey = SUMMARY_REMOVED
 				// file1
 				sourceFileRef = s.jsonFile
 			case "update":
-				typeKey = "Updated"
+				typeKey = SUMMARY_UPDATED
 				// both
 				// try file1 first
 				sourceFileRef = s.jsonFile
@@ -233,7 +254,39 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 					}
 				}
 
-				// TODO: RequestBody
+				// RequestBody: endpoint.operation.requestBody
+				if len(c.Path) > 2 && c.Path[2] == "requestBody" {
+					// endpoint.operation.requestBody.content.key
+					if len(c.Path) > 4 && c.Path[3] == "content" {
+						requestBodyName := c.Path[4]
+						summaryData.AddRequestBody(typeKey, endpointKey, requestBodyName)
+					} else if len(c.Path) == 3 {
+						// endpoint.operation.requestBody
+						// handle create/delete
+						var customTypeKey = typeKey
+						var requestBody *model.RequestBody
+						var ok bool
+
+						// create
+						if c.From == nil {
+							customTypeKey = SUMMARY_NEW
+							requestBody, ok = c.To.(*model.RequestBody)
+						} else if c.To == nil {
+							// delete
+							customTypeKey = SUMMARY_REMOVED
+							requestBody, ok = c.From.(*model.RequestBody)
+						}
+
+						if !ok {
+							panic(fmt.Errorf("failed to get request body data for path %s", strings.Join(c.Path, ".")))
+						}
+						// we can have multiple content keys
+						for requestBodyName := range requestBody.Content {
+							summaryData.AddRequestBody(customTypeKey, endpointKey, requestBodyName)
+						}
+					}
+
+				}
 
 				// Responses: endpoint.operation.responses
 				if len(c.Path) > 3 && c.Path[2] == "responses" {

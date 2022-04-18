@@ -32,96 +32,6 @@ func NewSummaryReporter(jsonFile file.JsonFile, jsonFile2 file.JsonFile, output 
 }
 
 func (s *summaryReporter) Build() ([]byte, error) {
-	data, err := s.buildEndpointChangelogMap()
-	if err != nil {
-		return nil, err
-	}
-	return json.MarshalIndent(data, "", "\t")
-}
-
-type SummaryData struct {
-	Endpoints       map[string][]string
-	RequestHeaders  map[string]map[string][]string
-	RequestBodies   map[string]map[string][]string
-	Parameters      map[string]map[string][]string
-	ResponseHeaders map[string]map[string][]string
-	Responses       map[string]map[string][]string
-}
-
-func (s *SummaryData) AddEndpoint(typeKey string, value string) {
-	_, ok := s.Endpoints[typeKey]
-	if !ok {
-		s.Endpoints[typeKey] = make([]string, 0)
-	}
-	s.Endpoints[typeKey] = util.SliceElementAddUnique(s.Endpoints[typeKey], value)
-}
-
-func (s *SummaryData) AddRequestHeader(typeKey string, endpointKey, value string) {
-	_, ok := s.RequestHeaders[typeKey]
-	if !ok {
-		s.RequestHeaders[typeKey] = make(map[string][]string, 0)
-	}
-	_, ok = s.RequestHeaders[typeKey][endpointKey]
-	if !ok {
-		s.RequestHeaders[typeKey][endpointKey] = make([]string, 0)
-	}
-
-	s.RequestHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestHeaders[typeKey][endpointKey], value)
-}
-
-func (s *SummaryData) AddRequestBody(typeKey string, endpointKey, value string) {
-	_, ok := s.RequestBodies[typeKey]
-	if !ok {
-		s.RequestBodies[typeKey] = make(map[string][]string, 0)
-	}
-	_, ok = s.RequestBodies[typeKey][endpointKey]
-	if !ok {
-		s.RequestBodies[typeKey][endpointKey] = make([]string, 0)
-	}
-
-	s.RequestBodies[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestBodies[typeKey][endpointKey], value)
-}
-
-func (s *SummaryData) AddResponseHeader(typeKey string, endpointKey, value string) {
-	_, ok := s.ResponseHeaders[typeKey]
-	if !ok {
-		s.ResponseHeaders[typeKey] = make(map[string][]string, 0)
-	}
-	_, ok = s.ResponseHeaders[typeKey][endpointKey]
-	if !ok {
-		s.ResponseHeaders[typeKey][endpointKey] = make([]string, 0)
-	}
-
-	s.ResponseHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.ResponseHeaders[typeKey][endpointKey], value)
-}
-
-func (s *SummaryData) AddParameter(typeKey string, endpointKey, value string) {
-	_, ok := s.Parameters[typeKey]
-	if !ok {
-		s.Parameters[typeKey] = make(map[string][]string, 0)
-	}
-	_, ok = s.Parameters[typeKey][endpointKey]
-	if !ok {
-		s.Parameters[typeKey][endpointKey] = make([]string, 0)
-	}
-
-	s.Parameters[typeKey][endpointKey] = util.SliceElementAddUnique(s.Parameters[typeKey][endpointKey], value)
-}
-
-func (s *SummaryData) AddResponse(typeKey string, endpointKey, value string) {
-	_, ok := s.Responses[typeKey]
-	if !ok {
-		s.Responses[typeKey] = make(map[string][]string, 0)
-	}
-	_, ok = s.Responses[typeKey][endpointKey]
-	if !ok {
-		s.Responses[typeKey][endpointKey] = make([]string, 0)
-	}
-
-	s.Responses[typeKey][endpointKey] = util.SliceElementAddUnique(s.Responses[typeKey][endpointKey], value)
-}
-
-func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 	params := model.Parameters{}
 	summaryData := SummaryData{
 		Endpoints:       make(map[string][]string, 0),
@@ -177,17 +87,6 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 				}
 			}
 
-			if endpointNode == nil {
-				endpointNode = sourceFileRef.GetNodeData(fmt.Sprintf("%s.%s", model.OAS_PATHS_KEY, endpoint))
-				if endpointNode == nil {
-					panic(fmt.Errorf(`failed to find endpoint "%s" node for "%s" operation in file "%s"`, endpoint, c.Type, sourceFileRef.GetPath()))
-				}
-			}
-			err := pathItem.ParseFromNode(endpointNode)
-			if err != nil {
-				return summaryData, err
-			}
-
 			if len(c.Path) > 1 {
 				op = c.Path[1]
 				endpointKey = fmt.Sprintf("%s %s", strings.ToUpper(op), endpoint)
@@ -197,10 +96,20 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 					summaryData.AddEndpoint(typeKey, endpointKey)
 				}
 
-				// TODO: How to distinguish Parameters type: "query", "header", "path" or "cookie"
-
 				// Request Headers: endpoint.parameters || endpoint.operation.parameters
+				// TODO: How to distinguish Parameters type: "query", "header", "path" or "cookie"
 				if op == params.GetName() || (len(c.Path) > 2 && c.Path[2] == params.GetName()) {
+					if endpointNode == nil {
+						endpointNode = sourceFileRef.GetNodeData(fmt.Sprintf("%s.%s", model.OAS_PATHS_KEY, endpoint))
+						if endpointNode == nil {
+							panic(fmt.Errorf(`failed to find endpoint "%s" node for "%s" operation in file "%s"`, endpoint, c.Type, sourceFileRef.GetPath()))
+						}
+					}
+					err := pathItem.ParseFromNode(endpointNode)
+					if err != nil {
+						return nil, err
+					}
+
 					paramsRef := pathItem.Parameters
 
 					// endpoint.operation.parameters
@@ -339,5 +248,87 @@ func (s *summaryReporter) buildEndpointChangelogMap() (SummaryData, error) {
 		}
 	}
 
-	return summaryData, nil
+	return json.MarshalIndent(summaryData, "", "\t")
+}
+
+type SummaryData struct {
+	Endpoints       map[string][]string
+	RequestHeaders  map[string]map[string][]string
+	RequestBodies   map[string]map[string][]string
+	Parameters      map[string]map[string][]string
+	ResponseHeaders map[string]map[string][]string
+	Responses       map[string]map[string][]string
+}
+
+func (s *SummaryData) AddEndpoint(typeKey string, value string) {
+	_, ok := s.Endpoints[typeKey]
+	if !ok {
+		s.Endpoints[typeKey] = make([]string, 0)
+	}
+	s.Endpoints[typeKey] = util.SliceElementAddUnique(s.Endpoints[typeKey], value)
+}
+
+func (s *SummaryData) AddRequestHeader(typeKey string, endpointKey, value string) {
+	_, ok := s.RequestHeaders[typeKey]
+	if !ok {
+		s.RequestHeaders[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.RequestHeaders[typeKey][endpointKey]
+	if !ok {
+		s.RequestHeaders[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.RequestHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestHeaders[typeKey][endpointKey], value)
+}
+
+func (s *SummaryData) AddRequestBody(typeKey string, endpointKey, value string) {
+	_, ok := s.RequestBodies[typeKey]
+	if !ok {
+		s.RequestBodies[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.RequestBodies[typeKey][endpointKey]
+	if !ok {
+		s.RequestBodies[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.RequestBodies[typeKey][endpointKey] = util.SliceElementAddUnique(s.RequestBodies[typeKey][endpointKey], value)
+}
+
+func (s *SummaryData) AddResponseHeader(typeKey string, endpointKey, value string) {
+	_, ok := s.ResponseHeaders[typeKey]
+	if !ok {
+		s.ResponseHeaders[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.ResponseHeaders[typeKey][endpointKey]
+	if !ok {
+		s.ResponseHeaders[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.ResponseHeaders[typeKey][endpointKey] = util.SliceElementAddUnique(s.ResponseHeaders[typeKey][endpointKey], value)
+}
+
+func (s *SummaryData) AddParameter(typeKey string, endpointKey, value string) {
+	_, ok := s.Parameters[typeKey]
+	if !ok {
+		s.Parameters[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.Parameters[typeKey][endpointKey]
+	if !ok {
+		s.Parameters[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.Parameters[typeKey][endpointKey] = util.SliceElementAddUnique(s.Parameters[typeKey][endpointKey], value)
+}
+
+func (s *SummaryData) AddResponse(typeKey string, endpointKey, value string) {
+	_, ok := s.Responses[typeKey]
+	if !ok {
+		s.Responses[typeKey] = make(map[string][]string, 0)
+	}
+	_, ok = s.Responses[typeKey][endpointKey]
+	if !ok {
+		s.Responses[typeKey][endpointKey] = make([]string, 0)
+	}
+
+	s.Responses[typeKey][endpointKey] = util.SliceElementAddUnique(s.Responses[typeKey][endpointKey], value)
 }

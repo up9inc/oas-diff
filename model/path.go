@@ -35,7 +35,30 @@ func (p *PathsMap) Parse(file file.JsonFile) error {
 	if node != nil {
 		err := json.Unmarshal(*node, p)
 		if err != nil {
-			return fmt.Errorf("failed to Unmarshal PathsMap struct: %v", err)
+			return fmt.Errorf("failed to Unmarshal PathsMap: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (p *PathItem) Parse(file file.JsonFile, path string) error {
+	node := file.GetNodeData(fmt.Sprintf("%s.%s", OAS_PATHS_KEY, path))
+	if node != nil {
+		err := json.Unmarshal(*node, p)
+		if err != nil {
+			return fmt.Errorf("failed to Unmarshal PathItem struct: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (p *PathItem) ParseFromNode(node *[]byte) error {
+	if node != nil {
+		err := json.Unmarshal(*node, p)
+		if err != nil {
+			return fmt.Errorf("failed to Unmarshal PathItem struct: %v", err)
 		}
 	}
 
@@ -47,21 +70,29 @@ func (p PathItem) GetOperationsName() []string {
 
 	if p.Connect != nil {
 		operations = append(operations, "connect")
-	} else if p.Delete != nil {
+	}
+	if p.Delete != nil {
 		operations = append(operations, "delete")
-	} else if p.Get != nil {
+	}
+	if p.Get != nil {
 		operations = append(operations, "get")
-	} else if p.Head != nil {
+	}
+	if p.Head != nil {
 		operations = append(operations, "head")
-	} else if p.Options != nil {
+	}
+	if p.Options != nil {
 		operations = append(operations, "options")
-	} else if p.Patch != nil {
+	}
+	if p.Patch != nil {
 		operations = append(operations, "patch")
-	} else if p.Post != nil {
+	}
+	if p.Post != nil {
 		operations = append(operations, "post")
-	} else if p.Put != nil {
+	}
+	if p.Put != nil {
 		operations = append(operations, "put")
-	} else if p.Trace != nil {
+	}
+	if p.Trace != nil {
 		operations = append(operations, "trace")
 	}
 

@@ -18,4 +18,5 @@ build/
 lib/
 test/
 changelog*.json
+summary*.json
 changelog*.html

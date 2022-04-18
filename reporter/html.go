@@ -23,12 +23,12 @@ type pathChangelog struct {
 }
 
 type pathsData struct {
-	Key           string
-	Paths         []pathChangelog
-	TotalChanges  int
-	CreateChanges int
-	UpdateChanges int
-	DeleteChanges int
+	Key            string
+	Paths          []pathChangelog
+	TotalChanges   int
+	CreatedChanges int
+	UpdatedChanges int
+	DeletedChanges int
 }
 
 type pathsMap map[string]pathsData
@@ -213,12 +213,12 @@ func (h *htmlReporter) buildPathChangelogMap() []pathKeyValue {
 			_, ok := pathsMap[endpoint]
 			if !ok {
 				pathsMap[endpoint] = pathsData{
-					Key:           k,
-					Paths:         make([]pathChangelog, 0),
-					TotalChanges:  0,
-					CreateChanges: 0,
-					UpdateChanges: 0,
-					DeleteChanges: 0,
+					Key:            k,
+					Paths:          make([]pathChangelog, 0),
+					TotalChanges:   0,
+					CreatedChanges: 0,
+					UpdatedChanges: 0,
+					DeletedChanges: 0,
 				}
 			}
 
@@ -226,11 +226,11 @@ func (h *htmlReporter) buildPathChangelogMap() []pathKeyValue {
 			aux.TotalChanges++
 			switch c.Type {
 			case "create":
-				aux.CreateChanges++
+				aux.CreatedChanges++
 			case "update":
-				aux.UpdateChanges++
+				aux.UpdatedChanges++
 			case "delete":
-				aux.DeleteChanges++
+				aux.DeletedChanges++
 			}
 			aux.Paths = append(pathsMap[endpoint].Paths, pathChangelog{
 				Endpoint:  endpoint,

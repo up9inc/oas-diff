@@ -14,7 +14,7 @@ type Differentiator interface {
 }
 
 type DifferentiatorOptions struct {
-	TypeFilter         string `json:"type"`
+	TypeFilter         string `json:"type-filter"`
 	Loose              bool   `json:"loose"`
 	IncludeFilePath    bool   `json:"include-file-path"`
 	IgnoreDescriptions bool   `json:"ignore-descriptions"`

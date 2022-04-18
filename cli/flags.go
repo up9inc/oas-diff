@@ -16,38 +16,49 @@ var (
 		Required: true,
 	}
 	TypeFilterFlag = &cli.StringFlag{
-		Name:     "type",
-		Aliases:  []string{"t"},
-		Usage:    "Changelog Type filter (create/update/delete)",
+		Name:     "type-filter",
+		Aliases:  []string{"tf"},
+		Usage:    "changelog Type filter (create/update/delete)",
 		Required: false,
 	}
 	LooseFlag = &cli.BoolFlag{
 		Name:     "loose",
+		Aliases:  []string{"l"},
 		Usage:    "loosely diff, ignores global case sensitivity for strings comparisons and ignore headers that start with 'x-' and 'user-agent'",
 		Required: false,
 		Value:    false,
 	}
 	IncludeFilePathFlag = &cli.BoolFlag{
 		Name:     "include-file-path",
+		Aliases:  []string{"ifp"},
 		Usage:    "whether or not to include the full file path from the diff changelog",
 		Required: false,
 		Value:    false,
 	}
 	IgnoreDescriptionsFlag = &cli.BoolFlag{
 		Name:     "ignore-descriptions",
+		Aliases:  []string{"id"},
 		Usage:    "whether or not to ignore descriptions when performing the diff",
 		Required: false,
 		Value:    false,
 	}
 	IgnoreExamplesFlag = &cli.BoolFlag{
 		Name:     "ignore-examples",
+		Aliases:  []string{"ie"},
 		Usage:    "whether or not to ignore examples when performing the diff",
 		Required: false,
 		Value:    false,
 	}
 	HtmlOutputFlag = &cli.BoolFlag{
-		Name:     "html",
+		Name:     "output-html",
+		Aliases:  []string{"oh"},
 		Usage:    "save an html report",
+		Required: false,
+	}
+	SummaryOutputFlag = &cli.BoolFlag{
+		Name:     "output-summary",
+		Aliases:  []string{"oe"},
+		Usage:    "summary of endpoints based changelog output",
 		Required: false,
 	}
 )

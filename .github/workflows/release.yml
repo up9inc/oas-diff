@@ -50,16 +50,19 @@ jobs:
           go-version: '^1.18'
       - name: Get OS and arch info
         run: |
+          VERSION=${git describe --tags --abbrev=0}
           GOOSARCH=${{matrix.goosarch}}
           GOOS=${GOOSARCH%/*}
           GOARCH=${GOOSARCH#*/}
           BINARY_NAME=${{github.repository}}-$GOOS-$GOARCH
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "BINARY_NAME=$BINARY_NAME" >> $GITHUB_ENV
           echo "GOOS=$GOOS" >> $GITHUB_ENV
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
+          echo $GITHUB_ENV      
       - name: Build
         run: |
-          go build -o "$BINARY_NAME" -v
+          go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
       - name: Release Notes
         run:
           git log $(git describe HEAD~ --tags --abbrev=0)..HEAD --pretty='format:* %h %s%n  * %an <%ae>' --no-merges >> ".github/RELEASE-TEMPLATE.md"
@@ -67,5 +70,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: ".github/RELEASE-TEMPLATE.md"
-          draft: true
           files: ${{env.BINARY_NAME}}
+          draft: true
+          prerelease: true

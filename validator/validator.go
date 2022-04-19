@@ -9,7 +9,8 @@ import (
 )
 
 type Validator interface {
-	InitOAS31Schema(path string) error
+	InitSchemaFromFile(schemaFile file.JsonFile) error
+	InitSchemaFromURL(url string) error
 	Validate(jsonFile file.JsonFile) error
 	GetSchemaProperty(key string) (*jsonschema.Schema, error)
 	GetSchemaPropertyRequiredFields(key string) ([]string, error)
@@ -35,7 +36,7 @@ func NewValidator() Validator {
 
 func (v *validator) Validate(jsonFile file.JsonFile) error {
 	if v.schema == nil {
-		err := v.InitOAS31Schema(OAS_SCHEMA_FILE)
+		err := v.InitSchemaFromURL(OAS31_SCHEMA_URL)
 		if err != nil {
 			return err
 		}

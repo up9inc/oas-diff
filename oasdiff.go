@@ -11,10 +11,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var Version = "0.0.0-dev"
+
 func main() {
 	app := &cli.App{
 		Name:     "oas-diff",
-		Version:  "0.1.0-alpha",
+		Version:  Version,
 		Usage:    "Validate/Diff OAS 3.1 files",
 		HideHelp: true,
 		Commands: []*cli.Command{

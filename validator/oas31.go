@@ -8,22 +8,32 @@ import (
 )
 
 const (
-	OAS_SCHEMA_URL  = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v3.1/schema.json"
-	OAS_SCHEMA_FILE = "validator/oas31.json"
+	OAS31_SCHEMA_URL  = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v3.1/schema.json"
+	OAS31_SCHEMA_FILE = "validator/oas31.json"
 )
 
-func (v *validator) InitOAS31Schema(path string) error {
-	if len(path) == 0 {
-		path = OAS_SCHEMA_FILE
-	}
-
-	v.jsonSchema = file.NewJsonFile(path)
-	err := v.jsonSchema.ValidatePath()
+func (v *validator) InitSchemaFromFile(schemaFile file.JsonFile) error {
+	err := schemaFile.ValidatePath()
 	if err != nil {
 		return err
 	}
 
+	v.jsonSchema = schemaFile
 	v.schema, err = v.compiler.Compile(v.jsonSchema.GetPath())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (v *validator) InitSchemaFromURL(url string) error {
+	if len(url) == 0 {
+		url = OAS31_SCHEMA_URL
+	}
+
+	var err error
+	v.schema, err = v.compiler.Compile(url)
 	if err != nil {
 		return err
 	}
@@ -33,7 +43,7 @@ func (v *validator) InitOAS31Schema(path string) error {
 
 func (v *validator) GetSchemaProperty(key string) (*jsonschema.Schema, error) {
 	if v.schema == nil {
-		err := v.InitOAS31Schema(OAS_SCHEMA_FILE)
+		err := v.InitSchemaFromURL(OAS31_SCHEMA_URL)
 		if err != nil {
 			return nil, err
 		}

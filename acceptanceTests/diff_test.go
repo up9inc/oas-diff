@@ -34,8 +34,9 @@ type DiffSuite struct {
 
 	absPath string
 
-	jsonFile1 file.JsonFile
-	jsonFile2 file.JsonFile
+	OAS31schemaFile file.JsonFile
+	jsonFile1       file.JsonFile
+	jsonFile2       file.JsonFile
 
 	vall validator.Validator
 	diff differentiator.Differentiator
@@ -49,6 +50,7 @@ func (d *DiffSuite) SetupTest() {
 		return
 	}
 
+	d.OAS31schemaFile = file.NewJsonFile(OAS_SCHEMA_FILE)
 	// must be set on each test because of the options
 	d.diff = nil
 }
@@ -788,7 +790,7 @@ func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {
 	d.jsonFile2 = file.NewJsonFile(FILE2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -806,7 +808,7 @@ func (d *DiffSuite) TestSimpleDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -824,7 +826,7 @@ func (d *DiffSuite) TestSimpleLooseDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE_LOOSE2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -843,7 +845,7 @@ func (d *DiffSuite) TestSimpleLooseDiffWithFullFilePath() {
 	d.jsonFile2 = file.NewJsonFile(FILE_LOOSE2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -862,7 +864,7 @@ func (d *DiffSuite) TestSimpleLooseDiffWithExcludeDescriptions() {
 	d.jsonFile2 = file.NewJsonFile(FILE_LOOSE2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -881,7 +883,7 @@ func (d *DiffSuite) TestHeadersDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE_HEADERS2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -899,7 +901,7 @@ func (d *DiffSuite) TestHeadersLooseDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE_HEADERS2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -918,7 +920,7 @@ func (d *DiffSuite) TestResponsesDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE_RESPONSES2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -936,7 +938,7 @@ func (d *DiffSuite) TestResponsesLooseDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE_RESPONSES2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -955,7 +957,7 @@ func (d *DiffSuite) TestOperationsDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE_OPERATIONS2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return
@@ -973,7 +975,7 @@ func (d *DiffSuite) TestOperationsLooseDiff() {
 	d.jsonFile2 = file.NewJsonFile(FILE_OPERATIONS2)
 
 	d.vall = validator.NewValidator()
-	err := d.vall.InitOAS31Schema(OAS_SCHEMA_FILE)
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
 	if err != nil {
 		d.T().Error(err)
 		return

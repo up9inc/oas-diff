@@ -2,15 +2,21 @@ package reporter
 
 import (
 	"bytes"
+	"embed"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/up9inc/oas-diff/differentiator"
 	"github.com/up9inc/oas-diff/model"
 )
+
+//go:embed template.html
+var templateFS embed.FS
+
+const templateName = "template.html"
 
 type htmlReporter struct {
 	output *differentiator.ChangelogOutput
@@ -141,7 +147,7 @@ func (h *htmlReporter) Build() ([]byte, error) {
 	}
 
 	var buf bytes.Buffer
-	tmpl, err := template.New("template.html").Funcs(funcMap).ParseFiles("reporter/template.html")
+	tmpl, err := template.New(templateName).Funcs(funcMap).ParseFS(templateFS, templateName)
 	if err != nil {
 		return nil, err
 	}

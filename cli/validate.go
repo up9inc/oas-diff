@@ -31,7 +31,7 @@ func validateCmd(c *cli.Context) error {
 	}
 
 	val := validator.NewValidator()
-	err = val.InitOAS31Schema(validator.OAS_SCHEMA_FILE)
+	err = val.InitSchemaFromURL(validator.OAS31_SCHEMA_URL)
 	if err != nil {
 		return err
 	}

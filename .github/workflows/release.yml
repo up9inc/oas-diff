@@ -50,7 +50,7 @@ jobs:
           go-version: '^1.18'
       - name: Get OS and arch info
         run: |
-          VERSION=${git describe --tags --abbrev=0}
+          VERSION=$(git describe --tags --abbrev=0)
           GOOSARCH=${{matrix.goosarch}}
           GOOS=${GOOSARCH%/*}
           GOARCH=${GOOSARCH#*/}

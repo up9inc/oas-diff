@@ -2,6 +2,9 @@ package model
 
 // https://spec.openapis.org/oas/v3.1.0#security-scheme-object
 type SecurityScheme struct {
+	Ref     string `json:"$ref,omitempty" diff:"$ref"`
+	Summary string `json:"summary,omitempty" diff:"summary"`
+
 	Type             string     `json:"type,omitempty" diff:"type"`
 	Description      string     `json:"description,omitempty" diff:"description"`
 	Name             string     `json:"name,omitempty" diff:"name"`

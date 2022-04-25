@@ -7,6 +7,9 @@ var _ ExamplesInterface = (*Header)(nil)
 
 // https://spec.openapis.org/oas/v3.1.0#header-object
 type Header struct {
+	Ref     string `json:"$ref,omitempty" diff:"$ref"`
+	Summary string `json:"summary,omitempty" diff:"summary"`
+
 	Description     string      `json:"description,omitempty" diff:"description"`
 	Required        bool        `json:"required,omitempty" diff:"required"`
 	Deprecated      bool        `json:"deprecated,omitempty" diff:"deprecated"`

@@ -14,7 +14,13 @@ type Parameters []*Parameter
 var _ ExamplesInterface = (*Parameter)(nil)
 
 // https://spec.openapis.org/oas/v3.1.0#parameter-object
+// TODO: Handle Array of Reference Object with our custom array interface?
+// TODO: Handle Multiple identifiers when the model is an array of Reference Object
 type Parameter struct {
+	//Ref     string `json:"$ref,omitempty" diff:"$ref,identifier"`
+	Ref     string `json:"$ref,omitempty" diff:"$ref"`
+	Summary string `json:"summary,omitempty" diff:"summary"`
+
 	Name            string      `json:"name,omitempty" diff:"name,identifier"`
 	In              string      `json:"in,omitempty" diff:"in"`
 	Description     string      `json:"description,omitempty" diff:"description"`
@@ -26,7 +32,7 @@ type Parameter struct {
 	AllowReserved   bool        `json:"allowReserved,omitempty" diff:"allowReserved"`
 	Schema          *Schema     `json:"schema,omitempty" diff:"schema"`
 	Example         interface{} `json:"example,omitempty" diff:"example"`
-	Examples        AnyMap      `json:"examples,omitempty" diff:"examples"`
+	Examples        ExamplesMap `json:"examples,omitempty" diff:"examples"`
 	Content         ContentMap  `json:"content,omitempty" diff:"content"`
 }
 

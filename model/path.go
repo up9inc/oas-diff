@@ -14,20 +14,21 @@ type PathsMap map[string]*PathItem
 
 // https://spec.openapis.org/oas/v3.1.0#path-item-object
 type PathItem struct {
-	Ref         string     `json:"$ref,omitempty" diff:"$ref"`
-	Summary     string     `json:"summary,omitempty" diff:"summary"`
-	Description string     `json:"description,omitempty" diff:"description"`
-	Connect     *Operation `json:"connect,omitempty" diff:"connect"`
-	Delete      *Operation `json:"delete,omitempty" diff:"delete"`
-	Get         *Operation `json:"get,omitempty" diff:"get"`
-	Head        *Operation `json:"head,omitempty" diff:"head"`
-	Options     *Operation `json:"options,omitempty" diff:"options"`
-	Patch       *Operation `json:"patch,omitempty" diff:"patch"`
-	Post        *Operation `json:"post,omitempty" diff:"post"`
-	Put         *Operation `json:"put,omitempty" diff:"put"`
-	Trace       *Operation `json:"trace,omitempty" diff:"trace"`
-	Servers     Servers    `json:"servers,omitempty" diff:"servers"`
-	Parameters  Parameters `json:"parameters,omitempty" diff:"parameters"`
+	Ref         string `json:"$ref,omitempty" diff:"$ref"`
+	Summary     string `json:"summary,omitempty" diff:"summary"`
+	Description string `json:"description,omitempty" diff:"description"`
+
+	Connect    *Operation `json:"connect,omitempty" diff:"connect"`
+	Delete     *Operation `json:"delete,omitempty" diff:"delete"`
+	Get        *Operation `json:"get,omitempty" diff:"get"`
+	Head       *Operation `json:"head,omitempty" diff:"head"`
+	Options    *Operation `json:"options,omitempty" diff:"options"`
+	Patch      *Operation `json:"patch,omitempty" diff:"patch"`
+	Post       *Operation `json:"post,omitempty" diff:"post"`
+	Put        *Operation `json:"put,omitempty" diff:"put"`
+	Trace      *Operation `json:"trace,omitempty" diff:"trace"`
+	Servers    Servers    `json:"servers,omitempty" diff:"servers"`
+	Parameters Parameters `json:"parameters,omitempty" diff:"parameters"`
 }
 
 func (p *PathsMap) Parse(file file.JsonFile) error {

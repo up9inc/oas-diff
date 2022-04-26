@@ -76,6 +76,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	examplesMapDiffer := NewExamplesMapDiffer(opts)
 	serverVariablesMapDiffer := NewServerVariablesMapDiffer(opts)
 	requestBodiesMapDiffer := NewRequestBodiesMapDiffer(opts)
+	securitySchemesMapDiffer := NewSecuritySchemesMapDiffer(opts)
 
 	differ, err := lib.NewDiffer(
 		// strings
@@ -105,10 +106,12 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		lib.CustomValueDiffers(examplesMapDiffer),
 		lib.CustomValueDiffers(serverVariablesMapDiffer),
 		lib.CustomValueDiffers(requestBodiesMapDiffer),
+		lib.CustomValueDiffers(securitySchemesMapDiffer),
 		// options
 		lib.StructMapKeySupport(),
 		lib.DisableStructValues(),
 		lib.SliceOrdering(false))
+
 	if err != nil {
 		panic(err)
 	}

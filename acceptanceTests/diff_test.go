@@ -3,6 +3,7 @@ package acceptanceTests
 import (
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -42,6 +43,11 @@ type DiffSuite struct {
 
 	vall validator.Validator
 	diff differentiator.Differentiator
+}
+
+type OutputValidation struct {
+	output            []differentiator.Changelog
+	expectedChangelog *differentiator.Changelog
 }
 
 func (d *DiffSuite) SetupTest() {
@@ -84,7 +90,6 @@ func validateDependencies(d *DiffSuite) {
 }
 
 func validateExecutionStatus(d *DiffSuite, output *differentiator.ChangelogOutput) {
-	d.Assert().NotNil(d, "d is nil")
 	d.Assert().NotNil(output, "output is nil")
 
 	d.Assert().NotNil(output.ExecutionStatus, "executionStatus is nil")
@@ -95,7 +100,6 @@ func validateExecutionStatus(d *DiffSuite, output *differentiator.ChangelogOutpu
 }
 
 func validateChangeMapOutput(d *DiffSuite, output *differentiator.ChangelogOutput) {
-	d.Assert().NotNil(d, "d is nil")
 	d.Assert().NotNil(output, "output is nil")
 
 	d.Assert().NotNil(output.Changelog, "changeMap is nil")
@@ -108,6 +112,34 @@ func validateChangeMapOutput(d *DiffSuite, output *differentiator.ChangelogOutpu
 	d.Assert().NotNil(output.Changelog[model.OAS_TAGS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_TAGS_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_EXTERNAL_DOCS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_EXTERNAL_DOCS_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_SECURITY_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SECURITY_KEY))
+}
+
+func validateChangelog(d *DiffSuite, ov *OutputValidation) {
+	assert := d.Assert()
+
+	assert.NotNil(ov, "OutputValidation struct is nil")
+	assert.NotNil(ov.expectedChangelog, "ExpectedChangelog struct is nil")
+
+	// filter output based on type + path
+	index := -1
+	for i, c := range ov.output {
+		if c.Type == ov.expectedChangelog.Type &&
+			reflect.DeepEqual(c.Path, ov.expectedChangelog.Path) {
+			index = i
+			break
+		}
+	}
+
+	assert.NotEqual(-1, index, fmt.Sprintf("failed to find changelog in output: %v", ov.expectedChangelog))
+	changelog := ov.output[index]
+
+	// expected changelog
+	assert.Equal(ov.expectedChangelog.Type, changelog.Type)
+	assert.Len(ov.expectedChangelog.Path, len(ov.expectedChangelog.Path))
+	assert.Equal(ov.expectedChangelog.Path, changelog.Path)
+	assert.Equal(ov.expectedChangelog.Identifier, changelog.Identifier)
+	assert.Equal(ov.expectedChangelog.From, changelog.From)
+	assert.Equal(ov.expectedChangelog.To, changelog.To)
 }
 
 func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
@@ -804,9 +836,6 @@ func ReferencesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	// changeMap
 	validateChangeMapOutput(d, output)
 
-	// aux vars
-	index := -1
-
 	// paths
 	paths := output.Changelog[model.OAS_PATHS_KEY]
 	assert.Len(paths, 0, "paths should have 0 changes")
@@ -815,154 +844,165 @@ func ReferencesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	webhooks := output.Changelog[model.OAS_WEBHOOKS_KEY]
 	assert.Len(webhooks, 3, "webhooks should have 3 changes")
 
-	// webhooks[0]
-	index = 0
-	basePath := []string{"/ref", "$ref"}
-	assert.Equal("update", webhooks[index].Type)
-	assert.Len(webhooks[index].Path, len(basePath))
-	assert.Equal(basePath, webhooks[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), webhooks[index].Identifier)
-	assert.Equal("#/components/schemas/ref", webhooks[index].From)
-	assert.Equal("#/components/schemas/updatedRef", webhooks[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: webhooks,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "update",
+			Path:       []string{"/ref", "$ref"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       "#/components/schemas/ref",
+			To:         "#/components/schemas/updatedRef",
+		},
+	})
 
-	// webhooks[1]
-	index = 1
-	basePath = []string{"/legacyRef"}
-	assert.Equal("delete", webhooks[index].Type)
-	assert.Len(webhooks[index].Path, len(basePath))
-	assert.Equal(basePath, webhooks[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), webhooks[index].Identifier)
-	assert.Equal(model.PathItem{
-		Ref:         "#/components/schemas/legacyRef",
-		Summary:     "legacy ref webhook",
-		Description: "legacy ref desc",
-	}, webhooks[index].From)
-	assert.Equal(nil, webhooks[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: webhooks,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "delete",
+			Path:       []string{"/legacyRef"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From: model.PathItem{
+				Ref:         "#/components/schemas/legacyRef",
+				Summary:     "legacy ref webhook",
+				Description: "legacy ref desc",
+			},
+			To: nil,
+		},
+	})
 
-	// webhooks[2]
-	index = 2
-	basePath = []string{"/newRef"}
-	assert.Equal("create", webhooks[index].Type)
-	assert.Len(webhooks[index].Path, len(basePath))
-	assert.Equal(basePath, webhooks[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), webhooks[index].Identifier)
-	assert.Equal(nil, webhooks[index].From)
-	assert.Equal(model.PathItem{
-		Ref: "#/components/schemas/newRef",
-	}, webhooks[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: webhooks,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"/newRef"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.PathItem{
+				Ref: "#/components/schemas/newRef",
+			},
+		},
+	})
 
 	// components
 	components := output.Changelog[model.OAS_COMPONENTS_KEY]
 	assert.Len(components, 9, "components should have 9 changes")
 
-	// components[0]
-	index = 0
-	basePath = []string{"responses", "some_response"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.Response{
-		Ref: "#/components/schemas/response",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"responses", "some_response"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Response{
+				Ref: "#/components/schemas/response",
+			},
+		},
+	})
 
-	// components[1]
-	index = 1
-	basePath = []string{"parameters", "some_parameter"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.Parameter{
-		Ref: "#/components/schemas/parameter",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"parameters", "some_parameter"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Parameter{
+				Ref: "#/components/schemas/parameter",
+			},
+		},
+	})
 
-	// components[2]
-	index = 2
-	basePath = []string{"examples", "some_example"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.Example{
-		Ref: "#/components/schemas/example",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"examples", "some_example"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Example{
+				Ref: "#/components/schemas/example",
+			},
+		},
+	})
 
-	// components[3]
-	index = 3
-	basePath = []string{"requestBodies", "some_request_body"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.RequestBody{
-		Ref: "#/components/schemas/requestBody",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"requestBodies", "some_request_body"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.RequestBody{
+				Ref: "#/components/schemas/requestBody",
+			},
+		},
+	})
 
-	// components[4]
-	index = 4
-	basePath = []string{"headers", "some_header"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.Header{
-		Ref: "#/components/schemas/header",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"headers", "some_header"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Header{
+				Ref: "#/components/schemas/header",
+			},
+		},
+	})
 
-	// components[5]
-	index = 5
-	basePath = []string{"securitySchemes", "some_security_scheme"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.SecurityScheme{
-		Ref: "#/components/schemas/securityScheme",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"securitySchemes", "some_security_scheme"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.SecurityScheme{
+				Ref: "#/components/schemas/securityScheme",
+			},
+		},
+	})
 
-	// components[6]
-	index = 6
-	basePath = []string{"links", "some_link"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.Link{
-		Ref: "#/components/schemas/link",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"links", "some_link"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Link{
+				Ref: "#/components/schemas/link",
+			},
+		},
+	})
 
-	// components[7]
-	index = 7
-	basePath = []string{"callbacks", "some_callback"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.PathItem{
-		Ref: "#/components/schemas/callback",
-	}, components[index].To)
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"callbacks", "some_callback"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.PathItem{
+				Ref: "#/components/schemas/callback",
+			},
+		},
+	})
 
-	// components[8]
-	index = 8
-	basePath = []string{"pathItems", "some_path"}
-	assert.Equal("create", components[index].Type)
-	assert.Len(components[index].Path, len(basePath))
-	assert.Equal(basePath, components[index].Path)
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
-	assert.Equal(nil, components[index].From)
-	assert.Equal(model.PathItem{
-		Ref: "#/components/schemas/path",
-	}, components[index].To)
-
+	validateChangelog(d, &OutputValidation{
+		output: components,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"pathItems", "some_path"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.PathItem{
+				Ref: "#/components/schemas/path",
+			},
+		},
+	})
 }
 
 func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {

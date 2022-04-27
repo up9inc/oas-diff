@@ -31,7 +31,7 @@
         {
             "label": "clean-changelog",
             "type": "shell",
-            "command": "rm changelog*.json || true && rm changelog*.html || true"
+            "command": "rm summary*.json || true && rm changelog*.json || true && rm changelog*.html || true"
         }        
     ]
 }

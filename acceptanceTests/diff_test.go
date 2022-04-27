@@ -545,156 +545,153 @@ func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	// changeMap
 	validateChangeMapOutput(d, output)
 
-	// aux vars
-	index := -1
-
 	// paths
 	paths := output.Changelog[model.OAS_PATHS_KEY]
+
+	path := []string{"/example", "get", "responses", "200", "description"}
+	if opts.IncludeFilePath {
+		path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3], path[4]}
+	}
+	validateChangelog(d, &OutputValidation{
+		output: paths,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "update",
+			Path:       path,
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       "A simple string response",
+			To:         "the success response",
+		},
+	})
+
+	path = []string{"/example", "get", "responses", "default"}
+	if opts.IncludeFilePath {
+		path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3]}
+	}
+	validateChangelog(d, &OutputValidation{
+		output: paths,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       path,
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Response{
+				Description: "the default response",
+			},
+		},
+	})
+
 	if opts.Loose {
 		assert.Len(paths, 2, "paths should have 2 changes")
 	} else {
+		// no loose
 		assert.Len(paths, 8, "paths should have 4 changes")
-	}
 
-	// paths[0]
-	index = 0
-	basePath := []string{"/example", "get", "responses", "200", "description"}
-	assert.Equal("update", paths[index].Type)
-	if opts.IncludeFilePath {
-		assert.Len(paths[index].Path, 7)
-		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4]}, paths[index].Path)
-	} else {
-		assert.Len(paths[index].Path, 5)
-		assert.Equal(basePath, paths[index].Path)
-	}
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-	assert.Equal("A simple string response", paths[index].From)
-	assert.Equal("the success response", paths[index].To)
-
-	if opts.Loose {
-		// update the index for the last path
-		index = 1
-
-	} else {
-		index = 1
-		basePath = []string{"/example", "get", "responses", "200", "content", "application/json"}
-		assert.Equal("delete", paths[index].Type)
+		path = []string{"/example", "get", "responses", "200", "content", "application/json"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3], path[4], path[5]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.MediaType{
-			Schema: &model.Schema{
-				Type: "object",
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.MediaType{
+					Schema: &model.Schema{
+						Type: "object",
+					},
+				},
+				To: nil,
 			},
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+		})
 
-		index = 2
-		basePath = []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "base64"}
-		assert.Equal("delete", paths[index].Type)
+		path = []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "base64"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 10)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5], basePath[6], basePath[7]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3], path[4], path[5], path[6], path[7]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.Encoding{
-			ContentType: "base64",
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
-
-		index = 3
-		basePath = []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "BASE64"}
-		assert.Equal("create", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 10)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5], basePath[6], basePath[7]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.Encoding{
-			ContentType: "base64",
-		}, paths[index].To)
-
-		index = 4
-		basePath = []string{"/example", "get", "responses", "200", "content", "Application/JSON"}
-		assert.Equal("create", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.MediaType{
-			Schema: &model.Schema{
-				Type: "object",
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.Encoding{
+					ContentType: "base64",
+				},
+				To: nil,
 			},
-		}, paths[index].To)
+		})
 
-		index = 5
-		basePath = []string{"/example", "get", "responses", "200", "links", "address"}
-		assert.Equal("delete", paths[index].Type)
+		path = []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "BASE64"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3], path[4], path[5], path[6], path[7]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.Link{
-			OperationID: "some-id",
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.Encoding{
+					ContentType: "base64",
+				},
+			},
+		})
 
-		index = 6
-		basePath = []string{"/example", "get", "responses", "200", "links", "Address"}
-		assert.Equal("create", paths[index].Type)
+		path = []string{"/example", "get", "responses", "200", "content", "Application/JSON"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3], path[4], path[5]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.Link{
-			OperationID: "some-id",
-		}, paths[index].To)
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.MediaType{
+					Schema: &model.Schema{
+						Type: "object",
+					},
+				},
+			},
+		})
 
-		// update the index for the last path
-		index = 7
+		path = []string{"/example", "get", "responses", "200", "links", "address"}
+		if opts.IncludeFilePath {
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3], path[4], path[5]}
+		}
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.Link{
+					OperationID: "some-id",
+				},
+				To: nil,
+			},
+		})
+
+		path = []string{"/example", "get", "responses", "200", "links", "Address"}
+		if opts.IncludeFilePath {
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3], path[4], path[5]}
+		}
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.Link{
+					OperationID: "some-id",
+				},
+			},
+		})
 	}
-
-	basePath = []string{"/example", "get", "responses", "default"}
-	assert.Equal("create", paths[index].Type)
-	if opts.IncludeFilePath {
-		assert.Len(paths[index].Path, 6)
-		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3]}, paths[index].Path)
-	} else {
-		assert.Len(paths[index].Path, 4)
-		assert.Equal(basePath, paths[index].Path)
-	}
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-	assert.Equal(nil, paths[index].From)
-	assert.Equal(model.Response{
-		Description: "the default response",
-	}, paths[index].To)
-
 }
 
 func OperationsDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {

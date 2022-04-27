@@ -2,9 +2,6 @@ package model
 
 // https://spec.openapis.org/oas/v3.1.0#security-scheme-object
 type SecurityScheme struct {
-	Ref     string `json:"$ref,omitempty" diff:"$ref"`
-	Summary string `json:"summary,omitempty" diff:"summary"`
-
 	Type             string     `json:"type,omitempty" diff:"type"`
 	Description      string     `json:"description,omitempty" diff:"description"`
 	Name             string     `json:"name,omitempty" diff:"name"`
@@ -13,6 +10,10 @@ type SecurityScheme struct {
 	BearerFormat     string     `json:"bearerFormat,omitempty" diff:"bearerFormat"`
 	Flows            OAuthFlows `json:"flows,omitempty" diff:"flows"`
 	OpenIdConnectUrl string     `json:"openIdConnectUrl,omitempty" diff:"openIdConnectUrl"`
+
+	// Reference object
+	Ref     string `json:"$ref,omitempty" diff:"$ref"`
+	Summary string `json:"summary,omitempty" diff:"summary"`
 }
 
 // https://spec.openapis.org/oas/v3.1.0#oauth-flow-object

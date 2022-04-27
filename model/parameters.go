@@ -17,10 +17,6 @@ var _ ExamplesInterface = (*Parameter)(nil)
 // TODO: Handle Array of Reference Object with our custom array interface?
 // TODO: Handle Multiple identifiers when the model is an array of Reference Object
 type Parameter struct {
-	//Ref     string `json:"$ref,omitempty" diff:"$ref,identifier"`
-	Ref     string `json:"$ref,omitempty" diff:"$ref"`
-	Summary string `json:"summary,omitempty" diff:"summary"`
-
 	Name            string      `json:"name,omitempty" diff:"name,identifier"`
 	In              string      `json:"in,omitempty" diff:"in"`
 	Description     string      `json:"description,omitempty" diff:"description"`
@@ -34,6 +30,10 @@ type Parameter struct {
 	Example         interface{} `json:"example,omitempty" diff:"example"`
 	Examples        ExamplesMap `json:"examples,omitempty" diff:"examples"`
 	Content         ContentMap  `json:"content,omitempty" diff:"content"`
+
+	// Reference object
+	Ref     string `json:"$ref,omitempty" diff:"$ref"`
+	Summary string `json:"summary,omitempty" diff:"summary"`
 }
 
 func (p Parameters) GetName() string {

@@ -15,6 +15,51 @@
     }
   ],
   "paths": {
-    "/users": {}
-  }  
+    "/users": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "style": "simple",
+          "schema": {
+            "type": "string",
+            "pattern": ".+(_|-ABC-|\\.).+"
+          },
+          "example": "custom uuid"
+        },
+        {
+          "in": "header",
+          "name": "accept",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-accept",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "pattern": ".+(_|-|\\.).+"
+            },
+            "example": "some-uuid-maybe"
+          }
+        ]
+      }
+    }
+  }
 }

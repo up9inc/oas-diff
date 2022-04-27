@@ -12,7 +12,6 @@ var _ Model = (*Components)(nil)
 
 type ParametersMap map[string]*Parameter
 type RequestBodiesMap map[string]*RequestBody
-type SecuritySchemesMap map[string]*SecurityScheme
 
 // make sure we implement the Examples interface
 var _ ExamplesInterface = (*Components)(nil)

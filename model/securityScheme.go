@@ -1,15 +1,17 @@
 package model
 
+type SecuritySchemesMap map[string]*SecurityScheme
+
 // https://spec.openapis.org/oas/v3.1.0#security-scheme-object
 type SecurityScheme struct {
-	Type             string     `json:"type,omitempty" diff:"type"`
-	Description      string     `json:"description,omitempty" diff:"description"`
-	Name             string     `json:"name,omitempty" diff:"name"`
-	In               string     `json:"in,omitempty" diff:"in"`
-	Scheme           string     `json:"scheme,omitempty" diff:"scheme"`
-	BearerFormat     string     `json:"bearerFormat,omitempty" diff:"bearerFormat"`
-	Flows            OAuthFlows `json:"flows,omitempty" diff:"flows"`
-	OpenIdConnectUrl string     `json:"openIdConnectUrl,omitempty" diff:"openIdConnectUrl"`
+	Type             string      `json:"type,omitempty" diff:"type"`
+	Description      string      `json:"description,omitempty" diff:"description"`
+	Name             string      `json:"name,omitempty" diff:"name"`
+	In               string      `json:"in,omitempty" diff:"in"`
+	Scheme           string      `json:"scheme,omitempty" diff:"scheme"`
+	BearerFormat     string      `json:"bearerFormat,omitempty" diff:"bearerFormat"`
+	Flows            *OAuthFlows `json:"flows,omitempty" diff:"flows"`
+	OpenIdConnectUrl string      `json:"openIdConnectUrl,omitempty" diff:"openIdConnectUrl"`
 
 	// Reference object
 	Ref     string `json:"$ref,omitempty" diff:"$ref"`
@@ -26,8 +28,8 @@ type OAuthFlow struct {
 
 // https://spec.openapis.org/oas/v3.1.0#oauth-flows-object
 type OAuthFlows struct {
-	Implicit          OAuthFlow `json:"implicit,omitempty" diff:"implicit"`
-	Password          OAuthFlow `json:"password,omitempty" diff:"password"`
-	ClientCredentials OAuthFlow `json:"clientCredentials,omitempty" diff:"clientCredentials"`
-	AuthorizationCode OAuthFlow `json:"authorizationCode,omitempty" diff:"authorizationCode"`
+	Implicit          *OAuthFlow `json:"implicit,omitempty" diff:"implicit"`
+	Password          *OAuthFlow `json:"password,omitempty" diff:"password"`
+	ClientCredentials *OAuthFlow `json:"clientCredentials,omitempty" diff:"clientCredentials"`
+	AuthorizationCode *OAuthFlow `json:"authorizationCode,omitempty" diff:"authorizationCode"`
 }

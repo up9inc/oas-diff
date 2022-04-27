@@ -1,0 +1,29 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "references",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/example": {
+      "parameters": [
+        {
+          "$ref": "#/components/schemas/param1"
+        }
+      ]
+    }
+  },
+  "webhooks": {
+    "/ref": {
+      "$ref": "#/components/schemas/ref",
+      "summary": "ref webhook",
+      "description": "ref desc"
+    },
+    "/legacyRef": {
+      "$ref": "#/components/schemas/legacyRef",
+      "summary": "legacy ref webhook",
+      "description": "legacy ref desc"
+    }
+  },
+  "components": {}
+}

@@ -27,6 +27,8 @@ const (
 	FILE_OPERATIONS2 = "data/operations2.json"
 	FILE_SERVERS     = "data/servers.json"
 	FILE_SERVERS2    = "data/servers2.json"
+	FILE_REFERENCES  = "data/references.json"
+	FILE_REFERENCES2 = "data/references2.json"
 )
 
 type DiffSuite struct {
@@ -782,6 +784,184 @@ func OperationsDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 		}, paths[index].To)
 
 	}
+}
+
+func ReferencesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
+	validateDependencies(d)
+
+	assert := d.Assert()
+
+	_, err := d.jsonFile1.Read()
+	assert.NoError(err)
+
+	_, err = d.jsonFile2.Read()
+	assert.NoError(err)
+
+	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
+	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
+	// ExecutionStatus
+	validateExecutionStatus(d, output)
+	// changeMap
+	validateChangeMapOutput(d, output)
+
+	// aux vars
+	index := -1
+
+	// paths
+	paths := output.Changelog[model.OAS_PATHS_KEY]
+	assert.Len(paths, 0, "paths should have 0 changes")
+
+	// webhooks
+	webhooks := output.Changelog[model.OAS_WEBHOOKS_KEY]
+	assert.Len(webhooks, 3, "webhooks should have 3 changes")
+
+	// webhooks[0]
+	index = 0
+	basePath := []string{"/ref", "$ref"}
+	assert.Equal("update", webhooks[index].Type)
+	assert.Len(webhooks[index].Path, len(basePath))
+	assert.Equal(basePath, webhooks[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), webhooks[index].Identifier)
+	assert.Equal("#/components/schemas/ref", webhooks[index].From)
+	assert.Equal("#/components/schemas/updatedRef", webhooks[index].To)
+
+	// webhooks[1]
+	index = 1
+	basePath = []string{"/legacyRef"}
+	assert.Equal("delete", webhooks[index].Type)
+	assert.Len(webhooks[index].Path, len(basePath))
+	assert.Equal(basePath, webhooks[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), webhooks[index].Identifier)
+	assert.Equal(model.PathItem{
+		Ref:         "#/components/schemas/legacyRef",
+		Summary:     "legacy ref webhook",
+		Description: "legacy ref desc",
+	}, webhooks[index].From)
+	assert.Equal(nil, webhooks[index].To)
+
+	// webhooks[2]
+	index = 2
+	basePath = []string{"/newRef"}
+	assert.Equal("create", webhooks[index].Type)
+	assert.Len(webhooks[index].Path, len(basePath))
+	assert.Equal(basePath, webhooks[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), webhooks[index].Identifier)
+	assert.Equal(nil, webhooks[index].From)
+	assert.Equal(model.PathItem{
+		Ref: "#/components/schemas/newRef",
+	}, webhooks[index].To)
+
+	// components
+	components := output.Changelog[model.OAS_COMPONENTS_KEY]
+	assert.Len(components, 9, "components should have 9 changes")
+
+	// components[0]
+	index = 0
+	basePath = []string{"responses", "some_response"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.Response{
+		Ref: "#/components/schemas/response",
+	}, components[index].To)
+
+	// components[1]
+	index = 1
+	basePath = []string{"parameters", "some_parameter"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.Parameter{
+		Ref: "#/components/schemas/parameter",
+	}, components[index].To)
+
+	// components[2]
+	index = 2
+	basePath = []string{"examples", "some_example"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.Example{
+		Ref: "#/components/schemas/example",
+	}, components[index].To)
+
+	// components[3]
+	index = 3
+	basePath = []string{"requestBodies", "some_request_body"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.RequestBody{
+		Ref: "#/components/schemas/requestBody",
+	}, components[index].To)
+
+	// components[4]
+	index = 4
+	basePath = []string{"headers", "some_header"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.Header{
+		Ref: "#/components/schemas/header",
+	}, components[index].To)
+
+	// components[5]
+	index = 5
+	basePath = []string{"securitySchemes", "some_security_scheme"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.SecurityScheme{
+		Ref: "#/components/schemas/securityScheme",
+	}, components[index].To)
+
+	// components[6]
+	index = 6
+	basePath = []string{"links", "some_link"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.Link{
+		Ref: "#/components/schemas/link",
+	}, components[index].To)
+
+	// components[7]
+	index = 7
+	basePath = []string{"callbacks", "some_callback"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.PathItem{
+		Ref: "#/components/schemas/callback",
+	}, components[index].To)
+
+	// components[8]
+	index = 8
+	basePath = []string{"pathItems", "some_path"}
+	assert.Equal("create", components[index].Type)
+	assert.Len(components[index].Path, len(basePath))
+	assert.Equal(basePath, components[index].Path)
+	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), components[index].Identifier)
+	assert.Equal(nil, components[index].From)
+	assert.Equal(model.PathItem{
+		Ref: "#/components/schemas/path",
+	}, components[index].To)
 
 }
 
@@ -987,4 +1167,22 @@ func (d *DiffSuite) TestOperationsLooseDiff() {
 	}
 	d.diff = differentiator.NewDifferentiator(d.vall, opts)
 	OperationsDiff(d, opts)
+}
+
+func (d *DiffSuite) TestReferencesDiff() {
+	d.jsonFile1 = file.NewJsonFile(FILE_REFERENCES)
+	d.jsonFile2 = file.NewJsonFile(FILE_REFERENCES2)
+
+	d.vall = validator.NewValidator()
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
+	if err != nil {
+		d.T().Error(err)
+		return
+	}
+
+	opts := differentiator.DifferentiatorOptions{
+		IncludeFilePath: false,
+	}
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
+	ReferencesDiff(d, opts)
 }

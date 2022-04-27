@@ -39,7 +39,7 @@ type differentiator struct {
 func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Differentiator {
 	if len(opts.TypeFilter) > 0 {
 		if opts.TypeFilter != "create" && opts.TypeFilter != "update" && opts.TypeFilter != "delete" {
-			panic(fmt.Errorf(`Invalid type filter value "%s", must be %s/%s/%s`, opts.TypeFilter, lib.CREATE, lib.UPDATE, lib.DELETE))
+			panic(fmt.Errorf(`invalid type filter value "%s", must be %s/%s/%s`, opts.TypeFilter, lib.CREATE, lib.UPDATE, lib.DELETE))
 		}
 	}
 

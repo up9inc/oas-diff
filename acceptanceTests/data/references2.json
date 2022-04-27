@@ -1,0 +1,73 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "references",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/example": {
+      "parameters": [
+        {
+          "$ref": "#/components/schemas/param1"
+        }
+      ]
+    }
+  },
+  "webhooks": {
+    "/ref": {
+      "$ref": "#/components/schemas/updatedRef",
+      "summary": "ref webhook",
+      "description": "ref desc"
+    },
+    "/newRef": {
+      "$ref": "#/components/schemas/newRef"
+    }
+  },
+  "components": {
+    "responses": {
+      "some_response": {
+        "$ref": "#/components/schemas/response"
+      }
+    },
+    "parameters": {
+      "some_parameter": {
+        "$ref": "#/components/schemas/parameter"
+      }
+    },
+    "examples": {
+      "some_example": {
+        "$ref": "#/components/schemas/example"
+      }
+    },
+    "requestBodies": {
+      "some_request_body": {
+        "$ref": "#/components/schemas/requestBody"
+      }
+    },
+    "headers": {
+      "some_header": {
+        "$ref": "#/components/schemas/header"
+      }
+    },
+    "securitySchemes": {
+      "some_security_scheme": {
+        "$ref": "#/components/schemas/securityScheme"
+      }
+    },
+    "links": {
+      "some_link": {
+        "$ref": "#/components/schemas/link"
+      }
+    },
+    "callbacks": {
+      "some_callback": {
+        "$ref": "#/components/schemas/callback"
+      }
+    },
+    "pathItems": {
+      "some_path": {
+        "$ref": "#/components/schemas/path"
+      }
+    }
+  }
+}

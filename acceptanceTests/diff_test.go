@@ -715,106 +715,102 @@ func OperationsDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	// changeMap
 	validateChangeMapOutput(d, output)
 
-	// aux vars
-	index := -1
-
 	// paths
 	paths := output.Changelog[model.OAS_PATHS_KEY]
 	if opts.Loose {
 		assert.Len(paths, 1, "paths should have 1 change")
+
+		path := []string{"/example", "get"}
+		if opts.IncludeFilePath {
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1]}
+		}
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "update",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To:         &model.Operation{},
+			},
+		})
+
 	} else {
+		// no loose
 		assert.Len(paths, 4, "paths should have 4 changes")
-	}
 
-	if opts.Loose {
-		// paths[0]
-		index = 0
-		basePath := []string{"/example", "get"}
-		assert.Equal("update", paths[index].Type)
+		path := []string{"/example"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 4)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 2)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(&model.Operation{}, paths[index].To)
-	} else {
-		// paths[0]
-		index = 0
-		basePath := []string{"/example"}
-		assert.Equal("delete", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 3)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 1)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.PathItem{
-			Options: &model.Operation{},
-			Patch:   &model.Operation{},
-			Put:     &model.Operation{},
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.PathItem{
+					Options: &model.Operation{},
+					Patch:   &model.Operation{},
+					Put:     &model.Operation{},
+				},
+				To: nil,
+			},
+		})
 
-		// paths[1]
-		index = 1
-		basePath = []string{"/login", "post", "callbacks", "/logincallback"}
-		assert.Equal("delete", paths[index].Type)
+		path = []string{"/login", "post", "callbacks", "/logincallback"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 4)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.PathItem{
-			Post: &model.Operation{},
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.PathItem{
+					Post: &model.Operation{},
+				},
+				To: nil,
+			},
+		})
 
-		// paths[2]
-		index = 2
-		basePath = []string{"/login", "post", "callbacks", "/LoginCallback"}
-		assert.Equal("create", paths[index].Type)
+		path = []string{"/login", "post", "callbacks", "/LoginCallback"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 4)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0], path[1], path[2], path[3]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.PathItem{
-			Post: &model.Operation{},
-		}, paths[index].To)
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.PathItem{
+					Post: &model.Operation{},
+				},
+			},
+		})
 
-		// paths[3]
-		index = 3
-		basePath = []string{"/Example"}
-		assert.Equal("create", paths[index].Type)
+		path = []string{"/Example"}
 		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 3)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 1)
-			assert.Equal(basePath, paths[index].Path)
+			path = []string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, path[0]}
 		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.PathItem{
-			Get:     &model.Operation{},
-			Options: &model.Operation{},
-			Patch:   &model.Operation{},
-			Put:     &model.Operation{},
-		}, paths[index].To)
-
+		validateChangelog(d, &OutputValidation{
+			output: paths,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       path,
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.PathItem{
+					Get:     &model.Operation{},
+					Options: &model.Operation{},
+					Patch:   &model.Operation{},
+					Put:     &model.Operation{},
+				},
+			},
+		})
 	}
 }
 

@@ -75,6 +75,10 @@ func (s *tagsDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (t *tagsDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if t.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromSlices[model.Tags](a, b)
+	}
+
 	if t.opts.Loose {
 		aValue, aOk := a.Interface().(model.Tags)
 		bValue, bOk := b.Interface().(model.Tags)

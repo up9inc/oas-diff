@@ -11,7 +11,6 @@ import (
 var _ Model = (*Components)(nil)
 
 type ParametersMap map[string]*Parameter
-type RequestBodiesMap map[string]*RequestBody
 
 // make sure we implement the Examples interface
 var _ ExamplesInterface = (*Components)(nil)

@@ -1,5 +1,8 @@
 package model
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Operation)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#operation-object
 type Operation struct {
 	Tags         []string             `json:"tags,omitempty" diff:"tags"`
@@ -15,4 +18,10 @@ type Operation struct {
 	Consumes     []string             `json:"consumes,omitempty" diff:"consumes"`
 	Security     SecurityRequirements `json:"security,omitempty" diff:"security"`
 	Servers      Servers              `json:"servers,omitempty" diff:"servers"`
+}
+
+func (o *Operation) IgnoreDescriptions() {
+	if o != nil && len(o.Description) > 0 {
+		o.Description = ""
+	}
 }

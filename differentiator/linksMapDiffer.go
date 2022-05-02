@@ -24,6 +24,10 @@ func (l *linksMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (l *linksMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if l.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromMaps[model.LinksMap](a, b)
+	}
+
 	if l.opts.Loose {
 		handleLooseMap[model.LinksMap](a, b)
 	}

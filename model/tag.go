@@ -13,6 +13,9 @@ var _ Model = (*Tags)(nil)
 // make sure we implement the Array interface
 var _ Array = (*Tags)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Tag)(nil)
+
 type Tags []*Tag
 
 // https://spec.openapis.org/oas/v3.1.0#tag-object
@@ -67,4 +70,10 @@ func (t Tags) FilterIdentifiers() []*ArrayIdentifierFilter {
 		}
 	}
 	return result
+}
+
+func (t *Tag) IgnoreDescriptions() {
+	if t != nil && len(t.Description) > 0 {
+		t.Description = ""
+	}
 }

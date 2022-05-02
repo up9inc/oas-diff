@@ -25,8 +25,11 @@ func (p *ParametersDiffer) Match(a, b reflect.Value) bool {
 	return lib.AreType(a, b, reflect.TypeOf(model.Parameters{}))
 }
 
-// TODO: Test if response Header is catched here
 func (p *ParametersDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if p.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromSlices[model.Parameters](a, b)
+	}
+
 	if p.opts.IgnoreExamples {
 		ignoreExamplesFromSlices[model.Parameters](a, b)
 	}

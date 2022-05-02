@@ -13,6 +13,9 @@ type Parameters []*Parameter
 // make sure we implement the Examples interface
 var _ ExamplesInterface = (*Parameter)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Parameter)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#parameter-object
 // TODO: Handle Array of Reference Object with our custom array interface?
 // TODO: Handle Multiple identifiers when the model is an array of Reference Object
@@ -87,5 +90,11 @@ func (p *Parameter) IgnoreExamples() {
 	}
 	if p.Examples != nil {
 		p.Examples = nil
+	}
+}
+
+func (p *Parameter) IgnoreDescriptions() {
+	if p != nil && len(p.Description) > 0 {
+		p.Description = ""
 	}
 }

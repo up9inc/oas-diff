@@ -75,6 +75,10 @@ func (s *serversDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (s *serversDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if s.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromSlices[model.Servers](a, b)
+	}
+
 	if s.opts.Loose {
 		aValue, aOk := a.Interface().(model.Servers)
 		bValue, bOk := b.Interface().(model.Servers)

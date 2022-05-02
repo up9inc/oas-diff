@@ -8,6 +8,9 @@ type References []*Reference
 // make sure we implement the Array interface
 var _ Array = (*References)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Reference)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#reference-object
 type Reference struct {
 	Ref         string `json:"$ref,omitempty" diff:"$ref,identifier"`
@@ -49,4 +52,10 @@ func (r References) FilterIdentifiers() []*ArrayIdentifierFilter {
 		}
 	}
 	return result
+}
+
+func (r *Reference) IgnoreDescriptions() {
+	if r != nil && len(r.Description) > 0 {
+		r.Description = ""
+	}
 }

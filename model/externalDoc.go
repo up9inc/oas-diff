@@ -10,6 +10,9 @@ import (
 // make sure we implement the Model interface
 var _ Model = (*ExternalDoc)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*ExternalDoc)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#external-documentation-object
 type ExternalDoc struct {
 	Description string `json:"description,omitempty" diff:"description"`
@@ -25,4 +28,10 @@ func (e *ExternalDoc) Parse(file file.JsonFile) error {
 		}
 	}
 	return nil
+}
+
+func (e *ExternalDoc) IgnoreDescriptions() {
+	if e != nil && len(e.Description) > 0 {
+		e.Description = ""
+	}
 }

@@ -5,6 +5,9 @@ type HeadersMap map[string]*Header
 // make sure we implement the Examples interface
 var _ ExamplesInterface = (*Header)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Header)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#header-object
 type Header struct {
 	Description     string      `json:"description,omitempty" diff:"description"`
@@ -25,10 +28,18 @@ type Header struct {
 }
 
 func (h *Header) IgnoreExamples() {
-	if h.Example != nil {
-		h.Example = nil
+	if h != nil {
+		if h.Example != nil {
+			h.Example = nil
+		}
+		if h.Examples != nil {
+			h.Examples = nil
+		}
 	}
-	if h.Examples != nil {
-		h.Examples = nil
+}
+
+func (h *Header) IgnoreDescriptions() {
+	if h != nil && len(h.Description) > 0 {
+		h.Description = ""
 	}
 }

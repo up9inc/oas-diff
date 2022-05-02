@@ -24,6 +24,19 @@ func (s *schemaDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (s *schemaDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if s.opts.IgnoreDescriptions {
+		aValue, aOk := a.Interface().(model.Schema)
+		bValue, bOk := b.Interface().(model.Schema)
+
+		if aOk {
+			aValue.IgnoreDescriptions()
+		}
+
+		if bOk {
+			bValue.IgnoreDescriptions()
+		}
+	}
+
 	if s.opts.IgnoreExamples {
 		aValue, aOk := a.Interface().(model.Schema)
 		bValue, bOk := b.Interface().(model.Schema)
@@ -35,7 +48,6 @@ func (s *schemaDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog,
 		if bOk {
 			bValue.IgnoreExamples()
 		}
-
 	}
 
 	return df(path, a, b, parent)

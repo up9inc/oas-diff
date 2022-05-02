@@ -26,7 +26,7 @@ type differentiator struct {
 	opts      DifferentiatorOptions
 	differ    *lib.Differ
 
-	info         *infoDiff
+	info         *infoDiffer
 	servers      *serversDiffer
 	paths        *pathsMapDiffer
 	webhooks     *webhooksMapDiffer
@@ -47,11 +47,21 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 	stringDiffer := NewStringDiffer(opts)
 
 	// structs
-	infoDiff := NewInfoDiff()
+	infoDiffer := NewInfoDiffer()
+	serverDiffer := NewServerDiffer(opts)
+	serverVariableDiffer := NewServerVariableDiffer(opts)
+	pathItemDiffer := NewPathItemDiffer(opts)
 	componentsDiffer := NewComponentsDiffer()
 	externalDocsDiffer := NewExternalDocsDiffer()
+	operationDiffer := NewOperationDiffer(opts)
 	parameterDiffer := NewParameterDiffer(opts)
 	schemaDiffer := NewSchemaDiffer(opts)
+	referenceDiffer := NewReferenceDiffer(opts)
+	requestBodyDiffer := NewRequestBodyDiffer(opts)
+	responseDiffer := NewResponseDiffer(opts)
+	linkDiffer := NewLinkDiffer(opts)
+	securitySchemeDiffer := NewSecuritySchemeDiffer(opts)
+	tagDiffer := NewTagDiffer(opts)
 
 	// slices
 	serversDiffer := NewServersDiffer()
@@ -82,9 +92,21 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		// strings
 		lib.CustomValueDiffers(stringDiffer),
 		// structs
+		lib.CustomValueDiffers(infoDiffer),
+		lib.CustomValueDiffers(serverDiffer),
+		lib.CustomValueDiffers(serverVariableDiffer),
+		lib.CustomValueDiffers(pathItemDiffer),
 		lib.CustomValueDiffers(componentsDiffer),
+		lib.CustomValueDiffers(operationDiffer),
 		lib.CustomValueDiffers(parameterDiffer),
 		lib.CustomValueDiffers(schemaDiffer),
+		lib.CustomValueDiffers(externalDocsDiffer),
+		lib.CustomValueDiffers(referenceDiffer),
+		lib.CustomValueDiffers(requestBodyDiffer),
+		lib.CustomValueDiffers(responseDiffer),
+		lib.CustomValueDiffers(linkDiffer),
+		lib.CustomValueDiffers(securitySchemeDiffer),
+		lib.CustomValueDiffers(tagDiffer),
 		// slices
 		lib.CustomValueDiffers(serversDiffer),
 		lib.CustomValueDiffers(parametersDiffer),
@@ -120,7 +142,7 @@ func NewDifferentiator(val validator.Validator, opts DifferentiatorOptions) Diff
 		validator:    val,
 		opts:         opts,
 		differ:       differ,
-		info:         infoDiff,
+		info:         infoDiffer,
 		servers:      serversDiffer,
 		paths:        pathsMapDiffer,
 		webhooks:     webhooksMapDiffer,

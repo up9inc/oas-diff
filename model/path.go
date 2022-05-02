@@ -10,6 +10,9 @@ import (
 // make sure we implement the Model interface
 var _ Model = (*PathsMap)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*PathItem)(nil)
+
 type PathsMap map[string]*PathItem
 
 // https://spec.openapis.org/oas/v3.1.0#path-item-object
@@ -98,4 +101,10 @@ func (p PathItem) GetOperationsName() []string {
 	}
 
 	return operations
+}
+
+func (p *PathItem) IgnoreDescriptions() {
+	if p != nil && len(p.Description) > 0 {
+		p.Description = ""
+	}
 }

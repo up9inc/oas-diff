@@ -1,5 +1,8 @@
 package model
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*SecurityScheme)(nil)
+
 type SecuritySchemesMap map[string]*SecurityScheme
 
 // https://spec.openapis.org/oas/v3.1.0#security-scheme-object
@@ -16,6 +19,12 @@ type SecurityScheme struct {
 	// Reference object
 	Ref     string `json:"$ref,omitempty" diff:"$ref"`
 	Summary string `json:"summary,omitempty" diff:"summary"`
+}
+
+func (s *SecurityScheme) IgnoreDescriptions() {
+	if s != nil && len(s.Description) > 0 {
+		s.Description = ""
+	}
 }
 
 // https://spec.openapis.org/oas/v3.1.0#oauth-flow-object

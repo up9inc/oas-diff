@@ -24,6 +24,14 @@ func (p *parametersMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (p *parametersMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if p.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromMaps[model.ParametersMap](a, b)
+	}
+
+	if p.opts.IgnoreExamples {
+		ignoreExamplesFromMaps[model.ParametersMap](a, b)
+	}
+
 	if p.opts.Loose {
 		handleLooseMap[model.ParametersMap](a, b)
 	}

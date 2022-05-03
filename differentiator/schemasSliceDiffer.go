@@ -24,16 +24,13 @@ func (s *schemasSliceDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (s *schemasSliceDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
-	/* 	aValue, aOk := a.Interface().(model.SchemasSlice)
-	   	bValue, bOk := b.Interface().(model.SchemasSlice)
+	if s.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromSlices[model.SchemasSlice](a, b)
+	}
 
-	   	if aOk {
-	   		fmt.Println(aValue)
-	   	}
-
-	   	if bOk {
-	   		fmt.Println(bValue)
-	   	} */
+	if s.opts.IgnoreExamples {
+		ignoreExamplesFromSlices[model.SchemasSlice](a, b)
+	}
 
 	return df(path, a, b, parent)
 }

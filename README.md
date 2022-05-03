@@ -90,13 +90,5 @@ OAS 3.1 Validation and Diff Tool
 ## Limitations
 - `openapi` field is not a part of the changelog, we only support OAS version 3.1, so any changes will cause a validation failure
 - `jsonSchemaDialect` field is not a part of the changelog, we only support OAS version 3.1 and it uses `JSON Schema Validation Draft 2020-12`
-- `Specification Extensions` are not supported yet (TODO)
-- `webhooks` not supporting the `Reference Object` (TODO)
-- `components` not supporting the `Reference Object` (TODO)
-- `headers` not supporting the `Reference Object` (TODO)
-- `parameters` not supporting the `Reference Object` (TODO)
-- `requestBody` not supporting the `Reference Object` (TODO)
-- `links` not supporting the `Reference Object` (TODO)
-- `callbacks` not supporting the `Reference Object` (TODO)
-- `responses` not supporting the `Reference Object` (TODO)
-
+- `Specification Extensions` are not supported (TODO)
+- `parameters` array of `Reference Object` are not supported (TODO)

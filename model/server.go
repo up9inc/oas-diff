@@ -13,6 +13,12 @@ var _ Model = (*Servers)(nil)
 // make sure we implement the Array interface
 var _ Array = (*Servers)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Server)(nil)
+
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*ServerVariable)(nil)
+
 type Servers []*Server
 type ServerVariablesMap map[string]*ServerVariable
 
@@ -23,11 +29,23 @@ type Server struct {
 	Variables   ServerVariablesMap `json:"variables,omitempty" diff:"variables"`
 }
 
+func (s *Server) IgnoreDescriptions() {
+	if s != nil && len(s.Description) > 0 {
+		s.Description = ""
+	}
+}
+
 // https://spec.openapis.org/oas/v3.1.0#server-variable-object
 type ServerVariable struct {
 	Enum        []string `json:"enum,omitempty" diff:"enum"`
 	Default     string   `json:"default,omitempty" diff:"default"`
 	Description string   `json:"description,omitempty" diff:"description"`
+}
+
+func (s *ServerVariable) IgnoreDescriptions() {
+	if s != nil && len(s.Description) > 0 {
+		s.Description = ""
+	}
 }
 
 func (s *Servers) Parse(file file.JsonFile) error {

@@ -24,6 +24,10 @@ func (s *schemasMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (s *schemasMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if s.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromMaps[model.SchemasMap](a, b)
+	}
+
 	if s.opts.IgnoreExamples {
 		ignoreExamplesFromMaps[model.SchemasMap](a, b)
 	}

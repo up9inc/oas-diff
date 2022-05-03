@@ -24,6 +24,10 @@ func (h *headersMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (h *headersMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if h.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromMaps[model.HeadersMap](a, b)
+	}
+
 	if h.opts.IgnoreExamples {
 		ignoreExamplesFromMaps[model.HeadersMap](a, b)
 	}

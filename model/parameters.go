@@ -13,7 +13,12 @@ type Parameters []*Parameter
 // make sure we implement the Examples interface
 var _ ExamplesInterface = (*Parameter)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Parameter)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#parameter-object
+// TODO: Handle Array of Reference Object with our custom array interface?
+// TODO: Handle Multiple identifiers when the model is an array of Reference Object
 type Parameter struct {
 	Name            string      `json:"name,omitempty" diff:"name,identifier"`
 	In              string      `json:"in,omitempty" diff:"in"`
@@ -26,8 +31,12 @@ type Parameter struct {
 	AllowReserved   bool        `json:"allowReserved,omitempty" diff:"allowReserved"`
 	Schema          *Schema     `json:"schema,omitempty" diff:"schema"`
 	Example         interface{} `json:"example,omitempty" diff:"example"`
-	Examples        AnyMap      `json:"examples,omitempty" diff:"examples"`
+	Examples        ExamplesMap `json:"examples,omitempty" diff:"examples"`
 	Content         ContentMap  `json:"content,omitempty" diff:"content"`
+
+	// Reference object
+	Ref     string `json:"$ref,omitempty" diff:"$ref"`
+	Summary string `json:"summary,omitempty" diff:"summary"`
 }
 
 func (p Parameters) GetName() string {
@@ -81,5 +90,11 @@ func (p *Parameter) IgnoreExamples() {
 	}
 	if p.Examples != nil {
 		p.Examples = nil
+	}
+}
+
+func (p *Parameter) IgnoreDescriptions() {
+	if p != nil && len(p.Description) > 0 {
+		p.Description = ""
 	}
 }

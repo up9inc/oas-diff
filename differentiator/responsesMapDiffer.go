@@ -24,6 +24,10 @@ func (r *responsesMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (r *responsesMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if r.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromMaps[model.ResponsesMap](a, b)
+	}
+
 	if r.opts.Loose {
 		handleLooseMap[model.ResponsesMap](a, b)
 	}

@@ -24,6 +24,10 @@ func (s *serverVariablesMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (s *serverVariablesMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if s.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromMaps[model.ServerVariablesMap](a, b)
+	}
+
 	if s.opts.Loose {
 		handleLooseMap[model.ServerVariablesMap](a, b)
 	}

@@ -10,6 +10,9 @@ import (
 // make sure we implement the Model interface
 var _ Model = (*Info)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Info)(nil)
+
 // https://spec.openapis.org/oas/v3.1.0#info-object
 type Info struct {
 	Title          string   `json:"title,omitempty" diff:"title"`
@@ -44,4 +47,10 @@ func (i *Info) Parse(file file.JsonFile) error {
 		}
 	}
 	return nil
+}
+
+func (i *Info) IgnoreDescriptions() {
+	if i != nil && len(i.Description) > 0 {
+		i.Description = ""
+	}
 }

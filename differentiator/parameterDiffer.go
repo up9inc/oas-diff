@@ -24,6 +24,32 @@ func (p *parameterDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (p *parameterDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if p.opts.IgnoreDescriptions {
+		aValue, aOk := a.Interface().(model.Parameter)
+		bValue, bOk := b.Interface().(model.Parameter)
+
+		if aOk {
+			aValue.IgnoreDescriptions()
+		}
+
+		if bOk {
+			bValue.IgnoreDescriptions()
+		}
+	}
+
+	if p.opts.IgnoreExamples {
+		aValue, aOk := a.Interface().(model.Parameter)
+		bValue, bOk := b.Interface().(model.Parameter)
+
+		if aOk {
+			aValue.IgnoreExamples()
+		}
+
+		if bOk {
+			bValue.IgnoreExamples()
+		}
+	}
+
 	if p.opts.Loose {
 		aValue, aOk := a.Interface().(model.Parameter)
 		bValue, bOk := b.Interface().(model.Parameter)

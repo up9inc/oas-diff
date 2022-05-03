@@ -68,3 +68,28 @@ func (e *externalDocsDiffer) InternalDiff(jsonFile file.JsonFile, jsonFile2 file
 
 	return nil
 }
+
+func (e *externalDocsDiffer) Match(a, b reflect.Value) bool {
+	return lib.AreType(a, b, reflect.TypeOf(model.ExternalDoc{}))
+}
+
+func (e *externalDocsDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if e.opts.IgnoreDescriptions {
+		aValue, aOk := a.Interface().(model.ExternalDoc)
+		bValue, bOk := b.Interface().(model.ExternalDoc)
+
+		if aOk {
+			aValue.IgnoreDescriptions()
+		}
+
+		if bOk {
+			bValue.IgnoreDescriptions()
+		}
+	}
+
+	return df(path, a, b, parent)
+}
+
+func (e *externalDocsDiffer) InsertParentDiffer(dfunc func(path []string, a, b reflect.Value, p interface{}) error) {
+	e.DiffFunc = dfunc
+}

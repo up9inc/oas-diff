@@ -6,6 +6,9 @@ type SchemasSlice []*Schema
 // make sure we implement the Examples interface
 var _ ExamplesInterface = (*Schema)(nil)
 
+// make sure we implement the Descriptions interface
+var _ DescriptionsInterface = (*Schema)(nil)
+
 // TODO: []*Schema should be handled as an array like servers/parameters? If we do, what will be the identifier?
 // TODO: Support Extensions
 // TODO: Numbers should be uint64 or int/uint32?
@@ -82,5 +85,11 @@ func (s *Schema) IgnoreExamples() {
 	}
 	if s.Examples != nil {
 		s.Examples = nil
+	}
+}
+
+func (s *Schema) IgnoreDescriptions() {
+	if s != nil && len(s.Description) > 0 {
+		s.Description = ""
 	}
 }

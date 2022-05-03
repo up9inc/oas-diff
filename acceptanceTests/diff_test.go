@@ -1,8 +1,10 @@
 package acceptanceTests
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -27,6 +29,8 @@ const (
 	FILE_OPERATIONS2 = "data/operations2.json"
 	FILE_SERVERS     = "data/servers.json"
 	FILE_SERVERS2    = "data/servers2.json"
+	FILE_REFERENCES  = "data/references.json"
+	FILE_REFERENCES2 = "data/references2.json"
 )
 
 type DiffSuite struct {
@@ -40,6 +44,13 @@ type DiffSuite struct {
 
 	vall validator.Validator
 	diff differentiator.Differentiator
+}
+
+type OutputValidation struct {
+	key               string
+	opts              *differentiator.DifferentiatorOptions
+	output            *differentiator.ChangelogOutput
+	expectedChangelog *differentiator.Changelog
 }
 
 func (d *DiffSuite) SetupTest() {
@@ -82,7 +93,6 @@ func validateDependencies(d *DiffSuite) {
 }
 
 func validateExecutionStatus(d *DiffSuite, output *differentiator.ChangelogOutput) {
-	d.Assert().NotNil(d, "d is nil")
 	d.Assert().NotNil(output, "output is nil")
 
 	d.Assert().NotNil(output.ExecutionStatus, "executionStatus is nil")
@@ -93,7 +103,6 @@ func validateExecutionStatus(d *DiffSuite, output *differentiator.ChangelogOutpu
 }
 
 func validateChangeMapOutput(d *DiffSuite, output *differentiator.ChangelogOutput) {
-	d.Assert().NotNil(d, "d is nil")
 	d.Assert().NotNil(output, "output is nil")
 
 	d.Assert().NotNil(output.Changelog, "changeMap is nil")
@@ -106,6 +115,66 @@ func validateChangeMapOutput(d *DiffSuite, output *differentiator.ChangelogOutpu
 	d.Assert().NotNil(output.Changelog[model.OAS_TAGS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_TAGS_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_EXTERNAL_DOCS_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_EXTERNAL_DOCS_KEY))
 	d.Assert().NotNil(output.Changelog[model.OAS_SECURITY_KEY], fmt.Sprintf("failed to find changeMap key '%s'", model.OAS_SECURITY_KEY))
+}
+
+func validateChangelog(d *DiffSuite, ov *OutputValidation) {
+	assert := d.Assert()
+
+	assert.NotNil(ov, "outputValidation struct is nil")
+	assert.NotNil(ov.opts, "opts struct is nil")
+	assert.NotNil(ov.output, "output is nil")
+	assert.NotNil(ov.expectedChangelog, "expectedChangelog struct is nil")
+	assert.NotEmpty(ov.key, "key is empty")
+	assert.NotNil(ov.output.Changelog[ov.key], fmt.Sprintf("failed to find output changelog for key %s", ov.key))
+
+	path := ov.expectedChangelog.Path
+
+	if ov.opts.IncludeFilePath {
+		fullPath := make([]string, 0)
+
+		// creation is always from file2
+		// deletion is always from file1
+		switch ov.expectedChangelog.Type {
+		case "create":
+			fullPath = append(fullPath, d.jsonFile2.GetPath())
+			// TODO: update
+		case "update":
+			fullPath = append(fullPath, d.jsonFile1.GetPath())
+		case "delete":
+			fullPath = append(fullPath, d.jsonFile1.GetPath())
+		}
+
+		// key
+		fullPath = append(fullPath, ov.key)
+
+		// path
+		path = append(fullPath, path...)
+	}
+
+	// filter output based on type + path
+	index := -1
+	for i, c := range ov.output.Changelog[ov.key] {
+		if c.Type == ov.expectedChangelog.Type &&
+			reflect.DeepEqual(c.Path, path) {
+			index = i
+			break
+		}
+	}
+
+	if index == -1 {
+		j, _ := json.MarshalIndent(ov.expectedChangelog, "", "\t")
+		assert.NotEqual(-1, index, fmt.Sprintf("failed to find changelog in output: %s", string(j)))
+		return
+	}
+	changelog := ov.output.Changelog[ov.key][index]
+
+	// expected changelog
+	assert.Equal(ov.expectedChangelog.Type, changelog.Type)
+	assert.Len(path, len(ov.expectedChangelog.Path))
+	assert.Equal(path, changelog.Path)
+	assert.Equal(ov.expectedChangelog.Identifier, changelog.Identifier)
+	assert.Equal(ov.expectedChangelog.From, changelog.From)
+	assert.Equal(ov.expectedChangelog.To, changelog.To)
 }
 
 func SimpleDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
@@ -511,156 +580,137 @@ func ResponsesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	// changeMap
 	validateChangeMapOutput(d, output)
 
-	// aux vars
-	index := -1
-
 	// paths
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_PATHS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "update",
+			Path:       []string{"/example", "get", "responses", "200", "description"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       "A simple string response",
+			To:         "the success response",
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_PATHS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"/example", "get", "responses", "default"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Response{
+				Description: "the default response",
+			},
+		},
+	})
+
 	paths := output.Changelog[model.OAS_PATHS_KEY]
+
 	if opts.Loose {
 		assert.Len(paths, 2, "paths should have 2 changes")
 	} else {
+		// no loose
 		assert.Len(paths, 8, "paths should have 4 changes")
-	}
 
-	// paths[0]
-	index = 0
-	basePath := []string{"/example", "get", "responses", "200", "description"}
-	assert.Equal("update", paths[index].Type)
-	if opts.IncludeFilePath {
-		assert.Len(paths[index].Path, 7)
-		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4]}, paths[index].Path)
-	} else {
-		assert.Len(paths[index].Path, 5)
-		assert.Equal(basePath, paths[index].Path)
-	}
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-	assert.Equal("A simple string response", paths[index].From)
-	assert.Equal("the success response", paths[index].To)
-
-	if opts.Loose {
-		// update the index for the last path
-		index = 1
-
-	} else {
-		index = 1
-		basePath = []string{"/example", "get", "responses", "200", "content", "application/json"}
-		assert.Equal("delete", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.MediaType{
-			Schema: &model.Schema{
-				Type: "object",
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       []string{"/example", "get", "responses", "200", "content", "application/json"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.MediaType{
+					Schema: &model.Schema{
+						Type: "object",
+					},
+				},
+				To: nil,
 			},
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+		})
 
-		index = 2
-		basePath = []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "base64"}
-		assert.Equal("delete", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 10)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5], basePath[6], basePath[7]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.Encoding{
-			ContentType: "base64",
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
-
-		index = 3
-		basePath = []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "BASE64"}
-		assert.Equal("create", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 10)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5], basePath[6], basePath[7]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.Encoding{
-			ContentType: "base64",
-		}, paths[index].To)
-
-		index = 4
-		basePath = []string{"/example", "get", "responses", "200", "content", "Application/JSON"}
-		assert.Equal("create", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.MediaType{
-			Schema: &model.Schema{
-				Type: "object",
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "base64"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.Encoding{
+					ContentType: "base64",
+				},
+				To: nil,
 			},
-		}, paths[index].To)
+		})
 
-		index = 5
-		basePath = []string{"/example", "get", "responses", "200", "links", "address"}
-		assert.Equal("delete", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.Link{
-			OperationID: "some-id",
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       []string{"/example", "get", "responses", "200", "content", "application/x-binary", "encoding", "BASE64"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.Encoding{
+					ContentType: "base64",
+				},
+			},
+		})
 
-		index = 6
-		basePath = []string{"/example", "get", "responses", "200", "links", "Address"}
-		assert.Equal("create", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 8)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3], basePath[4], basePath[5]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.Link{
-			OperationID: "some-id",
-		}, paths[index].To)
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       []string{"/example", "get", "responses", "200", "content", "Application/JSON"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.MediaType{
+					Schema: &model.Schema{
+						Type: "object",
+					},
+				},
+			},
+		})
 
-		// update the index for the last path
-		index = 7
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       []string{"/example", "get", "responses", "200", "links", "address"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.Link{
+					OperationID: "some-id",
+				},
+				To: nil,
+			},
+		})
+
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       []string{"/example", "get", "responses", "200", "links", "Address"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.Link{
+					OperationID: "some-id",
+				},
+			},
+		})
 	}
-
-	basePath = []string{"/example", "get", "responses", "default"}
-	assert.Equal("create", paths[index].Type)
-	if opts.IncludeFilePath {
-		assert.Len(paths[index].Path, 6)
-		assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3]}, paths[index].Path)
-	} else {
-		assert.Len(paths[index].Path, 4)
-		assert.Equal(basePath, paths[index].Path)
-	}
-	assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-	assert.Equal(nil, paths[index].From)
-	assert.Equal(model.Response{
-		Description: "the default response",
-	}, paths[index].To)
-
 }
 
 func OperationsDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
@@ -681,108 +731,304 @@ func OperationsDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
 	// changeMap
 	validateChangeMapOutput(d, output)
 
-	// aux vars
-	index := -1
-
 	// paths
 	paths := output.Changelog[model.OAS_PATHS_KEY]
 	if opts.Loose {
 		assert.Len(paths, 1, "paths should have 1 change")
+
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "update",
+				Path:       []string{"/example", "get"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To:         &model.Operation{},
+			},
+		})
+
 	} else {
+		// no loose
 		assert.Len(paths, 4, "paths should have 4 changes")
+
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       []string{"/example"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.PathItem{
+					Options: &model.Operation{},
+					Patch:   &model.Operation{},
+					Put:     &model.Operation{},
+				},
+				To: nil,
+			},
+		})
+
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "delete",
+				Path:       []string{"/login", "post", "callbacks", "/logincallback"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From: model.PathItem{
+					Post: &model.Operation{},
+				},
+				To: nil,
+			},
+		})
+
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       []string{"/login", "post", "callbacks", "/LoginCallback"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.PathItem{
+					Post: &model.Operation{},
+				},
+			},
+		})
+
+		validateChangelog(d, &OutputValidation{
+			opts:   &opts,
+			key:    model.OAS_PATHS_KEY,
+			output: output,
+			expectedChangelog: &differentiator.Changelog{
+				Type:       "create",
+				Path:       []string{"/Example"},
+				Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+				From:       nil,
+				To: model.PathItem{
+					Get:     &model.Operation{},
+					Options: &model.Operation{},
+					Patch:   &model.Operation{},
+					Put:     &model.Operation{},
+				},
+			},
+		})
 	}
+}
 
-	if opts.Loose {
-		// paths[0]
-		index = 0
-		basePath := []string{"/example", "get"}
-		assert.Equal("update", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 4)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 2)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(&model.Operation{}, paths[index].To)
-	} else {
-		// paths[0]
-		index = 0
-		basePath := []string{"/example"}
-		assert.Equal("delete", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 3)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 1)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.PathItem{
-			Options: &model.Operation{},
-			Patch:   &model.Operation{},
-			Put:     &model.Operation{},
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+func ReferencesDiff(d *DiffSuite, opts differentiator.DifferentiatorOptions) {
+	validateDependencies(d)
 
-		// paths[1]
-		index = 1
-		basePath = []string{"/login", "post", "callbacks", "/logincallback"}
-		assert.Equal("delete", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 4)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(model.PathItem{
-			Post: &model.Operation{},
-		}, paths[index].From)
-		assert.Equal(nil, paths[index].To)
+	assert := d.Assert()
 
-		// paths[2]
-		index = 2
-		basePath = []string{"/login", "post", "callbacks", "/LoginCallback"}
-		assert.Equal("create", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 6)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0], basePath[1], basePath[2], basePath[3]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 4)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.PathItem{
-			Post: &model.Operation{},
-		}, paths[index].To)
+	_, err := d.jsonFile1.Read()
+	assert.NoError(err)
 
-		// paths[3]
-		index = 3
-		basePath = []string{"/Example"}
-		assert.Equal("create", paths[index].Type)
-		if opts.IncludeFilePath {
-			assert.Len(paths[index].Path, 3)
-			assert.Equal([]string{d.jsonFile1.GetPath(), model.OAS_PATHS_KEY, basePath[0]}, paths[index].Path)
-		} else {
-			assert.Len(paths[index].Path, 1)
-			assert.Equal(basePath, paths[index].Path)
-		}
-		assert.Equal(differentiator.Identifier(differentiator.Identifier(nil)), paths[index].Identifier)
-		assert.Equal(nil, paths[index].From)
-		assert.Equal(model.PathItem{
-			Get:     &model.Operation{},
-			Options: &model.Operation{},
-			Patch:   &model.Operation{},
-			Put:     &model.Operation{},
-		}, paths[index].To)
+	_, err = d.jsonFile2.Read()
+	assert.NoError(err)
 
-	}
+	output, err := d.diff.Diff(d.jsonFile1, d.jsonFile2)
+	assert.NoError(err, fmt.Sprintf("diff error: %v", err))
+	// ExecutionStatus
+	validateExecutionStatus(d, output)
+	// changeMap
+	validateChangeMapOutput(d, output)
 
+	// paths
+	paths := output.Changelog[model.OAS_PATHS_KEY]
+	assert.Len(paths, 0, "paths should have 0 changes")
+
+	// webhooks
+	webhooks := output.Changelog[model.OAS_WEBHOOKS_KEY]
+	assert.Len(webhooks, 3, "webhooks should have 3 changes")
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_WEBHOOKS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "update",
+			Path:       []string{"/ref", "$ref"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       "#/components/schemas/ref",
+			To:         "#/components/schemas/updatedRef",
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_WEBHOOKS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "delete",
+			Path:       []string{"/legacyRef"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From: model.PathItem{
+				Ref:         "#/components/schemas/legacyRef",
+				Summary:     "legacy ref webhook",
+				Description: "legacy ref desc",
+			},
+			To: nil,
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_WEBHOOKS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"/newRef"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.PathItem{
+				Ref: "#/components/schemas/newRef",
+			},
+		},
+	})
+
+	// components
+	components := output.Changelog[model.OAS_COMPONENTS_KEY]
+	assert.Len(components, 9, "components should have 9 changes")
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"responses", "some_response"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Response{
+				Ref: "#/components/schemas/response",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"parameters", "some_parameter"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Parameter{
+				Ref: "#/components/schemas/parameter",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"examples", "some_example"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Example{
+				Ref: "#/components/schemas/example",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"requestBodies", "some_request_body"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.RequestBody{
+				Ref: "#/components/schemas/requestBody",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"headers", "some_header"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Header{
+				Ref: "#/components/schemas/header",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"securitySchemes", "some_security_scheme"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.SecurityScheme{
+				Ref: "#/components/schemas/securityScheme",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"links", "some_link"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.Link{
+				Ref: "#/components/schemas/link",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"callbacks", "some_callback"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.PathItem{
+				Ref: "#/components/schemas/callback",
+			},
+		},
+	})
+
+	validateChangelog(d, &OutputValidation{
+		opts:   &opts,
+		key:    model.OAS_COMPONENTS_KEY,
+		output: output,
+		expectedChangelog: &differentiator.Changelog{
+			Type:       "create",
+			Path:       []string{"pathItems", "some_path"},
+			Identifier: differentiator.Identifier(differentiator.Identifier(nil)),
+			From:       nil,
+			To: model.PathItem{
+				Ref: "#/components/schemas/path",
+			},
+		},
+	})
 }
 
 func (d *DiffSuite) TestSimpleDiffWithFullFilePath() {
@@ -987,4 +1233,22 @@ func (d *DiffSuite) TestOperationsLooseDiff() {
 	}
 	d.diff = differentiator.NewDifferentiator(d.vall, opts)
 	OperationsDiff(d, opts)
+}
+
+func (d *DiffSuite) TestReferencesDiff() {
+	d.jsonFile1 = file.NewJsonFile(FILE_REFERENCES)
+	d.jsonFile2 = file.NewJsonFile(FILE_REFERENCES2)
+
+	d.vall = validator.NewValidator()
+	err := d.vall.InitSchemaFromFile(d.OAS31schemaFile)
+	if err != nil {
+		d.T().Error(err)
+		return
+	}
+
+	opts := differentiator.DifferentiatorOptions{
+		IncludeFilePath: false,
+	}
+	d.diff = differentiator.NewDifferentiator(d.vall, opts)
+	ReferencesDiff(d, opts)
 }

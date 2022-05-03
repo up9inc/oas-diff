@@ -25,6 +25,10 @@ func (r *requestBodiesMapDiffer) Match(a, b reflect.Value) bool {
 }
 
 func (r *requestBodiesMapDiffer) Diff(dt lib.DiffType, df lib.DiffFunc, cl *lib.Changelog, path []string, a, b reflect.Value, parent interface{}) error {
+	if r.opts.IgnoreDescriptions {
+		ignoreDescriptionsFromMaps[model.RequestBodiesMap](a, b)
+	}
+
 	if r.opts.Loose {
 		aValue, aOk := a.Interface().(model.RequestBodiesMap)
 		bValue, bOk := b.Interface().(model.RequestBodiesMap)

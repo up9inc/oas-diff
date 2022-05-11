@@ -1,7 +1,10 @@
 package validator
 
 import (
+	"embed"
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	"github.com/santhosh-tekuri/jsonschema/v5"
 	file "github.com/up9inc/oas-diff/json"
@@ -9,10 +12,38 @@ import (
 
 const (
 	OAS31_SCHEMA_URL  = "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v3.1/schema.json"
-	OAS31_SCHEMA_FILE = "validator/oas31.json"
+	OAS31_SCHEMA_FILE = "oas31.json"
 )
 
+//go:embed oas31.json
+var schemaFileFS embed.FS
+
 func (v *validator) InitSchemaFromFile(schemaFile file.JsonFile) error {
+	if schemaFile == nil {
+		data, err := schemaFileFS.ReadFile(OAS31_SCHEMA_FILE)
+		if err != nil {
+			return err
+		}
+
+		// we have to create a temp file because the lib only accepts a file or a url
+		tempFile, err := ioutil.TempFile("", fmt.Sprintf("*.%s", OAS31_SCHEMA_FILE))
+		if err != nil {
+			return err
+		}
+		defer os.Remove(tempFile.Name())
+
+		n, err := tempFile.Write(data)
+		if err != nil {
+			return err
+		}
+
+		if n != len(data) {
+			return fmt.Errorf("InitSchemaFromFile failed to write %d bytes to %s", len(data), tempFile.Name())
+		}
+
+		schemaFile = file.NewJsonFile(tempFile.Name())
+	}
+
 	err := schemaFile.ValidatePath()
 	if err != nil {
 		return err
@@ -43,7 +74,7 @@ func (v *validator) InitSchemaFromURL(url string) error {
 
 func (v *validator) GetSchemaProperty(key string) (*jsonschema.Schema, error) {
 	if v.schema == nil {
-		err := v.InitSchemaFromURL(OAS31_SCHEMA_URL)
+		err := v.InitSchemaFromFile(nil)
 		if err != nil {
 			return nil, err
 		}

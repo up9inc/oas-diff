@@ -160,12 +160,12 @@ func (d *differentiator) Diff(jsonFile file.JsonFile, jsonFile2 file.JsonFile) (
 
 	err := d.validator.Validate(jsonFile)
 	if err != nil {
-		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile.GetPath())
+		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file: %s", jsonFile.GetPath(), err.Error())
 	}
 
 	err = d.validator.Validate(jsonFile2)
 	if err != nil {
-		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file", jsonFile2.GetPath())
+		return nil, fmt.Errorf("%s is not a valid 3.1 OAS file: %s", jsonFile2.GetPath(), err.Error())
 	}
 
 	output := NewChangelogOutput(start, jsonFile.GetPath(), jsonFile2.GetPath(), d.opts)

@@ -36,7 +36,7 @@ func NewValidator() Validator {
 
 func (v *validator) Validate(jsonFile file.JsonFile) error {
 	if v.schema == nil {
-		err := v.InitSchemaFromURL(OAS31_SCHEMA_URL)
+		err := v.InitSchemaFromFile(nil)
 		if err != nil {
 			return err
 		}

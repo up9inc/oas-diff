@@ -1,7 +1,5 @@
 .PHONY: build
 
-UI_COMMON_FOLDER=ui
-
 build:
 	@echo "building template..."
 	@(cd ui; npm i ; npm run build; )

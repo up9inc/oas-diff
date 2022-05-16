@@ -1,6 +1,10 @@
 const gulp = require('gulp');
 const inlinesource = require('gulp-inline-source');
 const replace = require('gulp-replace');
+const rename = require('gulp-rename');
+
+const fileName = "template.html"
+const fileLocation = '../reporter'
 
 gulp.task('default', () => {
     return gulp
@@ -13,5 +17,6 @@ gulp.task('default', () => {
                 ignore: ['png'],
             })
         )
-        .pipe(gulp.dest('./build'));
+        .pipe(rename(fileName))
+        .pipe(gulp.dest(fileLocation));
 });

@@ -8,6 +8,9 @@ const list = [{
   data: []
 }]
 
+let test = (window as { [key: string]: any })["reportData"] as object;
+console.log(test);
+
 function App() {
   return (
     <div className="App">

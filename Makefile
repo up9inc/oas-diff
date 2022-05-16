@@ -1,6 +1,10 @@
 .PHONY: build
 
+UI_COMMON_FOLDER=ui
+
 build:
+	@echo "building template..."
+	@(cd ui; npm i ; npm run build; )
 	@echo "building oas-diff.."
 	@mkdir build -p
 	@go build -race ${GCLFAGS} -o ./build oasdiff.go

@@ -135,15 +135,22 @@ func (h *htmlReporter) Build() ([]byte, error) {
 			return "info"
 		},
 	}
+	buildNonPathChangelogJson, err := json.Marshal(h.buildNonPathChangelogList())
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
 	data := struct {
-		Status               differentiator.ExecutionStatus
-		NonPathChangelogList []differentiator.Changelog
-		PathChangelogList    []pathKeyValue
+		Status                   differentiator.ExecutionStatus
+		NonPathChangelogList     []differentiator.Changelog
+		PathChangelogList        []pathKeyValue
+		NonPathChangelogListJson string
 	}{
-		Status:               h.output.ExecutionStatus,
-		NonPathChangelogList: h.buildNonPathChangelogList(),
-		PathChangelogList:    h.buildPathChangelogMap(),
+		Status:                   h.output.ExecutionStatus,
+		NonPathChangelogList:     h.buildNonPathChangelogList(),
+		PathChangelogList:        h.buildPathChangelogMap(),
+		NonPathChangelogListJson: string(buildNonPathChangelogJson),
 	}
 
 	var buf bytes.Buffer

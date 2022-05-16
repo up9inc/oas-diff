@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "craco build && npx gulp",
     "test": "craco test",
     "eject": "craco eject"
   },

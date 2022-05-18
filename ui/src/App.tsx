@@ -1,21 +1,22 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.sass';
-import { Select, Accordion, AccordionDetails, AccordionSummary, Typography, FormControl, InputLabel, MenuItem, Button, Card, CardActionArea, CardActions, CardContent, CardMedia } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-const list = [{
-  title: 'Section 1',
-  data: []
-}]
+import { Header } from './components/Header/Header';
+import { GeneralData } from './components/GeneralData/GeneralData';
+import { ChangeLog } from './components/ChangeLog/ChangeLog';
+import { PathList } from './components/PathList/PathList';
+
+
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
+      <Header dateGenerated=''></Header>
+      <GeneralData baseFile={'asdasd'} secondFile={'asdasd'} executionTime={'asdasd'} totalPathChanges={0} flags={0}></GeneralData>
+      <ChangeLog></ChangeLog>
+      <PathList></PathList>
+      {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
       </header>
       <div className='reportContainer'>
-
         <Card>
           <CardActionArea>
             <CardContent>
@@ -102,7 +103,7 @@ function App() {
           })}
 
         </div>
-      </div>
+      </div> */}
     </div >
   );
 }

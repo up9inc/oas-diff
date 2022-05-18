@@ -1,0 +1,56 @@
+@import '../../sass/mixins.sass'
+@import '../../sass/variables.sass'
+
+.pathListContainer
+    background-color: #f7f9fc
+
+    .innerContainer
+        @include section-margin
+        padding-top: 50px
+
+        .title
+            font-style: normal
+            font-weight: 700
+            font-size: 18px
+            line-height: 23px
+            text-transform: uppercase
+            color: #000000
+            text-align: initial
+            margin-bottom: 30px
+
+        .filters
+            text-align: start
+            margin-bottom: 30px
+
+        .pathList
+            height: 100%
+            overflow-y: auto
+
+.pathPrefix
+    border: 1px solid #8F9BB2
+    border-radius: 4px
+.pathName
+    font-style: normal
+    font-weight: 400
+    font-size: 18px
+    line-height: 23px
+    color: #0C0B1A
+
+.accordionTitle
+    display: flex
+    flex-direction: column
+    align-items: flex-start
+
+.changes
+    .change
+        font-weight: 600
+        font-size: 12px
+        line-height: 15px
+        color: #8F9BB2
+
+        &.created
+            color: $created-color
+        &.deleted
+            color: $deleted-color
+        &.updated
+            color: $updateed-color

@@ -5,7 +5,6 @@ import { ChangeLog } from './components/ChangeLog/ChangeLog';
 import { PathList } from './components/PathList/PathList';
 
 
-
 function App() {
   return (
     <div className="App">

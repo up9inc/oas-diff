@@ -5,7 +5,7 @@ import { useCommonStyles } from '../../useCommonStyles';
 import { getData } from '../../DataService';
 import React, { ChangeEvent, useState } from 'react';
 
-const data: any = getData()
+const data: any = getData().data
 export const PathListItem: React.FC<Props> = ({ }) => {
     return (
         <Accordion>
@@ -42,10 +42,10 @@ export interface Props {
 
 export const PathList: React.FC<Props> = (props: Props) => {
     const commonClasses = useCommonStyles()
-    const services: any = data.changelog.paths.map((x: any) => x.path[0])
+    const services: any = data.map((x: any) => x.Key)
     const uniqueServices = Array.from(new Set(services))
-    const types = data.changelog.paths.map((x: any) => x.type)
-    const uniqueTypes = Array.from(new Set(types))
+    // const types = data.changelog.paths.map((x: any) => x.type)
+    // const uniqueTypes = Array.from(new Set(types))
 
     const [service, setService] = useState('')
     const [type, setType] = useState('')
@@ -60,7 +60,7 @@ export const PathList: React.FC<Props> = (props: Props) => {
                     PATHS LIST
                 </div>
                 <div className="filters">
-                    <FormControl size="small" sx={{ m: 1, minWidth: 120 }} className={`${commonClasses.select}`}>
+                    {/* <FormControl size="small" sx={{ m: 1, minWidth: 120 }} className={`${commonClasses.select}`}>
                         <InputLabel id="demo-simple-select-label">Services</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -71,10 +71,12 @@ export const PathList: React.FC<Props> = (props: Props) => {
                         >
                             {uniqueServices.map((service: any) => <MenuItem key={service} value={service}>{service}</MenuItem>)}
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
                     <FormControl>
                         <TextField id="outlined-basic" label="Path" variant="outlined" size="small" value={path} onChange={onChange(setPath)} />
                     </FormControl>
+                    <div className='seperatorLine'></div>
+
                     <FormControl size="small" sx={{ m: 1, minWidth: 150 }} className={`${commonClasses.select}`}>
                         <InputLabel id="demo-simple-select-label">Change Type</InputLabel>
                         <Select
@@ -84,7 +86,10 @@ export const PathList: React.FC<Props> = (props: Props) => {
                             value={type}
                             onChange={onChange(setType)}
                         >
-                            {uniqueTypes.map((type: any) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
+                            <MenuItem key={"Created"} value={"create"}>Create</MenuItem>
+                            <MenuItem key={"updated"} value={"update"}>Update</MenuItem>
+                            <MenuItem key={"delete"} value={"delete"}>Delete</MenuItem>
+                            {/* {uniqueTypes.map((type: any) => <MenuItem key={type} value={type}>{type}</MenuItem>)} */}
                         </Select>
                     </FormControl>
 

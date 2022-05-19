@@ -1,3 +1,4 @@
+import { getStatus } from '../../DataService';
 import './GeneralData.sass';
 
 export interface IIndexable {
@@ -19,6 +20,8 @@ export interface Props extends IIndexable {
     totalPathChanges: number;
     flags: number
 }
+
+const status = getStatus()
 
 export const GeneralData: React.FC<Props> = (props: Props) => {
     return (

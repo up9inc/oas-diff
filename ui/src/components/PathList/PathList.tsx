@@ -1,48 +1,91 @@
-import { Accordion, AccordionDetails, AccordionSummary, FormControl, InputLabel, MenuItem, Select, Typography, TextField, SelectChangeEvent } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, FormControl, InputLabel, MenuItem, Select, Typography, TextField, SelectChangeEvent, Grid } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathList.sass';
 import { useCommonStyles } from '../../useCommonStyles';
-import { getData } from '../../DataService';
-import React, { ChangeEvent, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
+import { CollapsedContext } from '../../CollapsedContext';
 
-const data: any = getData().data
-export const PathListItem: React.FC<Props> = ({ }) => {
+export interface PathListItemProps {
+    change: any
+    showChangeType?: string
+}
+
+
+export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeType = "" }) => {
+
+    const changeVal = change.Value
+    const filteredChanges = useMemo(() => {
+        return showChangeType ? changeVal?.Paths.filter((path: any) => path.Changelog.type === showChangeType) : changeVal?.Paths
+    }, [changeVal?.Paths, showChangeType])
+
+    const { collapsed } = useContext(CollapsedContext);
+
     return (
-        <Accordion>
+        <Accordion expanded={!collapsed}>
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel2a-content"
                 id="panel2a-header"
             >
-                {/* <Typography>[PATHS] /customers/&#123;customerId&#125;addresses</Typography> */}
                 <div className='accordionTitle'>
                     <div className='path'>
-                        <span className='pathPrefix'>PATHS</span>&nbsp;
-                        <span className='pathName'>/customers/&#123;customerId&#125;addresses</span>
+                        <span className='pathPrefix'>{change.Value.Key}</span>&nbsp;
+                        <span className='pathName'>{change.Key}</span>
                     </div>
                     <div className='changes'>
-                        <span className='change'>Changes: 2</span>&nbsp;
-                        <span className='change created'>Created: 2</span>
+                        <span className='change total'>Changes: {changeVal.TotalChanges}</span>&nbsp;
+                        {changeVal.CreatedChanges > 0 && <span className='change create'>Created: {changeVal.CreatedChanges}</span>}
+                        {changeVal.UpdatedChanges > 0 && <span className='change update'>Updated: {changeVal.UpdatedChanges}</span>}
+                        {changeVal.DeletedChanges > 0 && <span className='change delete'>Deleted: {changeVal.DeletedChanges}</span>}
                     </div>
                 </div>
             </AccordionSummary>
             <AccordionDetails>
-                <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                    malesuada lacus ex, sit amet blandit leo lobortis eget.
-                </Typography>
-            </AccordionDetails>
-        </Accordion>
+                {filteredChanges?.map((path: any) => {
+                    return <Accordion key={JSON.stringify(path)} expanded={!collapsed}>
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel2a-content"
+                            id="panel2a-header">
+                            <div className='path'>
+                                <span className={`operation ${path.Operation}`}>{path.Operation}</span>&nbsp;
+                                <span className='pathName'>{path.Changelog.path.join(" ")}</span>
+                            </div>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <span>Path:</span>
+                            {path.Changelog.path.slice(1).map((path: any, index: number) => <div key={`${path + index}`} style={{ paddingLeft: `${(index + 1 * 0.4)}em` }}>{path}</div>)}
+                            <div style={{ marginTop: "10px" }}>
+                                <Grid container spacing={2}>
+                                    {path?.Changelog?.from && <Grid item md>
+                                        <div>From:</div>
+                                        <pre className={`${path.Changelog.type}`} style={{ whiteSpace: "pre-wrap" }}>
+                                            {JSON.stringify(path.Changelog.from)}
+                                        </pre>
+                                    </Grid>}
+                                    {path?.Changelog?.to && <Grid item md>
+                                        <div>To:</div>
+                                        <pre className={`${path.Changelog.type}`} style={{ whiteSpace: "pre-wrap" }}>
+                                            {JSON.stringify(path.Changelog.to)}
+                                        </pre>
+                                    </Grid>}
+                                </Grid>
+                            </div>
+                        </AccordionDetails>
+                    </Accordion>
+                })}
+            </AccordionDetails >
+        </Accordion >
     )
 }
 
 export interface Props {
-
+    changeList: any
 }
 
-export const PathList: React.FC<Props> = (props: Props) => {
+export const PathList: React.FC<Props> = ({ changeList }) => {
     const commonClasses = useCommonStyles()
-    const services: any = data.map((x: any) => x.Key)
+    const services: any = changeList.map((x: any) => x.Key)
     const uniqueServices = Array.from(new Set(services))
     // const types = data.changelog.paths.map((x: any) => x.type)
     // const uniqueTypes = Array.from(new Set(types))
@@ -52,6 +95,15 @@ export const PathList: React.FC<Props> = (props: Props) => {
     const [path, setPath] = useState('')
 
     const onChange = (setFunc: Function) => (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setFunc(event.target.value)
+
+
+    const filteredChanges = useMemo(() => {
+        let relevantList = changeList
+        if (type !== "")
+            relevantList = changeList?.filter((change: any) => change?.Value?.Paths.some((path: any) => path.Changelog.type === type))
+
+        return relevantList?.filter((change: any) => change?.Key.toLowerCase().includes(path.toLowerCase()))
+    }, [changeList, path, type])
 
     return (
         <div className='pathListContainer'>
@@ -77,7 +129,7 @@ export const PathList: React.FC<Props> = (props: Props) => {
                     </FormControl>
                     <div className='seperatorLine'></div>
 
-                    <FormControl size="small" sx={{ m: 1, minWidth: 150 }} className={`${commonClasses.select}`}>
+                    <FormControl size='small' sx={{ m: 1, minWidth: 150 }} className={`${commonClasses.select}`}>
                         <InputLabel id="demo-simple-select-label">Change Type</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -85,7 +137,9 @@ export const PathList: React.FC<Props> = (props: Props) => {
                             label="Change Type"
                             value={type}
                             onChange={onChange(setType)}
+
                         >
+                            <MenuItem key={"None"} value={""}>None</MenuItem>
                             <MenuItem key={"Created"} value={"create"}>Create</MenuItem>
                             <MenuItem key={"updated"} value={"update"}>Update</MenuItem>
                             <MenuItem key={"delete"} value={"delete"}>Delete</MenuItem>
@@ -94,8 +148,10 @@ export const PathList: React.FC<Props> = (props: Props) => {
                     </FormControl>
 
                 </div>
-                <div className='pathList'>
-                    <PathListItem></PathListItem>
+                <div className='changeLogList'>
+                    {filteredChanges.map((change: any, index: string) => <div key={"changeLogItem" + index} className='changeLogItem'>
+                        <PathListItem change={change} showChangeType={type}></PathListItem></div>)
+                    }
                 </div>
             </div>
         </div>

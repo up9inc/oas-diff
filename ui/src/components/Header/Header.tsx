@@ -1,6 +1,7 @@
 import './Header.sass';
 import mizuIcon from "../../assets/mizu-icon.svg";
-import logo from "../../assets/logo.svg";
+// import logo from "../../assets/logo.svg";
+import logo from "../../assets/Mizu-logo.svg";
 import byUp9 from "../../assets/byUp9-img.svg";
 
 export interface Props {
@@ -14,22 +15,17 @@ export const Header: React.FC<Props> = ({
         <header className='header'>
             <div className='leftSide'>
                 <div className='logoWrapper'>
-                    <img src={mizuIcon} className="mizuIcon" alt="logo icon"></img>
-                    <div className='logoIcon'>
-                        <img src={logo} alt="logo" className='mizuLogo'></img>
-                        <img src={byUp9} alt="by Up9" className='byUp9Icon'></img>
-                    </div>
+                    <img src={logo} className="" alt="logo icon"></img>
                 </div>
                 <div className='title'>
                     <h1>OAS-diff
                         <span className='subTitle'>&nbsp;Report</span>
                     </h1>
-
                 </div>
             </div>
             <div className='rightSide'>
                 <span className='dateGenerated'>
-                    {dateGenerated}{"18 Feb 2020"}
+                    {dateGenerated}
                 </span>
             </div>
         </header>

@@ -1,17 +1,31 @@
 import './App.sass';
 import { Header } from './components/Header/Header';
-import { GeneralData } from './components/GeneralData/GeneralData';
+import { StatusData } from './components/StatusData/StatusData';
 import { ChangeLog } from './components/ChangeLog/ChangeLog';
 import { PathList } from './components/PathList/PathList';
+import { getData, getStatus, getTotalChanged } from './DataService';
+import { useState } from 'react';
+import React from 'react';
+import { CollapsedContext } from './CollapsedContext';
+
+const status = getStatus()
+const changeLog = getData().data
+const totalChanges = getTotalChanged()
 
 
 function App() {
+
+  const [collapseAll, setCollapseAll] = useState(false)
+
   return (
     <div className="App">
-      <Header dateGenerated=''></Header>
-      <GeneralData baseFile={'asdasd'} secondFile={'asdasd'} executionTime={'asdasd'} totalPathChanges={0} flags={0}></GeneralData>
-      <ChangeLog></ChangeLog>
-      <PathList></PathList>
+      <Header dateGenerated={status.startTime}></Header>
+      <StatusData baseFile={status.baseFile} secondFile={status.secondFile} executionTime={status.executionTime} totalPathChanges={totalChanges} flags={Object.keys(status.executionFlags).length}></StatusData>
+      <ChangeLog onCollapseAll={() => { setCollapseAll(true) }}></ChangeLog>
+      <CollapsedContext.Provider value={{ collapsed: collapseAll }}>
+        <PathList changeList={changeLog}></PathList>
+      </CollapsedContext.Provider>
+
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
       </header>

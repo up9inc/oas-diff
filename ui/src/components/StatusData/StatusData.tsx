@@ -1,5 +1,5 @@
 import { getStatus } from '../../DataService';
-import './GeneralData.sass';
+import './StatusData.sass';
 
 export interface IIndexable {
     [key: string]: any;
@@ -23,12 +23,12 @@ export interface Props extends IIndexable {
 
 const status = getStatus()
 
-export const GeneralData: React.FC<Props> = (props: Props) => {
+export const StatusData: React.FC<Props> = (props: Props) => {
     return (
         <div className='generalData'>
             <div className='details'>
                 {Object.entries(props).map(([key, val]) => {
-                    return <div className='item'>
+                    return <div key={key} className='item'>
                         <span className='itemTitle'>
                             {dictionary[key]}
                         </span>

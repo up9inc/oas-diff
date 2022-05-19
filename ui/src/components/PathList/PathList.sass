@@ -1,8 +1,24 @@
 @import '../../sass/mixins.sass'
 @import '../../sass/variables.sass'
 
+.create
+    color: $created-color
+.delete
+    color: $deleted-color
+.update
+    color: $updated-color
+.method
+    border: 1px solid
+    border-radius: 4px
+    font-weight: 700
+    padding: 0px 4px
+    text-transform: uppercase
+
 .pathListContainer
     background-color: #f7f9fc
+    height: -moz-available
+    height: -webkit-fill-available
+    height: fill-available
 
     .innerContainer
         @include section-margin
@@ -11,7 +27,7 @@
         .title
             font-style: normal
             font-weight: 700
-            font-size: 16px
+            font-size: 18px
             line-height: 23px
             text-transform: uppercase
             color: #000000
@@ -27,19 +43,44 @@
             align-content: center
             align-items: center
 
-        .pathList
+        .changeLogList
             height: 100%
             overflow-y: auto
 
+            .changeLogItem
+                margin-bottom: 10px
+
+                .path
+                    text-align: start
+
+                    .operation
+
+                    & .get
+                        color: $blue-color
+                    & .post
+                        color: $post-color
+                    & .delete
+                        color: $delete-color
 .pathPrefix
-    border: 1px solid #8F9BB2
-    border-radius: 4px
+    @extend .method
+    border-color: $color-method-border
+    color: $color-dark
+
 .pathName
     font-style: normal
     font-weight: 400
     font-size: 16px
     line-height: 23px
     color: #0C0B1A
+
+.operation
+    @extend .method
+    &.get
+        @mixin borderAndColor($get-color)
+    &.post
+        @mixin borderAndColor($post-color)
+    &.delete
+        @mixin borderAndColor($delete-color)
 
 .accordionTitle
     display: flex
@@ -51,14 +92,8 @@
         font-weight: 600
         font-size: 11px
         line-height: 15px
-        color: #8F9BB2
-
-        &.created
-            color: $created-color
-        &.deleted
-            color: $deleted-color
-        &.updated
-            color: $updateed-color
+        &.total
+            color: #8F9BB2
 
 .seperatorLine
     display: inline-block

@@ -1,0 +1,36 @@
+@import '../../sass/mixins.sass'
+@import '../../sass/variables.sass'
+@import '../../sass/components.sass'
+
+.accordionTitle
+    display: flex
+    flex-direction: column
+    align-items: flex-start
+
+.pathPrefix
+    @extend .method
+    border-color: $color-method-border
+    color: $color-dark
+
+.pathName
+    font-style: normal
+    font-weight: 400
+    font-size: 16px
+    line-height: 23px
+    color: #0C0B1A
+
+.operation
+    @extend .method
+    &.get
+        @include borderAndColor($get-color)
+    &.post
+        @include borderAndColor($post-color)
+    &.delete
+        @include borderAndColor($delete-color)
+
+.change
+    font-weight: 600
+    font-size: 11px
+    line-height: 15px
+    &.total
+        color: #8F9BB2

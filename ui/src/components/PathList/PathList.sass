@@ -7,22 +7,15 @@
     color: $deleted-color
 .update
     color: $updated-color
-.method
-    border: 1px solid
-    border-radius: 4px
-    font-weight: 700
-    padding: 0px 4px
-    text-transform: uppercase
 
 .pathListContainer
     background-color: #f7f9fc
-    height: -moz-available
-    height: -webkit-fill-available
-    height: fill-available
+    min-height: calc(100% - 270px)
 
     .innerContainer
         @include section-margin
-        padding-top: 50px
+        padding: 50px 0px
+        height: 100%
 
         .title
             font-style: normal
@@ -44,56 +37,11 @@
             align-items: center
 
         .changeLogList
-            height: 100%
-            overflow-y: auto
+            // height: 100%
+            // overflow-y: auto
 
             .changeLogItem
                 margin-bottom: 10px
-
-                .path
-                    text-align: start
-
-                    .operation
-
-                    & .get
-                        color: $blue-color
-                    & .post
-                        color: $post-color
-                    & .delete
-                        color: $delete-color
-.pathPrefix
-    @extend .method
-    border-color: $color-method-border
-    color: $color-dark
-
-.pathName
-    font-style: normal
-    font-weight: 400
-    font-size: 16px
-    line-height: 23px
-    color: #0C0B1A
-
-.operation
-    @extend .method
-    &.get
-        @mixin borderAndColor($get-color)
-    &.post
-        @mixin borderAndColor($post-color)
-    &.delete
-        @mixin borderAndColor($delete-color)
-
-.accordionTitle
-    display: flex
-    flex-direction: column
-    align-items: flex-start
-
-.changes
-    .change
-        font-weight: 600
-        font-size: 11px
-        line-height: 15px
-        &.total
-            color: #8F9BB2
 
 .seperatorLine
     display: inline-block

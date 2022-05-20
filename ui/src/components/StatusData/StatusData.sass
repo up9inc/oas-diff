@@ -28,12 +28,36 @@
             @include eclipse
 
         .itemData
+            margin-top: 10px
             font-weight: 900
             font-size: 16px
             color: #0C0B1A
-            padding-top: 10px
             @include eclipse
+            display: flex
+            align-items: center
 
 .singleNumberCard
     background: #E9EBF8
     border-radius: 4px
+    width: 36px
+    height: 35px
+    display: flex
+    align-content: center
+    justify-content: center
+    align-items: center
+
+.timeContainer
+    display: flex
+
+    .time
+        padding: 6px 12px
+        background: #FFFFFF
+        border: 1px solid #E9EBF8
+        border-radius: 4px 0px 0px 4px
+    .measure
+        border: 1px solid #E9EBF8
+        border-radius: 0px 4px 4px 0px
+        display: flex
+        align-items: center
+        justify-content: center
+        padding: 5px

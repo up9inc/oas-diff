@@ -4,12 +4,17 @@ export interface IIndexable {
     [key: string]: any;
 }
 
+const timeExecutionComponent = (ms: number) => <div className='timeContainer'>
+    <span className='time'>{ms}</span>
+    <span className='measure'>ms</span>
+</div>
+
 const dictionary: IIndexable = {
-    baseFile: "Base File",
-    secondFile: "Second File",
-    executionTime: "Execution Time",
-    totalPathChanges: "Total Path Changes",
-    flags: "Flags",
+    baseFile: { name: "Base File" },
+    secondFile: { name: "Second File" },
+    executionTime: { name: "Execution Time", component: (val: any) => timeExecutionComponent(val) },
+    totalPathChanges: { name: "Total Path Changes", component: (val: any) => <span className='singleNumberCard'>{val}</span> },
+    flags: { name: "Flags", component: (val: any) => <span className='singleNumberCard'>{val}</span> },
 }
 
 export interface Props extends IIndexable {
@@ -27,11 +32,11 @@ export const StatusData: React.FC<Props> = (props: Props) => {
                 {Object.entries(props).map(([key, val]) => {
                     return <div key={key} className='item'>
                         <span className='itemTitle'>
-                            {dictionary[key]}
+                            {dictionary[key].name}
                         </span>
-                        <span className='itemData'>
-                            {props[key]}
-                        </span>
+                        <div className='itemData'>
+                            {dictionary[key]?.component ? dictionary[key].component(val) : val}
+                        </div>
                     </div>
                 })}
             </div>

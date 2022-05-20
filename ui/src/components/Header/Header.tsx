@@ -1,8 +1,5 @@
 import './Header.sass';
-import mizuIcon from "../../assets/mizu-icon.svg";
-// import logo from "../../assets/logo.svg";
 import logo from "../../assets/Mizu-logo.svg";
-import byUp9 from "../../assets/byUp9-img.svg";
 
 export interface Props {
     dateGenerated: string;

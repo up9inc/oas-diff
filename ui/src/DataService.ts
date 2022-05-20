@@ -1,26 +1,27 @@
 
-const data = (window as { [key: string]: any })["reportData"] as Object;
+const dataFromWindow = (window as { [key: string]: any })["reportData"] as Object;
+!dataFromWindow && console.error("No Data Found on Window.")
 
 class DataService {
-    private data: any;
+    private windowData: any;
 
     constructor(data: any) {
-        this.data = data
+        this.windowData = data
     }
 
     getData() {
-        return this.data.data
+        return this.windowData?.data
     }
 
     getStatus() {
-        return this.data.status
+        return this.windowData?.status
     }
 
     getTotalChanged() {
-        return this.data.data.reduce((previousValue: number, current: number, index: number, array: Array<any>) => {
+        return this.windowData?.data?.reduce((previousValue: number, current: number, index: number, array: Array<any>) => {
             return previousValue + array[index].Value.TotalChanges
         }, 0)
     }
 }
 
-export const dataService = new DataService(data)
+export const dataService = new DataService(dataFromWindow)

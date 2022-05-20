@@ -21,8 +21,8 @@ function App() {
 
   return (
     <div className="App">
-      <Header dateGenerated={status.startTime}></Header>
-      <StatusData baseFile={status.baseFile} secondFile={status.secondFile} executionTime={status.executionTime} totalPathChanges={totalChanges} flags={Object.keys(status.executionFlags).length}></StatusData>
+      <Header dateGenerated={status?.startTime}></Header>
+      <StatusData baseFile={status?.baseFile} secondFile={status?.secondFile} executionTime={status?.executionTime} totalPathChanges={totalChanges} flags={Object.keys(status?.executionFlags ?? {}).length}></StatusData>
       <ChangeLog onCollapseAll={setCollapseAll}></ChangeLog>
       <CollapsedContext.Provider value={{ accordions: accordions, setAccordions: setAccordions }}>
         <PathList changeList={changeLog}></PathList>

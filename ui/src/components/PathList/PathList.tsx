@@ -67,7 +67,7 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
 
                 </div>
                 <div className='changeLogList'>
-                    {filteredChanges.map((change: any, index: string) => <div key={"changeLogItem" + index} className='changeLogItem'>
+                    {filteredChanges?.map((change: any, index: string) => <div key={"changeLogItem" + index} className='changeLogItem'>
                         <PathListItem change={change} showChangeType={type}></PathListItem></div>)
                     }
                 </div>

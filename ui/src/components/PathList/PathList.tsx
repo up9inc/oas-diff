@@ -1,6 +1,5 @@
 import { FormControl, InputLabel, MenuItem, Select, TextField, SelectChangeEvent } from '@mui/material';
 import './PathList.sass';
-import { useCommonStyles } from '../../useCommonStyles';
 import React, { useMemo, useState } from 'react';
 import { PathListItem } from './PathListItem';
 
@@ -9,7 +8,6 @@ export interface Props {
 }
 
 export const PathList: React.FC<Props> = ({ changeList }) => {
-    const commonClasses = useCommonStyles()
     const [type, setType] = useState('')
     const [path, setPath] = useState('')
 
@@ -30,24 +28,11 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                     PATHS LIST
                 </div>
                 <div className="filters">
-                    {/* <FormControl size="small" sx={{ m: 1, minWidth: 120 }} className={`${commonClasses.select}`}>
-                        <InputLabel id="demo-simple-select-label">Services</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            label="Services"
-                            value={service}
-                            onChange={onChange(setService)}
-                        >
-                            {uniqueServices.map((service: any) => <MenuItem key={service} value={service}>{service}</MenuItem>)}
-                        </Select>
-                    </FormControl> */}
                     <FormControl>
                         <TextField id="outlined-basic" label="Path" variant="outlined" size="small" value={path} onChange={onChange(setPath)} />
                     </FormControl>
                     <div className='seperatorLine'></div>
-
-                    <FormControl size='small' sx={{ m: 1, minWidth: 150 }} className={`${commonClasses.select}`}>
+                    <FormControl size='small' sx={{ minWidth: 150 }} >
                         <InputLabel id="demo-simple-select-label">Change Type</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
@@ -55,7 +40,10 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                             label="Change Type"
                             value={type}
                             onChange={onChange(setType)}
-
+                            sx={{
+                                margin: "0px !important",
+                                width: "250px"
+                            }}
                         >
                             <MenuItem key={"None"} value={""}>None</MenuItem>
                             <MenuItem key={"Created"} value={"create"}>Create</MenuItem>

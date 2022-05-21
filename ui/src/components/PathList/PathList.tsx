@@ -29,19 +29,22 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                     PATHS LIST
                 </div>
                 <div className="filters">
-                    <FormControl variant="standard">
-                        <InputLabel htmlFor="path-input">Path</InputLabel>
-                        <BootstrapInput sx={{}} id="path-input" value={path} onChange={onChange(setPath)} size='small'></BootstrapInput>
+                    <FormControl>
+                        <TextField id="outlined-basic" label="Path" variant="outlined" size="small" value={path} onChange={onChange(setPath)} />
                     </FormControl>
                     <div className='seperatorLine'></div>
-                    <FormControl sx={{ minWidth: 250 }} variant="standard">
-                        <InputLabel id="demo-customized-select-label">Change Type</InputLabel>
+                    <FormControl size='small' sx={{ minWidth: 150 }} >
+                        <InputLabel id="demo-simple-select-label">Change Type</InputLabel>
                         <Select
-                            labelId="demo-customized-select-label"
-                            id="demo-customized-select"
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="Change Type"
                             value={type}
                             onChange={onChange(setType)}
-                            input={<BootstrapInput />}
+                            sx={{
+                                margin: "0px !important",
+                                width: "250px"
+                            }}
                         >
                             <MenuItem key={"None"} value={""}>None</MenuItem>
                             <MenuItem key={"Created"} value={"create"}>Create</MenuItem>

@@ -2,6 +2,7 @@ import { FormControl, InputLabel, MenuItem, Select, TextField, SelectChangeEvent
 import './PathList.sass';
 import React, { useMemo, useState } from 'react';
 import { PathListItem } from './PathListItem';
+import { BootstrapInput } from '../BootstrapInput';
 
 export interface Props {
     changeList: any
@@ -28,31 +29,26 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                     PATHS LIST
                 </div>
                 <div className="filters">
-                    <FormControl>
-                        <TextField id="outlined-basic" label="Path" variant="outlined" size="small" value={path} onChange={onChange(setPath)} />
+                    <FormControl variant="standard">
+                        <InputLabel htmlFor="path-input">Path</InputLabel>
+                        <BootstrapInput sx={{}} id="path-input" value={path} onChange={onChange(setPath)} size='small'></BootstrapInput>
                     </FormControl>
                     <div className='seperatorLine'></div>
-                    <FormControl size='small' sx={{ minWidth: 150 }} >
-                        <InputLabel id="demo-simple-select-label">Change Type</InputLabel>
+                    <FormControl sx={{ minWidth: 250 }} variant="standard">
+                        <InputLabel id="demo-customized-select-label">Change Type</InputLabel>
                         <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            label="Change Type"
+                            labelId="demo-customized-select-label"
+                            id="demo-customized-select"
                             value={type}
                             onChange={onChange(setType)}
-                            sx={{
-                                margin: "0px !important",
-                                width: "250px"
-                            }}
+                            input={<BootstrapInput />}
                         >
                             <MenuItem key={"None"} value={""}>None</MenuItem>
                             <MenuItem key={"Created"} value={"create"}>Create</MenuItem>
                             <MenuItem key={"updated"} value={"update"}>Update</MenuItem>
                             <MenuItem key={"delete"} value={"delete"}>Delete</MenuItem>
-                            {/* {uniqueTypes.map((type: any) => <MenuItem key={type} value={type}>{type}</MenuItem>)} */}
                         </Select>
                     </FormControl>
-
                 </div>
                 <div className='changeLogList'>
                     {filteredChanges?.map((change: any, index: string) => <div key={"changeLogItem" + index} className='changeLogItem'>

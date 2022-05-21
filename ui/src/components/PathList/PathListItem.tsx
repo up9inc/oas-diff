@@ -42,6 +42,31 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
         return false
     }
 
+    const getToTypeColor = (type: string) => {
+        switch (type) {
+            case "create":
+                return "create"
+            case "update":
+                return "create"
+            case "delete":
+                return "delete"
+            default:
+                return "info"
+        }
+    }
+
+    const getFromTypeColor = (type: string) => {
+        switch (type) {
+            case "create":
+                return "create"
+            case "update":
+                return "delete"
+            case "delete":
+                return "delete"
+            default:
+                return "info"
+        }
+    }
     return (
         <Accordion expanded={!accordions.find(x => x.id === JSON.stringify(change))?.isCollpased}>
             <AccordionSummary
@@ -62,39 +87,39 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
             </AccordionSummary>
             <AccordionDetails>
                 {filteredChanges?.map((path: any) => {
-                    return <Accordion key={JSON.stringify(path)} expanded={(() => isExpand(path))()}>
-                        <AccordionSummary
-                            onClick={() => onClick(JSON.stringify(path))}
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel2a-content">
-                            <div>
-                                <span className={`operation ${path.Operation}`}>{path.Operation}</span>&nbsp;
-                                <span className='pathName'>{path.Changelog.path.join(" ")}</span>
-                            </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <span>Path:</span>
-                            {path.Changelog.path.slice(1).map((path: any, index: number) =>
-                                <div key={`${path + index}`} style={{ paddingLeft: `${(index + 1 * 0.4)}em` }}>{path}</div>)
-                            }
-                            <div style={{ marginTop: "10px" }}>
-                                <Grid container spacing={2}>
-                                    {path?.Changelog?.from && <Grid item md>
-                                        <div>From:</div>
-                                        <pre className={`${path.Changelog.type}`} style={{ whiteSpace: "pre-wrap" }}>
-                                            {JSON.stringify(path.Changelog.from)}
-                                        </pre>
-                                    </Grid>}
-                                    {path?.Changelog?.to && <Grid item md>
-                                        <div>To:</div>
-                                        <pre className={`${path.Changelog.type}`} style={{ whiteSpace: "pre-wrap" }}>
-                                            {JSON.stringify(path.Changelog.to)}
-                                        </pre>
-                                    </Grid>}
-                                </Grid>
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
+                        <Accordion key={JSON.stringify(path)} expanded={(() => isExpand(path))()}>
+                            <AccordionSummary
+                                onClick={() => onClick(JSON.stringify(path))}
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel2a-content">
+                                <div>
+                                    <span className={`operation ${path.Operation}`}>{path.Operation}</span>&nbsp;
+                                    <span className='pathName'>{path.Changelog.path.join(" ")}</span>
+                                </div>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <span>Path:</span>
+                                {path.Changelog.path.slice(1).map((path: any, index: number) =>
+                                    <div key={`${path + index}`} style={{ paddingLeft: `${(index + 1 * 0.4)}em` }}>{path}</div>)
+                                }
+                                <div style={{ marginTop: "10px" }}>
+                                    <Grid container spacing={2}>
+                                        {path?.Changelog?.from && <Grid item md>
+                                            <div>From:</div>
+                                            <pre className={`${getFromTypeColor(path.Changelog.type)}`} style={{ whiteSpace: "pre-wrap" }}>
+                                                {JSON.stringify(path.Changelog.from)}
+                                            </pre>
+                                        </Grid>}
+                                        {path?.Changelog?.to && <Grid item md>
+                                            <div>To:</div>
+                                            <pre className={`${getToTypeColor(path.Changelog.type)}`} style={{ whiteSpace: "pre-wrap" }}>
+                                                {JSON.stringify(path.Changelog.to)}
+                                            </pre>
+                                        </Grid>}
+                                    </Grid>
+                                </div>
+                            </AccordionDetails>
+                        </Accordion>
                 })}
             </AccordionDetails >
         </Accordion >

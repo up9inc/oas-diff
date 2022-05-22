@@ -23,18 +23,18 @@ type htmlReporter struct {
 }
 
 type pathChangelog struct {
-	Endpoint  string
-	Operation string
-	Changelog differentiator.Changelog
+	Endpoint  string                   `json:"endpoint"`
+	Operation string                   `json:"operation"`
+	Changelog differentiator.Changelog `json:"changelog"`
 }
 
 type pathsData struct {
-	Key            string
-	Paths          []pathChangelog
-	TotalChanges   int
-	CreatedChanges int
-	UpdatedChanges int
-	DeletedChanges int
+	Key            string          `json:"key"`
+	Paths          []pathChangelog `json:"path"`
+	TotalChanges   int             `json:"totalChanges"`
+	CreatedChanges int             `json:"createdChanges"`
+	UpdatedChanges int             `json:"updatedChanges"`
+	DeletedChanges int             `json:"deletedChanges"`
 }
 
 type pathsMap map[string]pathsData
@@ -46,8 +46,8 @@ func (t byType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelo
 func (t byType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 
 type pathKeyValue struct {
-	Key   string
-	Value pathsData
+	Key   string    `json:"key"`
+	Value pathsData `json:"value"`
 }
 
 func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {

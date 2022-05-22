@@ -1,4 +1,5 @@
 import './Header.sass';
+import { ReactComponent as LogoSvg } from "../../assets/Mizu-logo.svg";
 
 export interface Props {
     dateGenerated: string;
@@ -11,7 +12,7 @@ export const Header: React.FC<Props> = ({
         <header className='header'>
             <div className='leftSide'>
                 <div className='logoWrapper'>
-                    <img src={"https://static.up9.com/icons/mizu-logo.svg"} alt="logo icon"></img>
+                    <LogoSvg />
                 </div>
                 <div className='title'>
                     <h1>OAS-diff

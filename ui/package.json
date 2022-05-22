@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "craco build && npx gulp",
     "test": "craco test",
     "eject": "craco eject"
   },
@@ -49,6 +49,7 @@
     "gulp": "^4.0.2",
     "gulp-inline-source": "^4.0.0",
     "gulp-replace": "^1.1.3",
-    "inline-chunk-html-plugin": "^1.1.1"
+    "inline-chunk-html-plugin": "^1.1.1",
+    "gulp-rename": "^2.0.0"
   }
 }

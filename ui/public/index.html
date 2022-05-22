@@ -23,7 +23,7 @@
 </head>
 <script>
   try {
-    window["reportData"] = {"data" : {{.PathChangelogListJson }}, "status": {{.StatusJson}}}
+    window["reportData"] = {"data" : {{.PathChangelogList }}, "status": {{.Status}}}
     console.log(window["reportData"])
   } catch (error) {
     console.log(error)

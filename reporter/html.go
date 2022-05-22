@@ -135,11 +135,6 @@ func (h *htmlReporter) Build() ([]byte, error) {
 			return "info"
 		},
 	}
-	buildNonPathChangelogJson, err := json.Marshal(h.buildNonPathChangelogList())
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
 
 	buildPathChangelogJson, err := json.Marshal(h.buildPathChangelogMap())
 	if err != nil {
@@ -153,21 +148,12 @@ func (h *htmlReporter) Build() ([]byte, error) {
 		return nil, err
 	}
 
-
 	data := struct {
-		Status                   differentiator.ExecutionStatus
-		StatusJson				 string
-		NonPathChangelogList     []differentiator.Changelog
-		PathChangelogList        []pathKeyValue
-		NonPathChangelogListJson string
-		PathChangelogListJson 	 string
+		Status            string
+		PathChangelogList string
 	}{
-		Status:                   h.output.ExecutionStatus,
-		StatusJson:				  string(buildStatusJson),
-		NonPathChangelogList:     h.buildNonPathChangelogList(),
-		PathChangelogList:        h.buildPathChangelogMap(),
-		NonPathChangelogListJson: string(buildNonPathChangelogJson),
-		PathChangelogListJson:    string(buildPathChangelogJson),
+		Status:            string(buildStatusJson),
+		PathChangelogList: string(buildPathChangelogJson),
 	}
 
 	var buf bytes.Buffer
@@ -180,27 +166,6 @@ func (h *htmlReporter) Build() ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
-}
-
-func (h *htmlReporter) buildNonPathChangelogList() []differentiator.Changelog {
-	result := make([]differentiator.Changelog, 0)
-
-	for k, v := range h.output.Changelog {
-		for _, c := range v {
-
-			// ignore paths and webhooks
-			if k == model.OAS_PATHS_KEY || k == model.OAS_WEBHOOKS_KEY {
-				continue
-			}
-
-			result = append(result, c)
-		}
-	}
-
-	// sort by type
-	sort.Sort(differentiator.ByType(result))
-
-	return result
 }
 
 func (h *htmlReporter) buildPathChangelogMap() []pathKeyValue {

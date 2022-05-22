@@ -18,6 +18,7 @@
     font-size: 16px
     line-height: 23px
     color: #0C0B1A
+    @include spaceBefore()
 
 .operation
     @extend .method
@@ -32,8 +33,9 @@
     font-weight: 600
     font-size: 11px
     line-height: 15px
+    @include spaceBefore()
     &.total
-        color: #8F9BB2
+        color: $color-info
 
 .changeCategory
     font-style: normal

@@ -1,11 +1,12 @@
+import { DataItem, ReaportData } from "./interfaces";
 
-const dataFromWindow = (window as { [key: string]: any })["reportData"] as Object;
+const dataFromWindow = (window as { [key: string]: any })["reportData"] as ReaportData;
 !dataFromWindow && console.error("No Data Found on Window.")
 
 class DataService {
-    private windowData: any;
+    private windowData: ReaportData;
 
-    constructor(data: any) {
+    constructor(data: ReaportData) {
         this.windowData = data
     }
 
@@ -18,8 +19,8 @@ class DataService {
     }
 
     getTotalChanged() {
-        return this.windowData?.data?.reduce((previousValue: number, current: number, index: number, array: Array<any>) => {
-            return previousValue + array[index].Value.TotalChanges
+        return this.windowData?.data?.reduce((previousValue: number, current: DataItem) => {
+            return previousValue + current.value.totalChanges
         }, 0)
     }
 }

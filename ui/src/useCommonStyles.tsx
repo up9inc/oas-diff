@@ -1,5 +1,4 @@
 import { Button, styled } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 
 export const CollapseButton = styled(Button)({
     backgroundColor: "#205cf5",

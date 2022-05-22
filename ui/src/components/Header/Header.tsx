@@ -16,13 +16,15 @@ export const Header: React.FC<Props> = ({
                 </div>
                 <div className='title'>
                     <h1>OAS-diff
-                        <span className='subTitle'>&nbsp;Report</span>
+                        <span className='subTitle'>Report</span>
                     </h1>
                 </div>
             </div>
             <div className='rightSide'>
                 <span className='dateGenerated'>
-                    {dateGenerated}
+                    {new Date(dateGenerated).toLocaleTimeString('en-us', {
+                        month: "long", year: "numeric", day: "numeric", hour: '2-digit', minute: '2-digit', hour12: false
+                    })}
                 </span>
             </div>
         </header>

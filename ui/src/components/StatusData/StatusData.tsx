@@ -4,7 +4,7 @@ export interface IIndexable {
     [key: string]: any;
 }
 
-const timeExecutionComponent = (ms: number) => <div className='timeContainer'>
+const TimeExecutionComponent = (ms: number) => <div className='timeContainer'>
     <span className='time'>{ms}</span>
     <span className='measure'>ms</span>
 </div>
@@ -12,7 +12,7 @@ const timeExecutionComponent = (ms: number) => <div className='timeContainer'>
 const dictionary: IIndexable = {
     baseFile: { name: "Base File" },
     secondFile: { name: "Second File" },
-    executionTime: { name: "Execution Time", component: (val: any) => timeExecutionComponent(val) },
+    executionTime: { name: "Execution Time", component: (val: any) => TimeExecutionComponent(val) },
     totalPathChanges: { name: "Total Path Changes", component: (val: any) => <span className='singleNumberCard'>{val}</span> },
     flags: { name: "Flags", component: (val: any) => <span className='singleNumberCard'>{val}</span> },
 }

@@ -5,7 +5,11 @@
     border-color: $color
     color: $color
 
-@mixin eclipse
+@mixin ellipsis
     overflow: hidden
     white-space: nowrap
     text-overflow: ellipsis
+
+@mixin spaceBefore()
+    &:before
+        content: " "

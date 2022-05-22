@@ -1,4 +1,3 @@
-
 import './ChangeLog.sass';
 import { CollapseButton } from '../../useCommonStyles';
 

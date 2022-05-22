@@ -95,29 +95,28 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
                             aria-controls="panel2a-content">
                             <div>
                                 <span className={`operation ${path.operation}`}>{path.operation}</span>
-                                <span className='pathName'>{path.changelog?.paths?.join(" ")}</span>
+                                <span className='pathName'>{path.changelog?.path?.join(" ")}</span>
                             </div>
                         </AccordionSummary>
                         <AccordionDetails>
                             <span>Path:</span>
-                            {path.changelog?.paths?.slice(1).map((path: string, index: number) =>
+                            {path.changelog?.path?.slice(1).map((path: string, index: number) =>
                                 <div key={`${path + index}`} style={{ paddingLeft: `${(index + 1 * 0.4)}em` }}>{path}</div>)
                             }
-                            <div style={{ marginTop: "10px" }}>
-                                <Grid container spacing={2}>
-                                    {path?.changelog?.from && <Grid item md>
-                                        <div>From:</div>
-                                        <pre className={`${getFromTypeColor(path.changelog.type)}`} style={{ whiteSpace: "pre-wrap" }}>
-                                            {JSON.stringify(path.changelog.from)}
-                                        </pre>
-                                    </Grid>}
-                                    {path?.changelog?.to && <Grid item md>
-                                        <div>To:</div>
-                                        <pre className={`${getToTypeColor(path.changelog.type)}`} style={{ whiteSpace: "pre-wrap" }}>
-                                            {JSON.stringify(path.changelog.to)}
-                                        </pre>
-                                    </Grid>}
-                                </Grid>
+                            <div style={{ marginTop: "10px" }} className="diffContainer">
+
+                                {path?.changelog?.from && <div style={{ flex: 1, width: "100%" }}>
+                                    <div>From:</div>
+                                    <pre className={`${getFromTypeColor(path.changelog.type)}`}>
+                                        {JSON.stringify(path.changelog.from)}
+                                    </pre>
+                                </div>}
+                                {path?.changelog?.to && <div style={{ flex: 1 }}>
+                                    <div>To:</div>
+                                    <pre className={`${getToTypeColor(path.changelog.type)}`}>
+                                        {JSON.stringify(path.changelog.to)}
+                                    </pre>
+                                </div>}
                             </div>
                         </AccordionDetails>
                     </Accordion>)

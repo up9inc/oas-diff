@@ -10,7 +10,7 @@ interface JSONObject {
 
 export interface ChangeLog {
     type: string
-    paths: string[]
+    path: string[]
     from: JSONObject
     to: JSONObject
 }

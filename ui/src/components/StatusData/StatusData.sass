@@ -1,0 +1,63 @@
+@import '../../sass/mixins.sass'
+
+.generalData
+    background-color: #fbfcfe
+    height: 100px
+    display: flex
+    justify-content: center
+    flex-direction: column
+
+    .details
+        display: flex
+        justify-content: space-between
+        @include section-margin
+
+    .item
+        display: flex
+        align-items: flex-start
+        justify-content: center
+        align-content: center
+        flex-direction: column
+        @include eclipse
+        display: inline-grid
+        padding: 0px 10px
+
+        .itemTitle
+            font-weight: 500
+            font-size: 16px
+            color: #0C0B1A
+            @include eclipse
+
+        .itemData
+            margin-top: 10px
+            font-weight: 900
+            font-size: 16px
+            color: #0C0B1A
+            @include eclipse
+            max-width: 300px
+
+.singleNumberCard
+    background: #E9EBF8
+    border-radius: 4px
+    width: 36px
+    height: 35px
+    display: flex
+    align-content: center
+    justify-content: center
+    align-items: center
+
+.timeContainer
+    display: flex
+
+    .time
+        padding: 6px 12px
+        background: #FFFFFF
+        border: 1px solid #E9EBF8
+        border-radius: 4px 0px 0px 4px
+    .measure
+        border: 1px solid #E9EBF8
+        border-radius: 0px 4px 4px 0px
+        display: flex
+        align-items: center
+        justify-content: center
+        padding: 5px

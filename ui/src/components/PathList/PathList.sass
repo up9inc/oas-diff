@@ -1,0 +1,48 @@
+@import '../../sass/mixins.sass'
+@import '../../sass/variables.sass'
+
+.create
+    color: $created-color
+.delete
+    color: $deleted-color
+.update
+    color: $updated-color
+
+.pathListContainer
+    background-color: #f7f9fc
+    min-height: calc(100% - 270px)
+
+    .innerContainer
+        @include section-margin
+        padding: 50px 0px
+        height: 100%
+
+        .title
+            font-style: normal
+            font-weight: 700
+            font-size: 18px
+            line-height: 23px
+            text-transform: uppercase
+            color: #000000
+            text-align: initial
+            margin-bottom: 10px
+
+        .filters
+            text-align: start
+            margin-bottom: 30px
+            text-align: start
+            margin-bottom: 30px
+            display: flex
+            align-content: center
+            align-items: center
+
+        .changeLogList
+            .changeLogItem
+                margin-bottom: 10px
+
+.seperatorLine
+    display: inline-block
+    border-left: 1px solid #ccc
+    margin: 0 10px
+    height: 30px
+    margin: 0 20px

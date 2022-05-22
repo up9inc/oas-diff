@@ -46,9 +46,9 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                             }}
                         >
                             <MenuItem key={"None"} value={""}>None</MenuItem>
-                            <MenuItem key={"created"} value={ChangeTypeEnum.Created}>Create</MenuItem>
-                            <MenuItem key={"updated"} value={ChangeTypeEnum.Updated}>Update</MenuItem>
-                            <MenuItem key={"deleted"} value={ChangeTypeEnum.Deleted}>Delete</MenuItem>
+                            <MenuItem key={ChangeTypeEnum.Created} value={ChangeTypeEnum.Created}>Create</MenuItem>
+                            <MenuItem key={ChangeTypeEnum.Updated} value={ChangeTypeEnum.Updated}>Update</MenuItem>
+                            <MenuItem key={ChangeTypeEnum.Deleted} value={ChangeTypeEnum.Deleted}>Delete</MenuItem>
                         </Select>
                     </FormControl>
                 </div>

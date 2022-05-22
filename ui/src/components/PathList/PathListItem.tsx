@@ -1,10 +1,10 @@
-import { Accordion, AccordionSummary, AccordionDetails, Grid } from "@mui/material";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import { useContext, useMemo, useEffect } from "react";
 import { CollapsedContext } from "../../CollapsedContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
-import { createClass, deleteClass } from "../../consts";
+import { TypeCaptionDictionary, createClass, deleteClass, infoClass } from "../../consts";
 
 export interface PathListItemProps {
     change: DataItem
@@ -50,7 +50,7 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
             case "delete":
                 return deleteClass
             default:
-                return "info"
+                return infoClass
         }
     }
 
@@ -63,7 +63,7 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
             case "delete":
                 return deleteClass
             default:
-                return "info"
+                return infoClass
         }
     }
 
@@ -86,7 +86,7 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
                 </div>
             </AccordionSummary>
             <AccordionDetails>
-                <div className={`${filteredChanges && filteredChanges[0]?.changelog?.type} changeCategory`}>{filteredChanges[0]?.changelog?.type + "d"}</div>
+                <div className={`${filteredChanges && filteredChanges[0]?.changelog?.type} changeCategory`}>{TypeCaptionDictionary[filteredChanges[0]?.changelog?.type]}</div>
                 {filteredChanges?.map((path: Path) => {
                     return (<Accordion key={JSON.stringify(path)} expanded={(() => isExpand(path))()}>
                         <AccordionSummary

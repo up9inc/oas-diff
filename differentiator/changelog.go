@@ -8,7 +8,7 @@ import (
 type ExecutionStatus struct {
 	BaseFilePath   string                `json:"baseFile"`
 	SecondFilePath string                `json:"secondFile"`
-	StartTime      time.Time             `json:"startTime"`
+	StartTime      string                `json:"startTime"`
 	ExecutionTime  string                `json:"executionTime"`
 	ExecutionFlags DifferentiatorOptions `json:"executionFlags"`
 }
@@ -38,7 +38,7 @@ func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string
 		ExecutionStatus: ExecutionStatus{
 			BaseFilePath:   baseFilePath,
 			SecondFilePath: secondFilePath,
-			StartTime:      startTime,
+			StartTime:      startTime.Format(time.RFC3339),
 			ExecutionTime:  time.Since(startTime).String(),
 			ExecutionFlags: opts,
 		},

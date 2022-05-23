@@ -9,7 +9,7 @@ const TimeExecutionComponent = (ms: number) => <div className='timeContainer'>
     <span className='measure'>ms</span>
 </div>
 
-const dictionary: IIndexable = {
+const propsToPresentationDictionary: IIndexable = {
     baseFile: { name: "Base File" },
     secondFile: { name: "Second File" },
     executionTime: { name: "Execution Time", component: (val: any) => TimeExecutionComponent(val) },
@@ -32,10 +32,10 @@ export const StatusData: React.FC<Props> = (props: Props) => {
                 {Object.entries(props).map(([key, val]) => {
                     return <div key={key} className='item'>
                         <span className='itemTitle'>
-                            {dictionary[key].name}
+                            {propsToPresentationDictionary[key].name}
                         </span>
                         <div className='itemData'>
-                            {dictionary[key]?.component ? dictionary[key].component(val) : val}
+                            {propsToPresentationDictionary[key]?.component ? propsToPresentationDictionary[key].component(val) : val}
                         </div>
                     </div>
                 })}

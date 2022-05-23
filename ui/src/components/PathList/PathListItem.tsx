@@ -7,12 +7,12 @@ import { DataItem, Path } from "../../interfaces";
 import { TypeCaptionDictionary, createClass, deleteClass, infoClass } from "../../consts";
 
 export interface PathListItemProps {
-    change: DataItem
+    changeLogItem: DataItem
     showChangeType?: string
 }
 
-export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeType = "" }) => {
-    const changeVal = change.value
+export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
+    const changeVal = changeLogItem.value
     const { accordions, setAccordions } = useContext(CollapsedContext);
     const filteredChanges = useMemo(() => {
         const changes = showChangeType ? changeVal?.path.filter((path: Path) => path.changelog.type === showChangeType) : changeVal?.path
@@ -33,8 +33,8 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
     }
 
     useEffect(() => {
-        setAccordions(prev => [...prev, { isCollpased: true, id: JSON.stringify(change) }])
-    }, [change, setAccordions])
+        setAccordions(prev => [...prev, { isCollpased: true, id: JSON.stringify(changeLogItem) }])
+    }, [changeLogItem, setAccordions])
 
     const isExpand = (path: Path) => {
         const acc = accordions?.find(x => x.id === JSON.stringify(path))
@@ -68,14 +68,14 @@ export const PathListItem: React.FC<PathListItemProps> = ({ change, showChangeTy
     }
 
     return (
-        <Accordion expanded={!accordions.find(x => x.id === JSON.stringify(change))?.isCollpased}>
+        <Accordion expanded={!accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollpased}>
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content" onClick={() => onClick(JSON.stringify(change))}>
+                aria-controls="panel2a-content" onClick={() => onClick(JSON.stringify(changeLogItem))}>
                 <div className='accordionTitle'>
                     <div className='path'>
-                        <span className='pathPrefix'>{change.value.key}</span>
-                        <span className='pathName'>{change.key}</span>
+                        <span className='pathPrefix'>{changeLogItem.value.key}</span>
+                        <span className='pathName'>{changeLogItem.key}</span>
                     </div>
                     <div>
                         <span className='change total'>Changes: {changeVal.totalChanges}</span>

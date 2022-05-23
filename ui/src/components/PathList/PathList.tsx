@@ -45,7 +45,7 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                                 width: "250px"
                             }}
                         >
-                            <MenuItem key={"None"} value={""}>None</MenuItem>
+                            <MenuItem key={"All"} value={""}>All</MenuItem>
                             <MenuItem key={ChangeTypeEnum.Created} value={ChangeTypeEnum.Created}>Create</MenuItem>
                             <MenuItem key={ChangeTypeEnum.Updated} value={ChangeTypeEnum.Updated}>Update</MenuItem>
                             <MenuItem key={ChangeTypeEnum.Deleted} value={ChangeTypeEnum.Deleted}>Delete</MenuItem>
@@ -54,7 +54,7 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                 </div>
                 <div className='changeLogList'>
                     {filteredChanges?.map((change: DataItem, index: number) => <div key={"changeLogItem" + index} className='changeLogItem'>
-                        <PathListItem change={change} showChangeType={type} /></div>)
+                        <PathListItem changeLogItem={change} showChangeType={type} /></div>)
                     }
                 </div>
             </div>

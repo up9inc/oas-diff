@@ -13,3 +13,7 @@
 @mixin spaceBefore()
     &:before
         content: " "
+
+@mixin applyColorOn($color)
+    & .hljs-string,&
+        color: $color

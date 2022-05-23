@@ -5,6 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
 import { TypeCaptionDictionary, createClass, deleteClass, infoClass } from "../../consts";
+import { SyntaxHighlighter } from "../SyntaxHighlighter";
 
 export interface PathListItemProps {
     changeLogItem: DataItem
@@ -107,15 +108,19 @@ export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showC
 
                                 {path?.changelog?.from && <div style={{ flex: 1, width: "100%" }}>
                                     <div>From:</div>
-                                    <pre className={`${getFromTypeColor(path.changelog.type)}`}>
-                                        {JSON.stringify(path.changelog.from)}
-                                    </pre>
+                                    <SyntaxHighlighter
+                                        code={JSON.stringify(path.changelog.from)}
+                                        language="json"
+                                        className={`${getFromTypeColor(path.changelog.type)}`}
+                                    />
                                 </div>}
-                                {path?.changelog?.to && <div style={{ flex: 1 }}>
+                                {path?.changelog?.to && <div style={{ flex: 1, width: "100%" }}>
                                     <div>To:</div>
-                                    <pre className={`${getToTypeColor(path.changelog.type)}`}>
-                                        {JSON.stringify(path.changelog.to)}
-                                    </pre>
+                                    <SyntaxHighlighter
+                                        code={JSON.stringify(path.changelog.to)}
+                                        language="json"
+                                        className={`${getToTypeColor(path.changelog.type)}`}
+                                    />
                                 </div>}
                             </div>
                         </AccordionDetails>

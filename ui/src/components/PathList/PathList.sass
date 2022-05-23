@@ -2,11 +2,12 @@
 @import '../../sass/variables.sass'
 
 .create
-    color: $created-color
+    @include applyColorOn($color: $created-color)
 .delete
-    color: $deleted-color
+    @include applyColorOn($color: $deleted-color)
 .update
-    color: $updated-color
+    @include applyColorOn($color: $updated-color)
+
 .info
     color: $color-info
 

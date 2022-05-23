@@ -38,7 +38,7 @@ func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string
 		ExecutionStatus: ExecutionStatus{
 			BaseFilePath:   baseFilePath,
 			SecondFilePath: secondFilePath,
-			StartTime:      startTime.Format(time.StampMilli),
+			StartTime:      startTime.Format(time.RFC3339),
 			ExecutionTime:  time.Since(startTime).String(),
 			ExecutionFlags: opts,
 		},

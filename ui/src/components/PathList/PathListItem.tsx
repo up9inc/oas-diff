@@ -4,7 +4,7 @@ import { CollapsedContext } from "../../CollapsedContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
-import { TypeCaptionDictionary, createClass, deleteClass, infoClass } from "../../consts";
+import { infoClass, ChangeTypeEnum } from "../../consts";
 import { SyntaxHighlighter } from "../SyntaxHighlighter";
 
 export interface PathListItemProps {
@@ -44,12 +44,12 @@ export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showC
 
     const getToTypeColor = (type: string) => {
         switch (type) {
-            case "create":
-                return createClass
-            case "update":
-                return createClass
-            case "delete":
-                return deleteClass
+            case ChangeTypeEnum.Created:
+                return ChangeTypeEnum.Created
+            case ChangeTypeEnum.Updated:
+                return ChangeTypeEnum.Created
+            case ChangeTypeEnum.Deleted:
+                return ChangeTypeEnum.Deleted
             default:
                 return infoClass
         }
@@ -57,12 +57,12 @@ export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showC
 
     const getFromTypeColor = (type: string) => {
         switch (type) {
-            case "create":
-                return createClass
-            case "update":
-                return deleteClass
-            case "delete":
-                return deleteClass
+            case ChangeTypeEnum.Created:
+                return ChangeTypeEnum.Created
+            case ChangeTypeEnum.Updated:
+                return ChangeTypeEnum.Deleted
+            case ChangeTypeEnum.Deleted:
+                return ChangeTypeEnum.Deleted
             default:
                 return infoClass
         }
@@ -87,7 +87,9 @@ export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showC
                 </div>
             </AccordionSummary>
             <AccordionDetails>
-                <div className={`${filteredChanges && filteredChanges[0]?.changelog?.type} changeCategory`}>{TypeCaptionDictionary[filteredChanges[0]?.changelog?.type]}</div>
+                <div className={`${filteredChanges && filteredChanges[0]?.changelog?.type} changeCategory`}>{Object.keys(ChangeTypeEnum).find(
+                    key => ChangeTypeEnum[key] === filteredChanges[0]?.changelog?.type?.toLocaleLowerCase()
+                )}</div>
                 {filteredChanges?.map((path: Path) => {
                     return (<Accordion key={JSON.stringify(path)} expanded={(() => isExpand(path))()}>
                         <AccordionSummary

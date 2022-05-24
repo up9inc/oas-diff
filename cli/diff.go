@@ -23,6 +23,7 @@ func RegisterDiffCmd() *cli.Command {
 		Usage:   "Diff between two OAS 3.1 files",
 		Action:  diffCmd,
 		Flags: []cli.Flag{
+			TempDirFlag,
 			BaseFileFlag,
 			SecondFileFlag,
 			TypeFilterFlag,
@@ -37,6 +38,7 @@ func RegisterDiffCmd() *cli.Command {
 }
 
 func diffCmd(c *cli.Context) error {
+	tempDir := c.String(TempDirFlag.Name)
 	baseFilePath := c.String(BaseFileFlag.Name)
 	secondFilePath := c.String(SecondFileFlag.Name)
 	isHtmlOutput := c.Bool(HtmlOutputFlag.Name)
@@ -54,7 +56,7 @@ func diffCmd(c *cli.Context) error {
 		return err
 	}
 
-	val := validator.NewValidator()
+	val := validator.NewValidator(tempDir)
 	diff := differentiator.NewDifferentiator(val, differentiator.DifferentiatorOptions{
 		TypeFilter:         strings.ToLower(c.String(TypeFilterFlag.Name)),
 		Loose:              c.Bool(LooseFlag.Name),

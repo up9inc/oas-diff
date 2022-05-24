@@ -18,13 +18,16 @@ type Validator interface {
 }
 
 type validator struct {
+	tempDir    string
 	compiler   *jsonschema.Compiler
 	schema     *jsonschema.Schema
 	jsonSchema file.JsonFile
 }
 
-func NewValidator() Validator {
+// passing an empty tempDir will use a temporary dir managed by OS, but it won't work inside docker/k8s
+func NewValidator(tempDir string) Validator {
 	v := &validator{
+		tempDir:    tempDir,
 		compiler:   jsonschema.NewCompiler(),
 		schema:     nil,
 		jsonSchema: nil,

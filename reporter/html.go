@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
-	"strings"
 	"text/template"
 
 	"github.com/up9inc/oas-diff/differentiator"
@@ -59,83 +58,6 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 var collapseHeaderIndex, collapseBodyIndex int
 
 func (h *htmlReporter) Build() ([]byte, error) {
-	funcMap := template.FuncMap{
-		"CollapseHeaderId": func() string {
-			collapseHeaderIndex++
-			return fmt.Sprintf("collapseHeader_%d", collapseHeaderIndex)
-		},
-		"CollapseBodyId": func() string {
-			collapseBodyIndex++
-			return fmt.Sprintf("collapse_%d", collapseBodyIndex)
-		},
-		"StringLen": func(s string) int { return len(s) },
-		"TotalPathsChanges": func(data []pathKeyValue) int {
-			var count int
-			for _, v := range data {
-				count += v.Value.TotalChanges
-			}
-			return count
-		},
-		"IsNotNil": func(data interface{}) bool { return data != nil },
-		"ToUpper":  strings.ToUpper,
-		"ToLower":  strings.ToLower,
-		"ToPrettyJSON": func(data interface{}) string {
-			j, _ := json.MarshalIndent(data, "", "\t")
-			return string(j)
-		},
-		"FormatPath":  func(path []string) string { return strings.Join(path, " ") },
-		"PathPadding": func(index int) string { return fmt.Sprintf("padding-left: %.1fem", float32(index)*0.4) },
-		"GetTypeInfo": func(t string, s differentiator.ExecutionStatus) string {
-			switch t {
-			case "create":
-				return fmt.Sprintf("CREATED from %s", s.SecondFilePath)
-			// TODO: Updated from source file info
-			case "update":
-				return "UPDATED"
-			case "delete":
-				return fmt.Sprintf("DELETED from %s", s.BaseFilePath)
-			}
-
-			return ""
-		},
-		"GetTypeColor": func(t string) string {
-			switch t {
-			case "create":
-				return "success"
-			case "update":
-				return "warning"
-			case "delete":
-				return "danger"
-			}
-
-			return ""
-		},
-		"GetFromTypeColor": func(t string) string {
-			switch t {
-			case "create":
-				return "success"
-			case "update":
-				return "danger"
-			case "delete":
-				return "danger"
-			}
-
-			return "info"
-		},
-		"GetToTypeColor": func(t string) string {
-			switch t {
-			case "create":
-				return "success"
-			case "update":
-				return "success"
-			case "delete":
-				return "danger"
-			}
-
-			return "info"
-		},
-	}
-
 	buildPathChangelogJson, err := json.Marshal(h.buildPathChangelogMap())
 	if err != nil {
 		fmt.Println(err)
@@ -157,7 +79,7 @@ func (h *htmlReporter) Build() ([]byte, error) {
 	}
 
 	var buf bytes.Buffer
-	tmpl, err := template.New(templateName).Funcs(funcMap).ParseFS(templateFS, templateName)
+	tmpl, err := template.New(templateName).ParseFS(templateFS, templateName)
 	if err != nil {
 		return nil, err
 	}

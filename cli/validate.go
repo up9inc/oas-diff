@@ -17,11 +17,15 @@ func RegisterValidateCmd() *cli.Command {
 		Aliases: []string{"v"},
 		Usage:   "Validate file to OAS 3.1 schema",
 		Action:  validateCmd,
-		Flags:   []cli.Flag{BaseFileFlag},
+		Flags: []cli.Flag{
+			TempDirFlag,
+			BaseFileFlag,
+		},
 	}
 }
 
 func validateCmd(c *cli.Context) error {
+	tempDir := c.String(TempDirFlag.Name)
 	baseFilePath := c.String(BaseFileFlag.Name)
 
 	jsonFile := file.NewJsonFile(baseFilePath)
@@ -30,7 +34,7 @@ func validateCmd(c *cli.Context) error {
 		return err
 	}
 
-	val := validator.NewValidator()
+	val := validator.NewValidator(tempDir)
 	err = val.InitSchemaFromFile(nil)
 	if err != nil {
 		return err

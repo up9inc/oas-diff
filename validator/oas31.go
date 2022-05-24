@@ -26,7 +26,7 @@ func (v *validator) InitSchemaFromFile(schemaFile file.JsonFile) error {
 		}
 
 		// we have to create a temp file because the lib only accepts a file or a url
-		tempFile, err := ioutil.TempFile("", fmt.Sprintf("*.%s", OAS31_SCHEMA_FILE))
+		tempFile, err := ioutil.TempFile(v.tempDir, fmt.Sprintf("*.%s", OAS31_SCHEMA_FILE))
 		if err != nil {
 			return err
 		}

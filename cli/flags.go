@@ -61,4 +61,10 @@ var (
 		Usage:    "summary of endpoints based changelog output",
 		Required: false,
 	}
+	TempDirFlag = &cli.StringFlag{
+		Name:     "temp-dir",
+		Usage:    "path for the temporary dir to be used to temporary store oas31 schema files",
+		Required: false,
+		Value:    "",
+	}
 )

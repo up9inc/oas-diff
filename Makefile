@@ -1,8 +1,10 @@
 .PHONY: build
 
 build:
+	@echo "building template..."
+	@(cd ui; npm i ; npm run build; )
 	@echo "building oas-diff.."
-	@mkdir build -p
+	@mkdir -p build
 	@go build -race ${GCLFAGS} -o ./build oasdiff.go
 	@echo "binary saved to ./build folder"
 

@@ -4,11 +4,12 @@
 <head>
   <base href="/">
   <meta charset="utf-8" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.svg" />
+  <link rel="icon" href="https://static.up9.com/icons/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Oas diff" />
-  <link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon.svg" />
+  <link rel="apple-touch-icon" href="https://static.up9.com/icons/favicon.svg" />
+  <link href='https://fonts.googleapis.com/css?family=Source Sans Pro' rel='stylesheet'>
   <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -20,6 +21,14 @@
     -->
   <title>Traffic Report</title>
 </head>
+<script>
+  try {
+    window["reportData"] = {"data" : {{.PathChangelogList }}, "status": {{.Status}}}
+  } catch (error) {
+    console.log(error)
+  }
+
+</script>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>

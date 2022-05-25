@@ -16,11 +16,14 @@ export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showC
     const changeVal = changeLogItem.value
     const { accordions, setAccordions } = useContext(CollapsedContext);
     const filteredChanges = useMemo(() => {
+        return showChangeType ? changeVal?.path.filter((path: Path) => path.changelog.type === showChangeType) : changeVal?.path
+    }, [changeVal?.path, showChangeType])
+
+    useEffect(() => {
         const changes = showChangeType ? changeVal?.path.filter((path: Path) => path.changelog.type === showChangeType) : changeVal?.path
         setAccordions((prev) => {
             return [...prev, changes.map((path: Path) => { return { isCollpased: true, id: JSON.stringify(path) } })].flat()
         })
-        return changes
     }, [changeVal?.path, setAccordions, showChangeType])
 
     const onClick = (id: string) => {

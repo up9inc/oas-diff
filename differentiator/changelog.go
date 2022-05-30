@@ -6,15 +6,15 @@ import (
 )
 
 type ExecutionStatus struct {
-	BaseFilePath   string                `json:"base-file"`
-	SecondFilePath string                `json:"second-file"`
-	StartTime      string                `json:"start-time"`
-	ExecutionTime  string                `json:"execution-time"`
-	ExecutionFlags DifferentiatorOptions `json:"execution-flags"`
+	BaseFilePath   string                `json:"baseFile"`
+	SecondFilePath string                `json:"secondFile"`
+	StartTime      string                `json:"startTime"`
+	ExecutionTime  string                `json:"executionTime"`
+	ExecutionFlags DifferentiatorOptions `json:"executionFlags"`
 }
 type ChangelogOutput struct {
-	ExecutionStatus ExecutionStatus `json:"execution-status"`
-	Changelog       ChangeMap       `json:"changelog"`
+	ExecutionStatus ExecutionStatus `json:"executionStatus"`
+	Changelog       ChangeMap       `json:"changeLog"`
 }
 
 type ChangeMap map[string][]Changelog
@@ -38,7 +38,7 @@ func NewChangelogOutput(startTime time.Time, baseFilePath, secondFilePath string
 		ExecutionStatus: ExecutionStatus{
 			BaseFilePath:   baseFilePath,
 			SecondFilePath: secondFilePath,
-			StartTime:      startTime.Format(time.StampMilli),
+			StartTime:      startTime.Format(time.RFC3339),
 			ExecutionTime:  time.Since(startTime).String(),
 			ExecutionFlags: opts,
 		},

@@ -2,39 +2,36 @@ package reporter
 
 import (
 	"bytes"
-	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
-	"strings"
 	"text/template"
 
 	"github.com/up9inc/oas-diff/differentiator"
+	"github.com/up9inc/oas-diff/embed"
 	"github.com/up9inc/oas-diff/model"
 )
 
-//go:embed template.html
-var templateFS embed.FS
-
-const templateName = "template.html"
+const templateName = "/template.html"
 
 type htmlReporter struct {
 	output *differentiator.ChangelogOutput
 }
 
 type pathChangelog struct {
-	Endpoint  string
-	Operation string
-	Changelog differentiator.Changelog
+	Endpoint  string                   `json:"endpoint"`
+	Operation string                   `json:"operation"`
+	Changelog differentiator.Changelog `json:"changelog"`
 }
 
 type pathsData struct {
-	Key            string
-	Paths          []pathChangelog
-	TotalChanges   int
-	CreatedChanges int
-	UpdatedChanges int
-	DeletedChanges int
+	Key            string          `json:"key"`
+	Paths          []pathChangelog `json:"path"`
+	TotalChanges   int             `json:"totalChanges"`
+	CreatedChanges int             `json:"createdChanges"`
+	UpdatedChanges int             `json:"updatedChanges"`
+	DeletedChanges int             `json:"deletedChanges"`
 }
 
 type pathsMap map[string]pathsData
@@ -46,8 +43,8 @@ func (t byType) Less(i, j int) bool { return t[i].Changelog.Type < t[j].Changelo
 func (t byType) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 
 type pathKeyValue struct {
-	Key   string
-	Value pathsData
+	Key   string    `json:"key"`
+	Value pathsData `json:"value"`
 }
 
 func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
@@ -59,124 +56,42 @@ func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
 var collapseHeaderIndex, collapseBodyIndex int
 
 func (h *htmlReporter) Build() ([]byte, error) {
-	funcMap := template.FuncMap{
-		"CollapseHeaderId": func() string {
-			collapseHeaderIndex++
-			return fmt.Sprintf("collapseHeader_%d", collapseHeaderIndex)
-		},
-		"CollapseBodyId": func() string {
-			collapseBodyIndex++
-			return fmt.Sprintf("collapse_%d", collapseBodyIndex)
-		},
-		"StringLen": func(s string) int { return len(s) },
-		"TotalPathsChanges": func(data []pathKeyValue) int {
-			var count int
-			for _, v := range data {
-				count += v.Value.TotalChanges
-			}
-			return count
-		},
-		"IsNotNil": func(data interface{}) bool { return data != nil },
-		"ToUpper":  strings.ToUpper,
-		"ToLower":  strings.ToLower,
-		"ToPrettyJSON": func(data interface{}) string {
-			j, _ := json.MarshalIndent(data, "", "\t")
-			return string(j)
-		},
-		"FormatPath":  func(path []string) string { return strings.Join(path, " ") },
-		"PathPadding": func(index int) string { return fmt.Sprintf("padding-left: %.1fem", float32(index)*0.4) },
-		"GetTypeInfo": func(t string, s differentiator.ExecutionStatus) string {
-			switch t {
-			case "create":
-				return fmt.Sprintf("CREATED from %s", s.SecondFilePath)
-			// TODO: Updated from source file info
-			case "update":
-				return "UPDATED"
-			case "delete":
-				return fmt.Sprintf("DELETED from %s", s.BaseFilePath)
-			}
+	buildPathChangelogJson, err := json.Marshal(h.buildPathChangelogMap())
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
-			return ""
-		},
-		"GetTypeColor": func(t string) string {
-			switch t {
-			case "create":
-				return "success"
-			case "update":
-				return "warning"
-			case "delete":
-				return "danger"
-			}
-
-			return ""
-		},
-		"GetFromTypeColor": func(t string) string {
-			switch t {
-			case "create":
-				return "success"
-			case "update":
-				return "danger"
-			case "delete":
-				return "danger"
-			}
-
-			return "info"
-		},
-		"GetToTypeColor": func(t string) string {
-			switch t {
-			case "create":
-				return "success"
-			case "update":
-				return "success"
-			case "delete":
-				return "danger"
-			}
-
-			return "info"
-		},
+	buildStatusJson, err := json.Marshal(h.output.ExecutionStatus)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
 
 	data := struct {
-		Status               differentiator.ExecutionStatus
-		NonPathChangelogList []differentiator.Changelog
-		PathChangelogList    []pathKeyValue
+		Status            string
+		PathChangelogList string
 	}{
-		Status:               h.output.ExecutionStatus,
-		NonPathChangelogList: h.buildNonPathChangelogList(),
-		PathChangelogList:    h.buildPathChangelogMap(),
+		Status:            string(buildStatusJson),
+		PathChangelogList: string(buildPathChangelogJson),
 	}
 
-	var buf bytes.Buffer
-	tmpl, err := template.New(templateName).Funcs(funcMap).ParseFS(templateFS, templateName)
+	templateData := embed.Get(templateName)
+	if len(templateData) == 0 {
+		return nil, errors.New("failed to get template data")
+	}
+
+	tmpl, err := template.New("").Parse(string(templateData))
 	if err != nil {
 		return nil, err
 	}
+
+	var buf bytes.Buffer
 	err = tmpl.Execute(&buf, data)
 	if err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
-}
-
-func (h *htmlReporter) buildNonPathChangelogList() []differentiator.Changelog {
-	result := make([]differentiator.Changelog, 0)
-
-	for k, v := range h.output.Changelog {
-		for _, c := range v {
-
-			// ignore paths and webhooks
-			if k == model.OAS_PATHS_KEY || k == model.OAS_WEBHOOKS_KEY {
-				continue
-			}
-
-			result = append(result, c)
-		}
-	}
-
-	// sort by type
-	sort.Sort(differentiator.ByType(result))
-
-	return result
 }
 
 func (h *htmlReporter) buildPathChangelogMap() []pathKeyValue {

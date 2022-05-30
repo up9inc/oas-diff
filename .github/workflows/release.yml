@@ -67,7 +67,7 @@ jobs:
       - name: Build
         run: |
           make build-template
-          make embed
+          make generate
           go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
       # - name: Release Notes
       #   run:

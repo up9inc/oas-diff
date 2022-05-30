@@ -90,47 +90,53 @@ export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showC
                 </div>
             </AccordionSummary>
             <AccordionDetails>
-                <div className={`${filteredChanges && filteredChanges[0]?.changelog?.type} changeCategory`}>{Object.keys(ChangeTypeEnum).find(
-                    key => ChangeTypeEnum[key] === filteredChanges[0]?.changelog?.type?.toLocaleLowerCase()
-                )}</div>
-                {filteredChanges?.map((path: Path) => {
-                    return (<Accordion key={JSON.stringify(path)} expanded={(() => isExpand(path))()}>
-                        <AccordionSummary
-                            onClick={() => onClick(JSON.stringify(path))}
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel2a-content">
-                            <div>
-                                <span className={`operation ${path.operation}`}>{path.operation}</span>
-                                <span className='pathName'>{path.changelog?.path?.join(" ")}</span>
-                            </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <span>Path:</span>
-                            {path.changelog?.path?.slice(1).map((path: string, index: number) =>
-                                <div key={`${path + index}`} style={{ paddingLeft: `${(index + 1 * 0.4)}em` }}>{path}</div>)
-                            }
-                            <div style={{ marginTop: "10px" }} className="diffContainer">
+                {Object.keys(ChangeTypeEnum).map((changeType) => {
+                    const changeOfType = filteredChanges.filter(x => x.changelog.type === ChangeTypeEnum[changeType])
+                    return changeOfType.length > 0 && <div key={ChangeTypeEnum[changeType]}>
+                        <div className={`${ChangeTypeEnum[changeType]} changeCategory`} >{Object.keys(ChangeTypeEnum).find(key => changeType === key)}</div>
+                        {changeOfType?.map((path: Path) => {
+                            return (<Accordion key={JSON.stringify(path)} expanded={(() => isExpand(path))()}>
+                                <AccordionSummary
+                                    onClick={() => onClick(JSON.stringify(path))}
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel2a-content">
+                                    <div>
+                                        <span className={`operation ${path.operation}`}>{path.operation}</span>
+                                        <span className='pathName'>{path.changelog?.path?.join(" ")}</span>
+                                    </div>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <span>Path:</span>
+                                    {path.changelog?.path?.slice(1).map((path: string, index: number) =>
+                                        <div key={`${path + index}`} style={{ paddingLeft: `${(index + 1 * 0.4)}em` }}>{path}</div>)
+                                    }
+                                    <div style={{ marginTop: "10px" }} className="diffContainer">
 
-                                {path?.changelog?.from && <div style={{ flex: 1, width: "100%" }}>
-                                    <div>From:</div>
-                                    <SyntaxHighlighter
-                                        code={JSON.stringify(path.changelog.from)}
-                                        language="json"
-                                        className={`${getFromTypeColor(path.changelog.type)}`}
-                                    />
-                                </div>}
-                                {path?.changelog?.to && <div style={{ flex: 1, width: "100%" }}>
-                                    <div>To:</div>
-                                    <SyntaxHighlighter
-                                        code={JSON.stringify(path.changelog.to)}
-                                        language="json"
-                                        className={`${getToTypeColor(path.changelog.type)}`}
-                                    />
-                                </div>}
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>)
-                })}
+                                        {path?.changelog?.from && <div style={{ flex: 1, width: "100%" }}>
+                                            <div>From:</div>
+                                            <SyntaxHighlighter
+                                                code={JSON.stringify(path.changelog.from)}
+                                                language="json"
+                                                className={`${getFromTypeColor(path.changelog.type)}`}
+                                            />
+                                        </div>}
+                                        {path?.changelog?.to && <div style={{ flex: 1, width: "100%" }}>
+                                            <div>To:</div>
+                                            <SyntaxHighlighter
+                                                code={JSON.stringify(path.changelog.to)}
+                                                language="json"
+                                                className={`${getToTypeColor(path.changelog.type)}`}
+                                            />
+                                        </div>}
+                                    </div>
+                                </AccordionDetails>
+                            </Accordion>)
+                        })}
+                    </div>
+                }
+                )}
+
+
             </AccordionDetails >
         </Accordion >
     )

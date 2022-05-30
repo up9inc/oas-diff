@@ -2,16 +2,16 @@
 
 generate:
 	@echo "running go generate .."
-	@go generate ./...
+	@go generate ./embed
 	@echo "files added to embed box"
 
-build-template:
+template:
 	@echo "building template file .."
 	@(cd ui; npm i ; npm run build; )
 	@echo "template file saved to ./static folder"
 
 build:
-	$(MAKE) build-template
+	$(MAKE) template
 	$(MAKE) generate
 	@echo "building oas-diff .."
 	@mkdir -p build
@@ -26,6 +26,8 @@ build-debug:
 
 clean:
 	@rm -rf build
+	@rm -rf static
+	@rm -rf embed/blob.go
 	@echo "cleanup done"
 
 test:

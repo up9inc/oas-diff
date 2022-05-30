@@ -1,6 +1,6 @@
 .PHONY: build
 
-embed:
+generate:
 	@echo "running go generate .."
 	@go generate ./...
 	@echo "files added to embed box"
@@ -12,7 +12,7 @@ build-template:
 
 build:
 	$(MAKE) build-template
-	$(MAKE) embed
+	$(MAKE) generate
 	@echo "building oas-diff .."
 	@mkdir -p build
 	@go build -race ${GCLFAGS} -o ./build oasdiff.go

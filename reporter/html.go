@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 	"text/template"
 
 	"github.com/up9inc/oas-diff/differentiator"
@@ -13,10 +14,10 @@ import (
 	"github.com/up9inc/oas-diff/model"
 )
 
-const templateName = "/template.html"
-
 type htmlReporter struct {
-	output *differentiator.ChangelogOutput
+	output       *differentiator.ChangelogOutput
+	templatePath string
+	isEmbedded   bool
 }
 
 type pathChangelog struct {
@@ -47,9 +48,20 @@ type pathKeyValue struct {
 	Value pathsData `json:"value"`
 }
 
-func NewHTMLReporter(output *differentiator.ChangelogOutput) Reporter {
+// Passing an empty templatePath will use the default embedded template.
+//
+// If you are using the HTML reporter package as an external package, you must pass a non-empty and valid templatePath
+func NewHTMLReporter(output *differentiator.ChangelogOutput, templatePath string) Reporter {
+	var embedded bool
+	if len(templatePath) == 0 {
+		embedded = true
+		templatePath = "/template.html"
+	}
+
 	return &htmlReporter{
-		output: output,
+		output:       output,
+		templatePath: templatePath,
+		isEmbedded:   embedded,
 	}
 }
 
@@ -76,14 +88,24 @@ func (h *htmlReporter) Build() ([]byte, error) {
 		PathChangelogList: string(buildPathChangelogJson),
 	}
 
-	templateData := embed.Get(templateName)
-	if len(templateData) == 0 {
-		return nil, errors.New("failed to get template data")
-	}
+	var tmpl *template.Template
 
-	tmpl, err := template.New("").Parse(string(templateData))
-	if err != nil {
-		return nil, err
+	if h.isEmbedded {
+		templateData := embed.Get(h.templatePath)
+		if len(templateData) == 0 {
+			return nil, errors.New("failed to get embedded template data")
+		}
+
+		tmpl, err = template.New("").Parse(string(templateData))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		ts := strings.Split(h.templatePath, "/")
+		tmpl, err = template.New(ts[len(ts)-1]).ParseFiles(h.templatePath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get template data from templatePath: %v", err)
+		}
 	}
 
 	var buf bytes.Buffer

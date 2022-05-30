@@ -102,7 +102,7 @@ func diffCmd(c *cli.Context) error {
 	}
 
 	if isHtmlOutput {
-		rep = reporter.NewHTMLReporter(changelog)
+		rep = reporter.NewHTMLReporter(changelog, "")
 		outputData, err := rep.Build()
 		if err != nil {
 			return err

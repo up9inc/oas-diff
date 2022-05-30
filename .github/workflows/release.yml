@@ -32,10 +32,14 @@ jobs:
       matrix:
         goosarch:
           - 'darwin/amd64'
+          - 'darwin/arm64'
           - 'linux/386'
           - 'linux/amd64'
+          - 'linux/arm'
+          - 'linux/arm64'
           - 'windows/386'
           - 'windows/amd64'
+          - 'windows/arm'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -47,7 +51,7 @@ jobs:
           node-version: 16
       - name: Build Template
         run: |
-          cd ui && npm i && npm run build
+          make template
 
       - uses: actions/setup-go@v2
         with:
@@ -55,7 +59,8 @@ jobs:
       
       - name: Go Generate
         run: |
-          go generate ./embed
+         make generate
+
       - name: Go Build
         run: |
           VERSION=$(git describe --tags --abbrev=0)
@@ -68,6 +73,7 @@ jobs:
           echo "GOOS=$GOOS" >> $GITHUB_ENV
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
           go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
+      
       # - name: Release Notes
       #   run:
       #     git log $(git describe HEAD~ --tags --abbrev=0)..HEAD --pretty='format:* %h %s%n  * %an <%ae>' --no-merges >> ".github/RELEASE-TEMPLATE.md"
@@ -77,4 +83,4 @@ jobs:
           #body_path: ".github/RELEASE-TEMPLATE.md"
           files: ${{env.BINARY_NAME}}
           draft: false
-          prerelease: true
+          prerelease: false

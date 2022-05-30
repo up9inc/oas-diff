@@ -65,10 +65,9 @@ jobs:
           echo "GOOS=$GOOS" >> $GITHUB_ENV
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
       - name: Build
-        run: |
-          make build-template
-          make generate
-          go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
+      - run: make build-template
+      - run: make generate
+      - run: go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
       # - name: Release Notes
       #   run:
       #     git log $(git describe HEAD~ --tags --abbrev=0)..HEAD --pretty='format:* %h %s%n  * %an <%ae>' --no-merges >> ".github/RELEASE-TEMPLATE.md"

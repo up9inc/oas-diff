@@ -39,7 +39,6 @@ jobs:
           - 'linux/arm64'
           - 'windows/386'
           - 'windows/amd64'
-          - 'windows/arm'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -66,7 +65,9 @@ jobs:
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
       - name: Build
         run: |
-          make build-template && make generate && go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
+          make build-template
+          go generate ./...
+          go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
       # - name: Release Notes
       #   run:
       #     git log $(git describe HEAD~ --tags --abbrev=0)..HEAD --pretty='format:* %h %s%n  * %an <%ae>' --no-merges >> ".github/RELEASE-TEMPLATE.md"

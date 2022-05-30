@@ -2,20 +2,18 @@ package reporter
 
 import (
 	"bytes"
-	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
 	"text/template"
 
 	"github.com/up9inc/oas-diff/differentiator"
+	"github.com/up9inc/oas-diff/embed"
 	"github.com/up9inc/oas-diff/model"
 )
 
-//go:embed template.html
-var templateFS embed.FS
-
-const templateName = "template.html"
+const templateName = "/template.html"
 
 type htmlReporter struct {
 	output *differentiator.ChangelogOutput
@@ -78,11 +76,17 @@ func (h *htmlReporter) Build() ([]byte, error) {
 		PathChangelogList: string(buildPathChangelogJson),
 	}
 
-	var buf bytes.Buffer
-	tmpl, err := template.New(templateName).ParseFS(templateFS, templateName)
+	templateData := embed.Get(templateName)
+	if len(templateData) == 0 {
+		return nil, errors.New("failed to get template data")
+	}
+
+	tmpl, err := template.New("").Parse(string(templateData))
 	if err != nil {
 		return nil, err
 	}
+
+	var buf bytes.Buffer
 	err = tmpl.Execute(&buf, data)
 	if err != nil {
 		return nil, err

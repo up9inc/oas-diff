@@ -4,7 +4,7 @@ const replace = require('gulp-replace');
 const rename = require('gulp-rename');
 
 const fileName = "template.html"
-const fileLocation = '../reporter'
+const fileLocation = '../static'
 
 gulp.task('default', () => {
     return gulp

@@ -66,8 +66,9 @@ jobs:
           echo "GOARCH=$GOARCH" >> $GITHUB_ENV
       - name: Build
         run: |
-          cd ui && npm i && npm run build
-          cd .. && go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
+          make build-template
+          make embed
+          go build -ldflags="-X 'main.Version=$VERSION'" -o "$BINARY_NAME" -v
       # - name: Release Notes
       #   run:
       #     git log $(git describe HEAD~ --tags --abbrev=0)..HEAD --pretty='format:* %h %s%n  * %an <%ae>' --no-merges >> ".github/RELEASE-TEMPLATE.md"

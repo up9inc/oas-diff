@@ -1,17 +1,10 @@
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import { useContext, useMemo, useState, useCallback, useRef } from "react";
-import { CollapsedContext } from "../../CollapsedContext";
+import { useMemo, useState } from "react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
-import { ChangeTypeEnum } from "../../consts";
 import { PathDisplay } from "./PathDisplay";
 import React from "react";
-
-const getKeyByValue = (value: string) => {
-    const indexOfS = Object.values(ChangeTypeEnum).indexOf(value as unknown as ChangeTypeEnum);
-    return Object.keys(ChangeTypeEnum)[indexOfS];
-}
 
 export interface PathListItemProps {
     changeLogItem: DataItem
@@ -22,7 +15,6 @@ export interface PathListItemProps {
 const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
     const changeVal = changeLogItem.value
     changeLogItem.isExpanded = false
-    const { accordions, setAccordions } = useContext(CollapsedContext);
     const [isExpanded, setIsExpanded] = useState(false)
     const changes = useMemo(() => {
         return changeVal?.path
@@ -32,21 +24,9 @@ const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeTy
         return changes.filter((path) => path.changelog.type.indexOf(showChangeType) >= 0)
     }, [changes, showChangeType])
 
-    // useEffect(() => {
-    //     // const changes = showChangeType ? changeVal?.path.filter((path: Path) => path.changelog.type === showChangeType) : changeVal?.path
-    //     // setAccordions((prev) => {
-    //     //     return [...prev, changes.map((path: Path) => { return { isCollpased: true, id: JSON.stringify(path) } })].flat()
-    //     // })
-    // }, [changeVal?.path, setAccordions, showChangeType])
-
     const onClick = () => {
         setIsExpanded(!isExpanded)
     }
-
-    // useEffect(() => {
-    //     //setAccordions(prev => [...prev, { isCollpased: true, id: JSON.stringify(changeLogItem) }])
-    // }, [changeLogItem, setAccordions])
-
 
     return (
         <Accordion expanded={isExpanded}>

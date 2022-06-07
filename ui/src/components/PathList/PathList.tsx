@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField, SelectChangeEvent } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import './PathList.sass';
 import React, { useMemo, useState } from 'react';
 import PathListItem from './PathListItem';

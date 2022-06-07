@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
+import { ChangeTypeEnum } from "../../consts";
 import { PathDisplay } from "./PathDisplay";
 import React from "react";
 
@@ -48,10 +49,19 @@ const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeTy
             </AccordionSummary>
             <AccordionDetails>
                 {isExpanded && <>
-                    {filteredChanges?.map((path: Path, index) => {
-                        return <PathDisplay path={path} key={index} />
+                    {Object.keys(ChangeTypeEnum).map((changeType) => {
+                        const changeOfType = filteredChanges.filter(x => x.changelog.type === ChangeTypeEnum[changeType])
+                        return changeOfType.length > 0 && <div key={ChangeTypeEnum[changeType]}>
+                            <div className={`${ChangeTypeEnum[changeType]} changeCategory`} >{
+                                Object.keys(ChangeTypeEnum).find(key => changeType === key)}
+                            </div>
+                            {changeOfType?.map((path: Path, index) => {
+                                return <PathDisplay path={path} key={index} />
+                            })}
+                        </div>
                     })}
-                </>}
+                </>
+                }
             </AccordionDetails>
         </Accordion >
     )

@@ -1,39 +1,55 @@
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo, useCallback } from "react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
 import { ChangeTypeEnum } from "../../consts";
 import { PathDisplay } from "./PathDisplay";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { collapseItemsList, collapseSubItemsList } from "../../recoil/collapse";
 
 export interface PathListItemProps {
     changeLogItem: DataItem
     showChangeType?: string
-    style?: any
 }
 
 const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
     const changeVal = changeLogItem.value
-    changeLogItem.isExpanded = false
+    const [accordions, setAccordions] = useRecoilState(collapseItemsList);
+    const [subAccordions, setSubAccordions] = useRecoilState(collapseSubItemsList);
     const [isExpanded, setIsExpanded] = useState(false)
+
+    // const isExpanded = useMemo(() => {
+    //     return !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
+    // }, [accordions, changeLogItem])
+
+    useEffect(() => {
+        const isGloballyExtended = !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
+        setIsExpanded(isGloballyExtended)
+    }, [accordions])
+
     const changes = useMemo(() => {
+        const subAccordions = changeVal?.path.map((path: Path) => {
+            return { isCollapsed: true, id: JSON.stringify(path) }
+        })
+        setSubAccordions(subAccordions)
         return changeVal?.path
-    }, [changeVal?.path])
+    }, [changeVal?.path, setSubAccordions])
 
     const filteredChanges = useMemo(() => {
         return changes.filter((path) => path.changelog.type.indexOf(showChangeType) >= 0)
     }, [changes, showChangeType])
 
-    const onClick = () => {
+    const onAccordionClick = useCallback(() => {
         setIsExpanded(!isExpanded)
-    }
+    }, [isExpanded])
 
     return (
         <Accordion expanded={isExpanded}>
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content" onClick={() => onClick()}>
+                aria-controls="panel2a-content" onClick={onAccordionClick}>
                 <div className='accordionTitle'>
                     <div className='path'>
                         <span className='pathPrefix'>{changeLogItem.value.key}</span>

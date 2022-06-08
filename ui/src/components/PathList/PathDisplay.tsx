@@ -3,7 +3,9 @@ import { Path } from "../../interfaces"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SyntaxHighlighter from "../SyntaxHighlighter"
 import { ChangeTypeEnum, infoClass } from "../../consts";
-import { useState } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useRecoilState } from "recoil";
+import { collapseSubItemsList } from "../../recoil/collapse";
 
 
 export interface PathDisplayProps {
@@ -12,6 +14,7 @@ export interface PathDisplayProps {
 }
 
 export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
+    const [subAccordions, setSubAccordions] = useRecoilState(collapseSubItemsList);
     const [isExpanded, setIsExpanded] = useState(false)
     const getToTypeColor = (type: string) => {
         switch (type) {
@@ -38,10 +41,21 @@ export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
                 return infoClass
         }
     }
+
+    useEffect(() => {
+        const isGloballyExtended = !!subAccordions.find(x => x.id === JSON.stringify(path))?.isCollapsed
+        setIsExpanded(isGloballyExtended)
+    }, [subAccordions])
+
+
+    const onAccordionClick = useCallback(() => {
+        setIsExpanded(!isExpanded)
+    }, [isExpanded])
+
     return (<>
         <Accordion expanded={isExpanded}>
             <AccordionSummary
-                onClick={() => { setIsExpanded(!isExpanded) }}
+                onClick={onAccordionClick}
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel2a-content">
                 <div className="singleLine">

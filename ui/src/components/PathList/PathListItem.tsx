@@ -25,11 +25,14 @@ const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeTy
     }, [accordions, changeLogItem])
 
     const changes = useMemo(() => {
+        return changeVal?.path
+    }, [changeVal?.path])
+
+    useEffect(() => {
         const subAccordions = changeVal?.path.map((path: Path) => {
             return { isCollapsed: true, id: JSON.stringify(path) }
         })
         setSubAccordions(subAccordions)
-        return changeVal?.path
     }, [changeVal?.path, setSubAccordions])
 
     const filteredChanges = useMemo(() => {

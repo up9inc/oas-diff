@@ -7,7 +7,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRecoilValue } from "recoil";
 import { subAccordionsList } from "../../recoil/collapse";
 
-
 export interface PathDisplayProps {
     path: Path
 }
@@ -15,6 +14,7 @@ export interface PathDisplayProps {
 export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
     const subAccordions = useRecoilValue(subAccordionsList);
     const [isExpanded, setIsExpanded] = useState(false)
+
     const getToTypeColor = (type: string) => {
         switch (type) {
             case ChangeTypeEnum.Created:
@@ -45,7 +45,6 @@ export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
         const isGloballyExtended = !!subAccordions.find(x => x.id === JSON.stringify(path))?.isCollapsed
         setIsExpanded(isGloballyExtended)
     }, [path, subAccordions])
-
 
     const onAccordionClick = useCallback(() => {
         setIsExpanded(!isExpanded)

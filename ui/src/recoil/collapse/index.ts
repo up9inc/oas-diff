@@ -1,3 +1,3 @@
-import { collapseItemsList, collapseSubItemsList } from "./atom"
-export { collapseItemsList, collapseSubItemsList }
+import { mainAccordionsList, subAccordionsList } from "./atom"
+export { mainAccordionsList, subAccordionsList }
 

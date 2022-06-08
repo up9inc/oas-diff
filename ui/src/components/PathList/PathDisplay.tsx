@@ -5,7 +5,7 @@ import SyntaxHighlighter from "../SyntaxHighlighter"
 import { ChangeTypeEnum, infoClass } from "../../consts";
 import { useState, useEffect, useCallback } from "react";
 import { useRecoilValue } from "recoil";
-import { collapseSubItemsList } from "../../recoil/collapse";
+import { subAccordionsList } from "../../recoil/collapse";
 
 
 export interface PathDisplayProps {
@@ -13,7 +13,7 @@ export interface PathDisplayProps {
 }
 
 export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
-    const subAccordions = useRecoilValue(collapseSubItemsList);
+    const subAccordions = useRecoilValue(subAccordionsList);
     const [isExpanded, setIsExpanded] = useState(false)
     const getToTypeColor = (type: string) => {
         switch (type) {

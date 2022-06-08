@@ -6,7 +6,7 @@ import { ChangeTypeEnum } from "../../consts";
 import { PathDisplay } from "./PathDisplay";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { collapseItemsList, collapseSubItemsList } from "../../recoil/collapse";
+import { mainAccordionsList, subAccordionsList } from "../../recoil/collapse";
 
 export interface PathListItemProps {
     changeLogItem: DataItem
@@ -15,8 +15,8 @@ export interface PathListItemProps {
 
 const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
     const changeVal = changeLogItem.value
-    const accordions = useRecoilValue(collapseItemsList);
-    const setSubAccordions = useSetRecoilState(collapseSubItemsList);
+    const accordions = useRecoilValue(mainAccordionsList);
+    const setSubAccordions = useSetRecoilState(subAccordionsList);
     const [isExpanded, setIsExpanded] = useState(false)
 
     useEffect(() => {

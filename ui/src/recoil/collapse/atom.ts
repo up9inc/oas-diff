@@ -5,16 +5,16 @@ export interface IAccordion {
     id: string
 }
 
-const collapseItemsList = atom({
-    key: "collapseItemsList",
+const mainAccordionsList = atom({
+    key: "mainAccordionsList",
     default: [] as IAccordion[]
 })
 
-const collapseSubItemsList = atom({
-    key: "collapseSubItemsList",
+const subAccordionsList = atom({
+    key: "subAccordionsList",
     default: [] as IAccordion[]
 })
 
-export { collapseItemsList, collapseSubItemsList };
+export { mainAccordionsList, subAccordionsList };
 
 

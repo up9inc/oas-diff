@@ -6,7 +6,7 @@ import { DataItem, Path } from '../../interfaces';
 import { ChangeTypeEnum } from '../../consts';
 import useDebounce from '../../hooks/useDebounce';
 import { useSetRecoilState } from 'recoil';
-import { collapseItemsList } from '../../recoil/collapse';
+import { mainAccordionsList } from '../../recoil/collapse';
 
 export interface Props {
     changeList: DataItem[]
@@ -16,7 +16,7 @@ const PathList: React.FC<Props> = ({ changeList }) => {
     const [typeFilter, setTypeFilter] = useState('')
     const [pathFilter, setPathFilter] = useState('')
     const debouncedSearchTerm = useDebounce(pathFilter, 200);
-    const setAccordions = useSetRecoilState(collapseItemsList);
+    const setAccordions = useSetRecoilState(mainAccordionsList);
     const onTypeChange = (event) => { setTypeFilter(event.target.value); }
     const onPathChange = (event) => { setPathFilter(event.target.value); }
 

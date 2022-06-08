@@ -1,15 +1,12 @@
 import './ChangeLog.sass';
 import { CollapseButton } from '../../useCommonStyles';
 import { useSetRecoilState } from 'recoil';
-import { collapseItemsList } from '../../recoil/collapse/';
+import { mainAccordionsList } from '../../recoil/collapse/';
 
-export interface Props {
-    //onCollapseAll: () => void
-}
 
-export const ChangeLog: React.FC<Props> = () => {
+export const ChangeLog = () => {
 
-    const setAccordions = useSetRecoilState(collapseItemsList)
+    const setAccordions = useSetRecoilState(mainAccordionsList)
 
     const onCollapseAll = () => {
         setAccordions((prev) => {

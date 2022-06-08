@@ -10,7 +10,6 @@ import { ChangeTypeEnum } from "../../consts";
 export interface PathListItemProps {
     changeLogItem: DataItem
     showChangeType?: string
-    style?: any
 }
 
 const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
@@ -24,7 +23,7 @@ const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeTy
         return changes.filter((path) => path.changelog.type.indexOf(showChangeType) >= 0)
     }, [changes, showChangeType])
 
-    const onClick = () => {
+    const onAccordionClick = () => {
         setIsExpanded(!isExpanded)
     }
 
@@ -32,7 +31,7 @@ const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeTy
         <Accordion expanded={isExpanded}>
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content" onClick={() => onClick()}>
+                aria-controls="panel2a-content" onClick={onAccordionClick}>
                 <div className='accordionTitle'>
                     <div className='path'>
                         <span className='pathPrefix'>{changeLogItem.value.key}</span>

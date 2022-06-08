@@ -8,7 +8,6 @@ import { useState } from "react";
 
 export interface PathDisplayProps {
     path: Path
-    style?: any
 }
 
 export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {

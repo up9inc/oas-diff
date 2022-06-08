@@ -5,6 +5,7 @@ import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
 import { PathDisplay } from "./PathDisplay";
 import React from "react";
+import { ChangeTypeEnum } from "../../consts";
 
 export interface PathListItemProps {
     changeLogItem: DataItem
@@ -14,7 +15,6 @@ export interface PathListItemProps {
 
 const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
     const changeVal = changeLogItem.value
-    changeLogItem.isExpanded = false
     const [isExpanded, setIsExpanded] = useState(false)
     const changes = useMemo(() => {
         return changeVal?.path
@@ -48,10 +48,19 @@ const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeTy
             </AccordionSummary>
             <AccordionDetails>
                 {isExpanded && <>
-                    {filteredChanges?.map((path: Path, index) => {
-                        return <PathDisplay path={path} key={index} />
+                    {Object.keys(ChangeTypeEnum).map((changeType) => {
+                        const changeOfType = filteredChanges.filter(x => x.changelog.type === ChangeTypeEnum[changeType])
+                        return changeOfType.length > 0 && <div key={ChangeTypeEnum[changeType]}>
+                            <div className={`${ChangeTypeEnum[changeType]} changeCategory`} >{
+                                Object.keys(ChangeTypeEnum).find(key => changeType === key)}
+                            </div>
+                            {changeOfType?.map((path: Path, index) => {
+                                return <PathDisplay path={path} key={index} />
+                            })}
+                        </div>
                     })}
-                </>}
+                </>
+                }
             </AccordionDetails>
         </Accordion >
     )

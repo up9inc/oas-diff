@@ -3,18 +3,17 @@ import { Path } from "../../interfaces"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SyntaxHighlighter from "../SyntaxHighlighter"
 import { ChangeTypeEnum, infoClass } from "../../consts";
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { useRecoilState } from "recoil";
+import { useState, useEffect, useCallback } from "react";
+import { useRecoilValue } from "recoil";
 import { collapseSubItemsList } from "../../recoil/collapse";
 
 
 export interface PathDisplayProps {
     path: Path
-    style?: any
 }
 
 export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
-    const [subAccordions, setSubAccordions] = useRecoilState(collapseSubItemsList);
+    const subAccordions = useRecoilValue(collapseSubItemsList);
     const [isExpanded, setIsExpanded] = useState(false)
     const getToTypeColor = (type: string) => {
         switch (type) {
@@ -45,7 +44,7 @@ export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
     useEffect(() => {
         const isGloballyExtended = !!subAccordions.find(x => x.id === JSON.stringify(path))?.isCollapsed
         setIsExpanded(isGloballyExtended)
-    }, [subAccordions])
+    }, [path, subAccordions])
 
 
     const onAccordionClick = useCallback(() => {

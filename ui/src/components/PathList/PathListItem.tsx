@@ -1,12 +1,11 @@
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import { useMemo, useCallback } from "react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
 import { ChangeTypeEnum } from "../../consts";
 import { PathDisplay } from "./PathDisplay";
-import React, { useState, useEffect } from "react";
-import { useRecoilState } from "recoil";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { collapseItemsList, collapseSubItemsList } from "../../recoil/collapse";
 
 export interface PathListItemProps {
@@ -16,18 +15,14 @@ export interface PathListItemProps {
 
 const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
     const changeVal = changeLogItem.value
-    const [accordions, setAccordions] = useRecoilState(collapseItemsList);
-    const [subAccordions, setSubAccordions] = useRecoilState(collapseSubItemsList);
+    const accordions = useRecoilValue(collapseItemsList);
+    const setSubAccordions = useSetRecoilState(collapseSubItemsList);
     const [isExpanded, setIsExpanded] = useState(false)
-
-    // const isExpanded = useMemo(() => {
-    //     return !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
-    // }, [accordions, changeLogItem])
 
     useEffect(() => {
         const isGloballyExtended = !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
         setIsExpanded(isGloballyExtended)
-    }, [accordions])
+    }, [accordions, changeLogItem])
 
     const changes = useMemo(() => {
         const subAccordions = changeVal?.path.map((path: Path) => {

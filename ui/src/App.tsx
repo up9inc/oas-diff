@@ -1,10 +1,8 @@
 import './App.sass';
-import { useState } from 'react'
 import { StatusData } from './components/StatusData/StatusData';
 import { ChangeLog } from './components/ChangeLog/ChangeLog';
 import PathList from './components/PathList/PathList';
 import { dataService } from './DataService';
-import { CollapsedContext, IAccordion } from './CollapsedContext';
 import { Header } from './components/Header/Header';
 import { RecoilRoot } from 'recoil';
 

@@ -20,8 +20,8 @@ const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeTy
     const [isExpanded, setIsExpanded] = useState(false)
 
     useEffect(() => {
-        const isGloballyExtended = !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
-        setIsExpanded(isGloballyExtended)
+        const isGloballyExpanded = !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
+        setIsExpanded(isGloballyExpanded)
     }, [accordions, changeLogItem])
 
     const changes = useMemo(() => {

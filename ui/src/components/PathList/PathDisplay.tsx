@@ -42,8 +42,8 @@ export const PathDisplay: React.FC<PathDisplayProps> = ({ path }) => {
     }
 
     useEffect(() => {
-        const isGloballyExtended = !!subAccordions.find(x => x.id === JSON.stringify(path))?.isCollapsed
-        setIsExpanded(isGloballyExtended)
+        const isGloballyExpanded = !!subAccordions.find(x => x.id === JSON.stringify(path))?.isCollapsed
+        setIsExpanded(isGloballyExpanded)
     }, [path, subAccordions])
 
     const onAccordionClick = useCallback(() => {

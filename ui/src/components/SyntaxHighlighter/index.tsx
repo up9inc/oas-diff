@@ -62,4 +62,4 @@ export const SyntaxHighlighter: React.FC<Props> = ({
     return <div style={{ fontSize: ".75rem" }} className={styles.highlighterContainer + ` ${className}`}><Lowlight language={language ? language : ""} value={formatTextBody(code)} markers={markers} /></div>;
 };
 
-export default SyntaxHighlighter;
+export default React.memo(SyntaxHighlighter);

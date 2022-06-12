@@ -1,27 +1,38 @@
-import { FormControl, InputLabel, MenuItem, Select, TextField, SelectChangeEvent } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import './PathList.sass';
-import React, { useMemo, useState } from 'react';
-import { PathListItem } from './PathListItem';
+import React, { useMemo, useState, useEffect } from 'react';
+import PathListItem from './PathListItem';
 import { DataItem, Path } from '../../interfaces';
 import { ChangeTypeEnum } from '../../consts';
+import useDebounce from '../../hooks/useDebounce';
+import { useSetRecoilState } from 'recoil';
+import { mainAccordionsList } from '../../recoil/collapse';
 
 export interface Props {
     changeList: DataItem[]
 }
 
-export const PathList: React.FC<Props> = ({ changeList }) => {
-    const [type, setType] = useState('')
-    const [path, setPath] = useState('')
+const PathList: React.FC<Props> = ({ changeList }) => {
+    const [typeFilter, setTypeFilter] = useState('')
+    const [pathFilter, setPathFilter] = useState('')
+    const debouncedSearchTerm = useDebounce(pathFilter, 200);
+    const setAccordions = useSetRecoilState(mainAccordionsList);
+    const onTypeChange = (event) => { setTypeFilter(event.target.value); }
+    const onPathChange = (event) => { setPathFilter(event.target.value); }
 
-    const onPathFilterChange = (setFunc: Function) => (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setFunc(event.target.value)
+    const filteredListItems = useMemo(() => {
+        let listAfterFilters = changeList?.filter((change: DataItem) => change?.key.toLowerCase().includes(debouncedSearchTerm.toLowerCase()))
+        if (typeFilter)
+            listAfterFilters = listAfterFilters?.filter((change: DataItem) => change?.value?.path.some((path: Path) => path.changelog.type === typeFilter))
+        return listAfterFilters
+    }, [changeList, debouncedSearchTerm, typeFilter])
 
-    const filteredChanges = useMemo(() => {
-        let relevantList = changeList
-        if (type)
-            relevantList = changeList?.filter((change: DataItem) => change?.value?.path.some((path: Path) => path.changelog.type === type))
-
-        return relevantList?.filter((change: DataItem) => change?.key.toLowerCase().includes(path.toLowerCase()))
-    }, [changeList, path, type])
+    useEffect(() => {
+        const accordions = changeList.map(change => {
+            return { isCollapsed: true, id: JSON.stringify(change) }
+        })
+        setAccordions(accordions)
+    }, [changeList, setAccordions])
 
     return (
         <div className='pathListContainer'>
@@ -31,15 +42,15 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                 </div>
                 <div className="filters">
                     <FormControl>
-                        <TextField id="outlined-basic" label="Path" variant="outlined" size="small" value={path} onChange={onPathFilterChange(setPath)} />
+                        <TextField id="outlined-basic" label="Path" variant="outlined" size="small" value={pathFilter} onChange={onPathChange} />
                     </FormControl>
                     <div className='seperatorLine'></div>
                     <FormControl size='small' sx={{ minWidth: 150 }} >
                         <InputLabel>Change Type</InputLabel>
                         <Select
                             label="Change Type"
-                            value={type}
-                            onChange={onPathFilterChange(setType)}
+                            value={typeFilter}
+                            onChange={onTypeChange}
                             sx={{
                                 margin: "0px !important",
                                 width: "250px"
@@ -53,11 +64,13 @@ export const PathList: React.FC<Props> = ({ changeList }) => {
                     </FormControl>
                 </div>
                 <div className='changeLogList'>
-                    {filteredChanges?.map((change: DataItem, index: number) => <div key={"changeLogItem" + index} className='changeLogItem'>
-                        <PathListItem changeLogItem={change} showChangeType={type} /></div>)
-                    }
+                    {filteredListItems?.map((change: DataItem, index: number) =>
+                        <PathListItem key={index} changeLogItem={change} showChangeType={typeFilter} />
+                    )}
                 </div>
             </div>
         </div>
     )
 }
+
+export default React.memo(PathList)

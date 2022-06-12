@@ -34,7 +34,7 @@ export const StatusData: React.FC<Props> = (props: Props) => {
                         <span className='itemTitle'>
                             {propsToPresentationDictionary[key].name}
                         </span>
-                        <div className='itemData'>
+                        <div className='itemData' title={`${val}`}>
                             {propsToPresentationDictionary[key]?.component ? propsToPresentationDictionary[key].component(val) : val}
                         </div>
                     </div>

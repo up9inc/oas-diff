@@ -17,3 +17,9 @@
 @mixin applyColorOn($color)
     & .hljs-string,&
         color: $color
+
+@mixin limitLineNumbers($lineNumbers : 1)
+    display: -webkit-box
+    -webkit-line-clamp: $lineNumbers
+    -webkit-box-orient: vertical
+    overflow: hidden

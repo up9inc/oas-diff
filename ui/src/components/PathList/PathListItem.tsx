@@ -1,81 +1,53 @@
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import { useContext, useMemo, useEffect } from "react";
-import { CollapsedContext } from "../../CollapsedContext";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
-import { infoClass, ChangeTypeEnum } from "../../consts";
-import { SyntaxHighlighter } from "../SyntaxHighlighter";
+import { ChangeTypeEnum } from "../../consts";
+import { PathDisplay } from "./PathDisplay";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { mainAccordionsList, subAccordionsList } from "../../recoil/collapse";
 
 export interface PathListItemProps {
     changeLogItem: DataItem
     showChangeType?: string
 }
 
-export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
+const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
     const changeVal = changeLogItem.value
-    const { accordions, setAccordions } = useContext(CollapsedContext);
+    const accordions = useRecoilValue(mainAccordionsList);
+    const setSubAccordions = useSetRecoilState(subAccordionsList);
+    const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const isGloballyExpanded = !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
+        setIsExpanded(isGloballyExpanded)
+    }, [accordions, changeLogItem])
+
+    const changes = useMemo(() => {
+        return changeVal?.path
+    }, [changeVal?.path])
+
+    useEffect(() => {
+        const subAccordions = changeVal?.path.map((path: Path) => {
+            return { isCollapsed: true, id: JSON.stringify(path) }
+        })
+        setSubAccordions(subAccordions)
+    }, [changeVal?.path, setSubAccordions])
+
     const filteredChanges = useMemo(() => {
-        return showChangeType ? changeVal?.path.filter((path: Path) => path.changelog.type === showChangeType) : changeVal?.path
-    }, [changeVal?.path, showChangeType])
+        return changes.filter((path) => path.changelog.type.indexOf(showChangeType) >= 0)
+    }, [changes, showChangeType])
 
-    useEffect(() => {
-        const changes = showChangeType ? changeVal?.path.filter((path: Path) => path.changelog.type === showChangeType) : changeVal?.path
-        setAccordions((prev) => {
-            return [...prev, changes.map((path: Path) => { return { isCollpased: true, id: JSON.stringify(path) } })].flat()
-        })
-    }, [changeVal?.path, setAccordions, showChangeType])
-
-    const onClick = (id: string) => {
-        setAccordions((prev) => {
-            const newArr = [...prev]
-            const accordion = newArr.find(x => x.id === id)
-            if (accordion)
-                accordion.isCollpased = !accordion?.isCollpased
-            return newArr
-        })
-    }
-
-    useEffect(() => {
-        setAccordions(prev => [...prev, { isCollpased: true, id: JSON.stringify(changeLogItem) }])
-    }, [changeLogItem, setAccordions])
-
-    const isExpand = (path: Path) => {
-        const acc = accordions?.find(x => x.id === JSON.stringify(path))
-        return acc ? !acc.isCollpased : false
-    }
-
-    const getToTypeColor = (type: string) => {
-        switch (type) {
-            case ChangeTypeEnum.Created:
-                return ChangeTypeEnum.Created
-            case ChangeTypeEnum.Updated:
-                return ChangeTypeEnum.Created
-            case ChangeTypeEnum.Deleted:
-                return ChangeTypeEnum.Deleted
-            default:
-                return infoClass
-        }
-    }
-
-    const getFromTypeColor = (type: string) => {
-        switch (type) {
-            case ChangeTypeEnum.Created:
-                return ChangeTypeEnum.Created
-            case ChangeTypeEnum.Updated:
-                return ChangeTypeEnum.Deleted
-            case ChangeTypeEnum.Deleted:
-                return ChangeTypeEnum.Deleted
-            default:
-                return infoClass
-        }
-    }
+    const onAccordionClick = useCallback(() => {
+        setIsExpanded(!isExpanded)
+    }, [isExpanded])
 
     return (
-        <Accordion expanded={!accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollpased}>
+        <Accordion expanded={isExpanded}>
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content" onClick={() => onClick(JSON.stringify(changeLogItem))}>
+                aria-controls="panel2a-content" onClick={onAccordionClick}>
                 <div className='accordionTitle'>
                     <div className='path'>
                         <span className='pathPrefix'>{changeLogItem.value.key}</span>
@@ -90,48 +62,23 @@ export const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showC
                 </div>
             </AccordionSummary>
             <AccordionDetails>
-                <div className={`${filteredChanges && filteredChanges[0]?.changelog?.type} changeCategory`}>{Object.keys(ChangeTypeEnum).find(
-                    key => ChangeTypeEnum[key] === filteredChanges[0]?.changelog?.type?.toLocaleLowerCase()
-                )}</div>
-                {filteredChanges?.map((path: Path) => {
-                    return (<Accordion key={JSON.stringify(path)} expanded={(() => isExpand(path))()}>
-                        <AccordionSummary
-                            onClick={() => onClick(JSON.stringify(path))}
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel2a-content">
-                            <div>
-                                <span className={`operation ${path.operation}`}>{path.operation}</span>
-                                <span className='pathName'>{path.changelog?.path?.join(" ")}</span>
+                {isExpanded && <>
+                    {Object.keys(ChangeTypeEnum).map((changeType) => {
+                        const changeOfType = filteredChanges.filter(x => x.changelog.type === ChangeTypeEnum[changeType])
+                        return changeOfType.length > 0 && <div key={ChangeTypeEnum[changeType]}>
+                            <div className={`${ChangeTypeEnum[changeType]} changeCategory`} >{
+                                Object.keys(ChangeTypeEnum).find(key => changeType === key)}
                             </div>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <span>Path:</span>
-                            {path.changelog?.path?.slice(1).map((path: string, index: number) =>
-                                <div key={`${path + index}`} style={{ paddingLeft: `${(index + 1 * 0.4)}em` }}>{path}</div>)
-                            }
-                            <div style={{ marginTop: "10px" }} className="diffContainer">
-
-                                {path?.changelog?.from && <div style={{ flex: 1, width: "100%" }}>
-                                    <div>From:</div>
-                                    <SyntaxHighlighter
-                                        code={JSON.stringify(path.changelog.from)}
-                                        language="json"
-                                        className={`${getFromTypeColor(path.changelog.type)}`}
-                                    />
-                                </div>}
-                                {path?.changelog?.to && <div style={{ flex: 1, width: "100%" }}>
-                                    <div>To:</div>
-                                    <SyntaxHighlighter
-                                        code={JSON.stringify(path.changelog.to)}
-                                        language="json"
-                                        className={`${getToTypeColor(path.changelog.type)}`}
-                                    />
-                                </div>}
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>)
-                })}
-            </AccordionDetails >
+                            {changeOfType?.map((path: Path, index) => {
+                                return <PathDisplay path={path} key={index} />
+                            })}
+                        </div>
+                    })}
+                </>
+                }
+            </AccordionDetails>
         </Accordion >
     )
 }
+
+export default React.memo(PathListItem)

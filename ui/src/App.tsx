@@ -1,8 +1,10 @@
 import './App.sass';
 import { StatusData } from './components/StatusData/StatusData';
+import { ChangeLog } from './components/ChangeLog/ChangeLog';
 import PathList from './components/PathList/PathList';
 import { dataService } from './DataService';
 import { Header } from './components/Header/Header';
+import { RecoilRoot } from 'recoil';
 
 const status = dataService.getStatus()
 const changeLog = dataService.getData()
@@ -13,7 +15,10 @@ const App = () => {
     <div className="App">
       <Header dateGenerated={status?.startTime} />
       <StatusData baseFile={status?.baseFile} secondFile={status?.secondFile} executionTime={status?.executionTime} totalPathChanges={totalChanges} flags={Object.keys(status?.executionFlags ?? {}).length} />
-      <PathList changeList={changeLog} />
+      <RecoilRoot>
+        <ChangeLog />
+        <PathList changeList={changeLog} />
+      </RecoilRoot>
     </div >
   );
 }

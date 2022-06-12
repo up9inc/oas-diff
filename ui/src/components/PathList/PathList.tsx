@@ -1,10 +1,12 @@
 import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import './PathList.sass';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import PathListItem from './PathListItem';
 import { DataItem, Path } from '../../interfaces';
 import { ChangeTypeEnum } from '../../consts';
 import useDebounce from '../../hooks/useDebounce';
+import { useSetRecoilState } from 'recoil';
+import { mainAccordionsList } from '../../recoil/collapse';
 
 export interface Props {
     changeList: DataItem[]
@@ -14,6 +16,7 @@ const PathList: React.FC<Props> = ({ changeList }) => {
     const [typeFilter, setTypeFilter] = useState('')
     const [pathFilter, setPathFilter] = useState('')
     const debouncedSearchTerm = useDebounce(pathFilter, 200);
+    const setAccordions = useSetRecoilState(mainAccordionsList);
     const onTypeChange = (event) => { setTypeFilter(event.target.value); }
     const onPathChange = (event) => { setPathFilter(event.target.value); }
 
@@ -23,6 +26,13 @@ const PathList: React.FC<Props> = ({ changeList }) => {
             listAfterFilters = listAfterFilters?.filter((change: DataItem) => change?.value?.path.some((path: Path) => path.changelog.type === typeFilter))
         return listAfterFilters
     }, [changeList, debouncedSearchTerm, typeFilter])
+
+    useEffect(() => {
+        const accordions = changeList.map(change => {
+            return { isCollapsed: true, id: JSON.stringify(change) }
+        })
+        setAccordions(accordions)
+    }, [changeList, setAccordions])
 
     return (
         <div className='pathListContainer'>

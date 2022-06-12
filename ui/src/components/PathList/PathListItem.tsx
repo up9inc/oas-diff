@@ -1,11 +1,12 @@
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import { useMemo, useState } from "react";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import './PathListItem.sass';
 import { DataItem, Path } from "../../interfaces";
-import { PathDisplay } from "./PathDisplay";
-import React from "react";
 import { ChangeTypeEnum } from "../../consts";
+import { PathDisplay } from "./PathDisplay";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { mainAccordionsList, subAccordionsList } from "../../recoil/collapse";
 
 export interface PathListItemProps {
     changeLogItem: DataItem
@@ -14,18 +15,33 @@ export interface PathListItemProps {
 
 const PathListItem: React.FC<PathListItemProps> = ({ changeLogItem, showChangeType = "" }) => {
     const changeVal = changeLogItem.value
+    const accordions = useRecoilValue(mainAccordionsList);
+    const setSubAccordions = useSetRecoilState(subAccordionsList);
     const [isExpanded, setIsExpanded] = useState(false)
+
+    useEffect(() => {
+        const isGloballyExpanded = !accordions.find(x => x.id === JSON.stringify(changeLogItem))?.isCollapsed
+        setIsExpanded(isGloballyExpanded)
+    }, [accordions, changeLogItem])
+
     const changes = useMemo(() => {
         return changeVal?.path
     }, [changeVal?.path])
+
+    useEffect(() => {
+        const subAccordions = changeVal?.path.map((path: Path) => {
+            return { isCollapsed: true, id: JSON.stringify(path) }
+        })
+        setSubAccordions(subAccordions)
+    }, [changeVal?.path, setSubAccordions])
 
     const filteredChanges = useMemo(() => {
         return changes.filter((path) => path.changelog.type.indexOf(showChangeType) >= 0)
     }, [changes, showChangeType])
 
-    const onAccordionClick = () => {
+    const onAccordionClick = useCallback(() => {
         setIsExpanded(!isExpanded)
-    }
+    }, [isExpanded])
 
     return (
         <Accordion expanded={isExpanded}>

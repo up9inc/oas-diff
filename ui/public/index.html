@@ -4,12 +4,17 @@
 <head>
   <base href="/">
   <meta charset="utf-8" />
-  <link rel="icon" href="https://static.up9.com/icons/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Oas diff" />
   <link rel="apple-touch-icon" href="https://static.up9.com/icons/favicon.svg" />
-  <link href='https://fonts.googleapis.com/css?family=Source Sans Pro' rel='stylesheet'>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link href='https://fonts.googleapis.com/css?family=Source Sans Pro' rel="preload" as="style">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source Sans Pro&display=swap" media="print"
+    onload="this.media='all'" />
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source Sans Pro&display=swap" />
+  </noscript>
   <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -23,7 +28,8 @@
 </head>
 <script>
   try {
-    window["reportData"] = {"data" : {{.PathChangelogList }}, "status": {{.Status}}}
+    window["reportData"] = { "data": {{.PathChangelogList }
+  }, "status": { {.Status } }}
   } catch (error) {
     console.log(error)
   }
@@ -43,6 +49,7 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+  <link rel="icon" href="https://static.up9.com/icons/favicon.svg" />
 </body>
 
 </html>
